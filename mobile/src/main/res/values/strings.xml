@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">SmartMeterApp</string>
-    <string name="action_settings">Settings</string>
-    <string name="edit_message">Enter a Message</string>
-    <string name="title_activity_live">Live</string>
-    <string name="title_activity_statistic">statistic</string>
-    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="home_view">Home</string>
+    <string name="live_view">Live</string>
+    <string name="statistic_view">Statistik</string>
+    <string name="action_settings">Einstellungen</string>
+    <string name="help">Hilfe</string>
 </resources>
