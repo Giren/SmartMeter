@@ -12,16 +12,20 @@ public class Limiter {
 	}
 	
 	public void setValue(float value) {
+		Limit.ILimitEventHandler eventHandler;
+
 		for(Limit l : limits) {
-			if(value >= l.getMin() && value <= l.getMax()) {
-				if(l.limitReached == false) {
-					l.getEventHandler().onLimitReached(l, value);
-					l.limitReached = true;
-				}
-			} else if(l.limitReached) {
-				if(value < l.getMin() || value > l.getMax() ) {
-					l.getEventHandler().onLimitLeave(l, value);
-					l.limitReached = false;
+			if((eventHandler = l.getEventHandler()) != null) {
+				if(value >= l.getMin() && value <= l.getMax()) {
+					if(l.limitReached == false) {
+						eventHandler.onLimitReached(l, value);
+						l.limitReached = true;
+					}
+				} else if(l.limitReached) {
+					if(value < l.getMin() || value > l.getMax() ) {
+						eventHandler.onLimitLeave(l, value);
+						l.limitReached = false;
+					}
 				}
 			}
 		}

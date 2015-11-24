@@ -16,7 +16,8 @@ public class LiveFragment extends Fragment {
 
     private MeterView meterView;
     private Limiter limiter;
-    private Limit limit;
+    private Limit limitRed;
+    private Limit limitYellow;
     private SeekBar seekBar;
 
     @Nullable
@@ -29,24 +30,17 @@ public class LiveFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        limit = new Limit(2000, 2500, Color.RED);
-        limit.setEventHandler(new Limit.ILimitEventHandler() {
-            @Override
-            public void onLimitReached(Limit limit, float value) {
-
-            }
-
-            @Override
-            public void onLimitLeave(Limit limit, float value) {
-
-            }
-        });
+        limitRed = new Limit(2000, 2500, Color.RED);
+        limitYellow = new Limit(1500, 2000, Color.YELLOW);
 
         limiter = new Limiter();
-        limiter.addLimit(limit);
+        limiter.addLimit(limitYellow);
+        limiter.addLimit(limitRed);
 
         meterView = (MeterView)view.findViewById(R.id.meterview);
         meterView.setMax(2500);
+        meterView.setOffsetAngle(45);
+        meterView.setAverage(750);
         meterView.setLimiter(limiter);
 
         seekBar = (SeekBar)view.findViewById(R.id.seekBar);

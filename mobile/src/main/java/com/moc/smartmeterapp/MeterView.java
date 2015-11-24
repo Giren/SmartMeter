@@ -14,7 +14,9 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.BounceInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.view.animation.OvershootInterpolator;
 
 public class MeterView extends View {
 	private final int ANGLE_ORIENTATION = 90;
@@ -37,6 +39,7 @@ public class MeterView extends View {
 	private Rect textBounds;
 	private int tempCountSticks;
 	private int tempAvg;
+	private float tempValue;
 	private double tempAngle;
 	private float mTextHeight;
 	private RectF rectF;
@@ -218,8 +221,8 @@ public class MeterView extends View {
 		}
 
 		if( value >= min && value <= max && max != 0) {
-			value = value * angle/max;
-			tempPoint = calcLine(center_x, center_y, radius-PIN_PADDING, value, offsetAngle);
+			tempValue = value * angle/max;
+			tempPoint = calcLine(center_x, center_y, radius-PIN_PADDING, tempValue, offsetAngle);
 			canvas.drawLine(center_x, center_y, tempPoint.x, tempPoint.y, linePaint);
 		}
 
