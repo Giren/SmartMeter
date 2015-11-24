@@ -44,13 +44,28 @@ public class MainActivity extends AppCompatActivity{
                 mDrawerLayout.closeDrawers();
 
                 if (menuItem.getItemId() == R.id.nav_item_live) {
-                    FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.containerView,new LiveFragment()).commit();
+                    FragmentTransaction liveFragmentTransaction = mFragmentManager.beginTransaction();
+                    liveFragmentTransaction.replace(R.id.containerView,new LiveFragment()).commit();
                 }
 
                 if (menuItem.getItemId() == R.id.nav_item_home) {
-                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
-                    xfragmentTransaction.replace(R.id.containerView,new TabFragment()).commit();
+                    FragmentTransaction homeFragmentTransaction = mFragmentManager.beginTransaction();
+                    homeFragmentTransaction.replace(R.id.containerView,new TabFragment()).commit();
+                }
+
+                if (menuItem.getItemId() == R.id.nav_item_statistic) {
+                    FragmentTransaction statisticFragmentTransaction = mFragmentManager.beginTransaction();
+                    statisticFragmentTransaction.replace(R.id.containerView,new StatisticFragment()).commit();
+                }
+
+                if (menuItem.getItemId() == R.id.nav_item_setting) {
+                    FragmentTransaction settingFragmentTransaction = mFragmentManager.beginTransaction();
+                    settingFragmentTransaction.replace(R.id.containerView,new SettingFragment()).commit();
+                }
+
+                if (menuItem.getItemId() == R.id.nav_item_help) {
+                    FragmentTransaction helpFragmentTransaction = mFragmentManager.beginTransaction();
+                    helpFragmentTransaction.replace(R.id.containerView,new HelpFragment()).commit();
                 }
 
                 return false;

@@ -9,9 +9,9 @@
         android:textSize="30sp"
         android:layout_marginTop="55dp"
         android:gravity="center"
-        android:id="@+id/live_textView"
+        android:id="@+id/setting_textView"
         android:layout_centerHorizontal="true"
         android:textColor="@android:color/holo_red_light"
-        android:text="Live\nFragment"/>
+        android:text="Einstellungen\nFragment"/>
 
 </RelativeLayout>

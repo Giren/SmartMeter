@@ -15,8 +15,10 @@
 
     <group android:id="@+id/group_settings_id">
         <item android:title="@string/action_settings"
+            android:id="@+id/nav_item_setting"
             android:icon="@drawable/settings"/>
         <item android:title="@string/help"
+            android:id="@+id/nav_item_help"
             android:icon="@drawable/help"/>
     </group>
 
