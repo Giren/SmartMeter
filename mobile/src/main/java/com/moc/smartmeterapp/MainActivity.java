@@ -10,6 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity{
+
+    private LiveFragment liveFragment;
+
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
     FragmentManager mFragmentManager;
@@ -44,8 +47,11 @@ public class MainActivity extends AppCompatActivity{
                 mDrawerLayout.closeDrawers();
 
                 if (menuItem.getItemId() == R.id.nav_item_live) {
+                    if(liveFragment == null){
+                        liveFragment = new LiveFragment();
+                    }
                     FragmentTransaction liveFragmentTransaction = mFragmentManager.beginTransaction();
-                    liveFragmentTransaction.replace(R.id.containerView,new LiveFragment()).commit();
+                    liveFragmentTransaction.replace(R.id.containerView,liveFragment).commit();
                 }
 
                 if (menuItem.getItemId() == R.id.nav_item_home) {
