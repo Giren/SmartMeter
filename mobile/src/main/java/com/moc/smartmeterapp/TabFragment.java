@@ -17,6 +17,10 @@ import android.view.ViewGroup;
 
 public class TabFragment extends Fragment {
 
+    private HomeWeekFragment homeWeekFragment;
+    private HomeMonthFragment homeMonthFragment;
+    private HomeYearFragment homeYearFragment;
+
     private static final String[] homeTabs = { "Woche", "Monat", "Jahr"};
     private static final int WEEK = 0;
     private static final int MONTH = 1;
@@ -69,9 +73,21 @@ public class TabFragment extends Fragment {
         public Fragment getItem(int position)
         {
             switch (position){
-                case WEEK : return new HomeWeekFragment();
-                case MONTH : return new HomeMonthFragment();
-                case YEAR : return new HomeYearFragment();
+                case WEEK :
+                    if(homeWeekFragment == null){
+                        homeWeekFragment = new HomeWeekFragment();
+                    }
+                    return homeWeekFragment;
+                case MONTH :
+                    if(homeMonthFragment == null){
+                        homeMonthFragment = new HomeMonthFragment();
+                    }
+                    return homeMonthFragment;
+                case YEAR :
+                    if(homeYearFragment == null){
+                        homeYearFragment = new HomeYearFragment();
+                    }
+                    return homeYearFragment;
             }
             return null;
         }
