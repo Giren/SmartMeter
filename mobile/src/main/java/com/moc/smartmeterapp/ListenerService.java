@@ -161,9 +161,8 @@ public class ListenerService extends WearableListenerService implements
         String myTime = sdf.format( new Date());
 
         // Datenvorbereitung
-        dataMessage += "\n";
-        dataMessage += myTime + "\n";
-        dataMessage += String.valueOf( 0 + ( Math.random() * 100));
+        // dataMessage += "\n";
+        dataMessage = String.valueOf( 0 + ( (int)( Math.random() * 2500)));
 
         // TODO Datenbeschaffung innerhalb des Threads und anschließend senden
 

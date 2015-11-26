@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
@@ -30,10 +31,17 @@ import java.util.List;
  */
 public class MainActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener,
+        MessageApi.MessageListener {
 
     private static final String WEARABLE_DATA_PATH = "/SmartMeterToWearable";
     private static final String HANDHELD_DATA_PATH = "/SmartMeterToHandheld";
+
+    LiveFragment liveFragment;
+    StatisticFragment limitWeek;
+    StatisticFragment limitMonth;
+    StatisticFragment limitYear;
+    MessageApi.MessageListener messageListener;
 
     ViewPager pager;
 //    CustomFragment actualFragment;
@@ -52,9 +60,9 @@ public class MainActivity extends FragmentActivity implements
         pager.setAdapter( new MyPagerAdapter( getSupportFragmentManager()));
 
         // Register the local broadcast receiver
-        IntentFilter messageFilter = new IntentFilter( Intent.ACTION_SEND);
-        MessageReceiver messageReceiver = new MessageReceiver();
-        LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, messageFilter);
+        // IntentFilter messageFilter = new IntentFilter( Intent.ACTION_SEND);
+        // MessageReceiver messageReceiver = new MessageReceiver();
+        // LocalBroadcastManager.getInstance(this).registerReceiver(messageReceiver, messageFilter);
 
         // Build a new GoogleApiClient for the Wearable API
         googleClient = new GoogleApiClient.Builder( this)
@@ -62,6 +70,7 @@ public class MainActivity extends FragmentActivity implements
                 .addConnectionCallbacks( this)
                 .addOnConnectionFailedListener( this)
                 .build();
+
 
         // TODO send "hello" to handheld
     }
@@ -71,10 +80,10 @@ public class MainActivity extends FragmentActivity implements
      */
     @Override
     protected void onStop() {
-        // TODO send "goodbye" to handheld and disconnect googleClient
-        sendDataToHandheld("goodbye");
-
+        // sendDataToHandheld("goodbye");
+        // remove MessageListener and disconnect googleClient
         if( null != googleClient && googleClient.isConnected()) {
+            Wearable.MessageApi.removeListener( googleClient, this);
             googleClient.disconnect();
         }
         super.onStop();
@@ -84,7 +93,7 @@ public class MainActivity extends FragmentActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        System.out.println("onDestry called");
+        System.out.println("onDestroy called");
     }
 
     /**
@@ -96,91 +105,91 @@ public class MainActivity extends FragmentActivity implements
         googleClient.connect();
     }
 
-
-
-    /**
-     * Send a message when the Data Layer connection is successful
-     * @param connectionHint
-     */
     @Override
     public void onConnected( Bundle connectionHint) {
-
-        //String message = "Hello Wearable\n Via the data layer";
-        // Requeres a new thread to avoid blocking the UI
-        //new SendToDataLayerThread( WEARABLE_DATA_PATH, message).start();
+        // register MessageListener
+        Wearable.MessageApi.addListener(googleClient, this);
     }
 
     // Placeholders for required connection callbacks
     @Override
     public void onConnectionSuspended( int cause) { }
-//
+
     @Override
     public void onConnectionFailed( ConnectionResult connectionResult) { }
-
 
     public void sendDataToHandheld(String toHandheld) {
         new SendToDataLayerThread( HANDHELD_DATA_PATH, toHandheld).start();
     }
 
+    @Override
+    public void onMessageReceived(MessageEvent messageEvent) {
+        if( messageEvent.getPath().equals( WEARABLE_DATA_PATH)) {
+            final String message = new String( messageEvent.getData());
+            Log.v("myTag", "Message path received on watch is: " + messageEvent.getPath());
+            Log.v("myTag", "Message received on watch is: " + message);
 
-    public class MessageReceiver extends BroadcastReceiver {
+            // verarbeite die empfangene message
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    handleReceivedMessage(message);
+                }
+            });
 
-        @Override
-        public void onReceive( Context context, final Intent intent) {
+            // Broadcast message to wearable activity for display
+//            Intent messageIntent = new Intent();
+//            messageIntent.setAction( Intent.ACTION_SEND);
+//            messageIntent.putExtra( "message", message);
+//            LocalBroadcastManager.getInstance(this).sendBroadcast( messageIntent);
+        } // if end
+    }
 
-//            final Intent localIntent = intent;
-//            runOnUiThread( new Runnable() {
-//                @Override
-//                public void run() {
-//
-//
-//                }
-//            });
 
-            String message = intent.getStringExtra( "message");
-            // Display message in UI
-            System.out.println("onReceive MainActivity" + message);
-            // System.out.println( actualFragment.getActivity().getSupportFragmentManager().);
-            List<Fragment> allFragments = getSupportFragmentManager().getFragments();
+    public void handleReceivedMessage(String message) {
+        // String message = intent.getStringExtra( "message");
+        // Display message in UI
+        System.out.println("onReceive MainActivity" + message);
+        // System.out.println( actualFragment.getActivity().getSupportFragmentManager().);
+        List<Fragment> allFragments = getSupportFragmentManager().getFragments();
 
-            if (allFragments != null) {
-                for (Fragment fragment : allFragments) {
-                    CustomFragment myFragment = (CustomFragment) fragment;
-                    if (myFragment != null && myFragment.getUserVisibleHint()) {
-                        // Ausführung wenn Fragment dem User sichtbar ist
-                        String[] msgSplit = message.split(";");
-                        // Wenn empfangene Nachricht nicht dem angezeigten Fragment entspricht,
-                        // das Fragment nicht mit falschen Daten versorgen
-                        // Daten können noch von vor dem Fragment/View-Wechsel sein
-                        if( msgSplit[0].equals( myFragment.getFragmentName())) {
-                            System.out.println( "visibleFragmentName: " + myFragment.getFragmentName());
-                            // wenn der Name des Fragments (Empfang) gleich dem angezeigten Fragment ist update die Daten
-                            myFragment.UpdateFragmentContent(message);
-                            // Fordere nach Empfang direkt neue Daten an für die sichtbare View
-                            final CustomFragment finalFragment = myFragment;
-                            Runnable getNewData = new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        Thread.sleep( 2000);
-                                    } catch (Exception e) {
-                                        System.out.println( e.getMessage());
-                                    }
-                                    new SendToDataLayerThread( HANDHELD_DATA_PATH, finalFragment.getFragmentName()).start();
+        if (allFragments != null) {
+            for (Fragment fragment : allFragments) {
+                CustomFragment myFragment = (CustomFragment) fragment;
+                if (myFragment != null && myFragment.getUserVisibleHint()) {
+                    // Ausführung wenn Fragment dem User sichtbar ist
+                    String[] msgSplit = message.split(";");
+                    // Wenn empfangene Nachricht nicht dem angezeigten Fragment entspricht,
+                    // das Fragment nicht mit falschen Daten versorgen
+                    // Daten können noch von vor dem Fragment/View-Wechsel sein
+                    if( msgSplit[0].equals( myFragment.getFragmentName())) {
+                        System.out.println( "visibleFragmentName: " + myFragment.getFragmentName());
+                        // wenn der Name des Fragments (Empfang) gleich dem angezeigten Fragment ist update die Daten
+                        myFragment.UpdateFragmentContent(message);
+                        // Fordere nach Empfang direkt neue Daten an für die sichtbare View
+                        final CustomFragment finalFragment = myFragment;
+
+                        Runnable getNewData = new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Thread.sleep( 2000);
+                                } catch (Exception e) {
+                                    System.out.println( e.getMessage());
                                 }
-                            };
-                            new Thread(getNewData).start();
-                        }
-                        System.out.println("visible");
-
-
+                                new SendToDataLayerThread( HANDHELD_DATA_PATH, finalFragment.getFragmentName()).start();
+                            }
+                        };
+                        new Thread(getNewData).start();
                     }
+                    // System.out.println("visible");
+
+
                 }
             }
+        }
+    }
 
-
-        } // onReceive end
-    } // class MessageReceiver end
 
     private class MyPagerAdapter extends FragmentPagerAdapter {
 
@@ -193,23 +202,38 @@ public class MainActivity extends FragmentActivity implements
             switch(pos) {
                 case 0: {
                     System.out.println( "liveData");
-                    return LiveFragment.newInstance("liveData");
+                    if( liveFragment != null)
+                        return liveFragment;
+                    else
+                        return LiveFragment.newInstance("liveData");
                 }
                 case 1: {
                     System.out.println( "limitWeek");
-                    return StatisticFragment.newInstance("limitWeek");
+                    if( limitWeek != null)
+                        return limitWeek;
+                    else
+                        return StatisticFragment.newInstance("limitWeek");
                 }
                 case 2: {
                     System.out.println( "limitMonth");
-                    return StatisticFragment.newInstance("limitMonth");
+                    if( limitMonth != null)
+                        return limitMonth;
+                    else
+                        return StatisticFragment.newInstance("limitMonth");
                 }
                 case 3: {
                     System.out.println( "limitYear");
-                    return StatisticFragment.newInstance("limitYear");
+                    if( limitYear != null)
+                        return  limitYear;
+                    else
+                        return StatisticFragment.newInstance("limitYear");
                 }
                 default: {
                     System.out.println( "Default");
-                    return LiveFragment.newInstance("liveData");
+                    if( liveFragment != null)
+                        return liveFragment;
+                    else
+                        return LiveFragment.newInstance("liveData");
                 }
             }
         }

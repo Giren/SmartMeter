@@ -5,6 +5,15 @@
     android:layout_height="match_parent"
     android:background="@android:color/holo_orange_dark" >
 
+    <com.moc.smartmeterapp.MeterView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/meterview"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
+
     <TextView
         android:id="@+id/tvLiveFrag"
         android:layout_width="wrap_content"
@@ -12,7 +21,8 @@
         android:textSize="26dp"
         android:text="TextView"
         android:layout_marginLeft="0dp"
-        android:layout_centerVertical="true"
+        android:layout_marginBottom="25dp"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

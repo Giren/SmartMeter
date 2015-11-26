@@ -1,6 +1,7 @@
 package com.moc.smartmeterapp;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,17 +17,35 @@ public class LiveFragment extends CustomFragment {
     TextView tv;
     boolean userVisible;
 
+    private MeterView meterView;
+    private Limiter limiter;
+    private Limit limitRed;
+    private Limit limitYellow;
+
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.live_frag, container, false);
+        View view = inflater.inflate(R.layout.live_frag, container, false);
 
-        tv = (TextView) v.findViewById(R.id.tvLiveFrag);
+        tv = (TextView) view.findViewById(R.id.tvLiveFrag);
         tv.setText(getArguments().getString("msg"));
-
 
         System.out.println("live onCreate");
 
-        return v;
+        limitRed = new Limit(2000, 2500, Color.RED);
+        limitYellow = new Limit(1500, 2000, Color.YELLOW);
+
+        limiter = new Limiter();
+        limiter.addLimit(limitYellow);
+        limiter.addLimit(limitRed);
+
+        meterView = (MeterView)view.findViewById(R.id.meterview);
+        meterView.setMax(2500);
+        meterView.setOffsetAngle(45);
+        meterView.setAverage(750);
+        meterView.setLimiter(limiter);
+        meterView.enableValueText( false);
+
+        return view;
     }
 
     @Override
@@ -42,6 +61,8 @@ public class LiveFragment extends CustomFragment {
     public void UpdateFragmentContent( String update) {
         System.out.println("Live UpdateFragmentContent" + update);
         tv.setText(update);
+        String[] splitted = update.split(";");
+        meterView.setValue( Float.valueOf( splitted[1]));
     }
 
     @Override
