@@ -322,6 +322,7 @@ public class MeterView extends View {
 			text = String.valueOf(value);
 	}
 
+
 	//*******************************CLASS*********************************************
 
 	private class PinAnimator implements Runnable {
