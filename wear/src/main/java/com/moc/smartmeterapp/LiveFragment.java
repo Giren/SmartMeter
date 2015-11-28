@@ -3,6 +3,7 @@ package com.moc.smartmeterapp;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,34 +15,60 @@ import android.widget.TextView;
 public class LiveFragment extends CustomFragment {
 
     String fragmentName;
-    TextView tv;
     boolean userVisible;
 
-    private MeterView meterView;
+    private MeterView_Wear meterView;
     private Limiter limiter;
     private Limit limitRed;
     private Limit limitYellow;
+
+    private Vibrator vibrator;
+    private long[] vibrationPattern = {0, 500, 50, 300};
+    private final int indexInPatternToRepeat = -1;
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        vibrator = (Vibrator) view.getContext().getSystemService(view.getContext().VIBRATOR_SERVICE);
+    }
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.live_frag, container, false);
 
-        tv = (TextView) view.findViewById(R.id.tvLiveFrag);
-        tv.setText(getArguments().getString("msg"));
-
-        System.out.println("live onCreate");
-
         limitRed = new Limit(2000, 2500, Color.RED);
+        limitRed.setEventHandler(new Limit.ILimitEventHandler() {
+            @Override
+            public void onLimitReached(Limit limit, float value) {
+                vibrator.vibrate(vibrationPattern, indexInPatternToRepeat);
+            }
+
+            @Override
+            public void onLimitLeave(Limit limit, float value) {
+            }
+        });
         limitYellow = new Limit(1500, 2000, Color.YELLOW);
+        limitYellow.setEventHandler(new Limit.ILimitEventHandler() {
+            @Override
+            public void onLimitReached(Limit limit, float value) {
+                vibrator.vibrate(vibrationPattern, indexInPatternToRepeat);
+            }
+
+            @Override
+            public void onLimitLeave(Limit limit, float value) {
+
+            }
+        });
 
         limiter = new Limiter();
         limiter.addLimit(limitYellow);
         limiter.addLimit(limitRed);
 
-        meterView = (MeterView)view.findViewById(R.id.meterview);
+        meterView = (MeterView_Wear)view.findViewById(R.id.meterview);
         meterView.setMax(2500);
         meterView.setOffsetAngle(45);
-        meterView.setAverage(750);
+        meterView.setTicks(45, 10);
+        meterView.setAverage(450);
         meterView.setLimiter(limiter);
         meterView.enableValueText( false);
 
@@ -60,7 +87,6 @@ public class LiveFragment extends CustomFragment {
     @Override
     public void UpdateFragmentContent( String update) {
         System.out.println("Live UpdateFragmentContent" + update);
-        tv.setText(update);
         String[] splitted = update.split(";");
         meterView.setValue( Float.valueOf( splitted[1]));
     }
@@ -100,6 +126,4 @@ public class LiveFragment extends CustomFragment {
 
         return liveFragment;
     }
-
-
 }

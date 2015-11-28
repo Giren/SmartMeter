@@ -19,11 +19,15 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".ListenerService">
+        <service android:name=".com.moc.smartmeterapp.communication.WearService">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>
         </service>
+
+        <service
+            android:name=".com.moc.smartmeterapp.communication.DataService"
+            android:exported="true"/>
 
     </application>
 
