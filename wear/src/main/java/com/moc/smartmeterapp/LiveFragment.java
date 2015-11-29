@@ -41,9 +41,10 @@ public class LiveFragment extends CustomFragment {
         meterView = (MeterView)view.findViewById(R.id.meterview);
         meterView.setMax(2500);
         meterView.setOffsetAngle(45);
-        meterView.setAverage(750);
+        //meterView.setAverage(750);
         meterView.setLimiter(limiter);
         meterView.enableValueText( false);
+        meterView.setTicks(45);
 
         return view;
     }
