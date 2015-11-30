@@ -7,16 +7,17 @@
 
     <lecho.lib.hellocharts.view.LineChartView
         android:id="@+id/chart"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1.15" >
+        android:layout_width="wrap_content"
+        android:layout_height="373dp"
+        android:paddingStart="10dp">
     </lecho.lib.hellocharts.view.LineChartView>
 
     <lecho.lib.hellocharts.view.PreviewLineChartView
         android:id="@+id/chart_preview"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_weight="0.26" >
+        android:layout_weight="0.26"
+        android:paddingStart="10dp">
     </lecho.lib.hellocharts.view.PreviewLineChartView>
 
     <LinearLayout

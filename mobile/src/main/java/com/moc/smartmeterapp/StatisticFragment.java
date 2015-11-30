@@ -17,6 +17,7 @@ import android.widget.NumberPicker;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 import lecho.lib.hellocharts.gesture.ZoomType;
 import lecho.lib.hellocharts.listener.ViewportChangeListener;
@@ -61,7 +62,7 @@ public class StatisticFragment extends Fragment{
         }
         test2 = new ArrayList<String>();
         for(int i=0; i<MAX_WHEEL_NUMBER; i++){
-            test2.add(String.valueOf(1000-i));
+            test2.add(String.valueOf(100-i));
         }
 
         liveList = new ArrayList<String>();
@@ -90,9 +91,9 @@ public class StatisticFragment extends Fragment{
         settingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for(int i=0; i<MAX_WHEEL_NUMBER; i++){
-                    addValueToChart(String.valueOf(100-i));
-                }
+                Random r = new Random();
+                int i1 = r.nextInt(3000 - 0 + 1);
+                addValueToChart(String.valueOf(i1));
             }
         });
 
@@ -100,7 +101,7 @@ public class StatisticFragment extends Fragment{
         adjustButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(dialog == null){
+                if (dialog == null) {
                     dialog = new Dialog(v.getContext());
                 }
 
@@ -220,6 +221,7 @@ public class StatisticFragment extends Fragment{
     private void updateChartView(){
         Viewport viewport = new Viewport(0, maxValueOfLineChartData, maxNumberToShow, 0);
         chart.setMaximumViewport(viewport);
+        chart.setCurrentViewport(viewport);
         previewChart.setMaximumViewport(viewport);
         previewX(false);
     }
