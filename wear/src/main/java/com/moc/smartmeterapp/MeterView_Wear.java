@@ -16,18 +16,18 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 
-public class MeterView extends View {
+public class MeterView_Wear extends View {
 	private final int ANGLE_ORIENTATION = 90;
 	private final int STICK_MARGIN = 17;
-	private final int INNER_MARGIN = 28;
-	private final int OUTTER_MARGIN = 18;
-	private final int TEXT_INNER_MARGIN = 25;
-	private final int TEXT_SIZE = 35;
-	private final int TEXT_SIZE_SMALL = 25;
-	private final int TEXT_SIZE_BIG = 80;
+	private final int INNER_MARGIN = 0;
+	private final int OUTTER_MARGIN = 0;
+	private final int TEXT_INNER_MARGIN = 40;
+	private final int TEXT_SIZE = 25;
+	private final int TEXT_SIZE_SMALL = 16;
+	private final int TEXT_SIZE_BIG = 20;
 	private final int LAST_TEXT_ANGLE = 350;
 	private final int PIN_PADDING = 50;
-	private final int LIMIT_PADDING = 45;
+	private final int LIMIT_PADDING = 0;
 	//animator
 	private PinAnimator animator;
 
@@ -71,17 +71,17 @@ public class MeterView extends View {
 	//event stuff
 	private Limiter limiter;
 
-	public MeterView(Context context) {
+	public MeterView_Wear(Context context) {
 		super(context);
 		init();
 	}
 
-	public MeterView(Context context, AttributeSet attrs) {
+	public MeterView_Wear(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init();
 	}
 
-	public MeterView(Context context, AttributeSet attrs, int defStyleAttr) {
+	public MeterView_Wear(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		init();
 	}
@@ -188,12 +188,6 @@ public class MeterView extends View {
 			tempAvg = avg * angle/max;
 			tempPoint = calcLine(center_x, center_y, radius, tempAvg, offsetAngle);
 			canvas.drawLine(center_x, center_y, tempPoint.x, tempPoint.y, avgPaint);
-
-			tempText = String.valueOf("AVG");
-			textPaint.getTextBounds(tempText, 0, tempText.length(), textBounds);
-			mTextHeight = textBounds.height();
-			tempPoint = calcLine(center_x, center_y, radius+INNER_MARGIN, tempAvg, offsetAngle);
-			canvas.drawText(tempText, tempPoint.x, tempPoint.y + (mTextHeight / 2f), avgPaint);
 		}
 
 		canvas.drawCircle(center_x, center_y, radius-INNER_MARGIN*2-STICK_MARGIN*2, backgroundPaint);
@@ -212,9 +206,7 @@ public class MeterView extends View {
 				mTextHeight = textBounds.height(); // Use height from getTextBounds()
 
 				tempPoint = calcLine(center_x, center_y, radius-INNER_MARGIN-TEXT_INNER_MARGIN-TEXT_SIZE, i, offsetAngle);
-				// Later when you draw...
-				// Text auskommentiert
-				//canvas.drawText(tempText, tempPoint.x, tempPoint.y + (mTextHeight / 2f), textPaint);
+				canvas.drawText(tempText, tempPoint.x, tempPoint.y + (mTextHeight / 2f), textPaint);
 				k++;
 			}
 		}
@@ -327,7 +319,7 @@ public class MeterView extends View {
 
 	private class PinAnimator implements Runnable {
 
-		private MeterView meterView;
+		private MeterView_Wear meterView;
 		private Handler handler;
 
 		//Fill Anim
@@ -350,7 +342,7 @@ public class MeterView extends View {
 		public static final int ANIMATIONSTATE_NONE = 0;
 		public static final int ANIMATIONSTATE_ANIMATE = 2;
 
-		public PinAnimator(MeterView meterView) {
+		public PinAnimator(MeterView_Wear meterView) {
 			this.meterView = meterView;
 			handler = new Handler();
 			delayFill = 0;

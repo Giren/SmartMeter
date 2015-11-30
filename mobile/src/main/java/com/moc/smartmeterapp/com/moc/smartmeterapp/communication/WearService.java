@@ -1,13 +1,11 @@
-package com.moc.smartmeterapp;
+package com.moc.smartmeterapp.com.moc.smartmeterapp.communication;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
@@ -19,11 +17,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Created by David on 23.11.2015.
+ * Created by philipp on 26.11.2015.
  */
-public class ListenerService extends WearableListenerService implements
+public class WearService extends WearableListenerService implements
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener,
+        IDataEventHandler{
 
     private static final String WEARABLE_DATA_PATH = "/SmartMeterToWearable";
     private static final String HANDHELD_DATA_PATH = "/SmartMeterToHandheld";
@@ -31,12 +30,11 @@ public class ListenerService extends WearableListenerService implements
     private GoogleApiClient googleClient;
 
     @Override
-    public void onCreate()
-    {
-        System.out.println("listenerservice: oncreate");
+    public void onCreate() {
+        Log.d("DEBUG", "WEAR SERVICE ON CREATE");
         super.onCreate();
-        if ( googleClient == null)
-        {
+
+        if ( googleClient == null) {
             // Build a new GoogleApiClient for the Wearable API
             googleClient = new GoogleApiClient.Builder( this)
                     .addApi(Wearable.API)
@@ -44,23 +42,43 @@ public class ListenerService extends WearableListenerService implements
                     .addOnConnectionFailedListener(this)
                     .build();
         }
-        if ( !googleClient.isConnected())
-        {
+
+        if ( !googleClient.isConnected()) {
             googleClient.connect();
-            System.out.println("listenerservice: connect googleclient");
         }
     }
 
-    // Send a message when the Data Layer connection is successful
     @Override
-    public void onConnected( Bundle connectionHint) {
-        ;
+    public void onConnected(Bundle bundle) {
+        startService(new Intent(this, DataService.class));
+        Communication com = Communication.getInstance();
+        com.setContext(this);
+        com.registerDataEventHandler(this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Communication.getInstance().unregisterDataEventHandler(this);
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Communication.getInstance().unregisterDataEventHandler(this);
+    }
+
+    @Override
+    public boolean onLiveDataReceived(int value) {
+        Log.d("DEBUG", "SEND DATA TO WEAR");
+        new SendToDataLayerThread( WEARABLE_DATA_PATH, "liveData" + ";" + String.valueOf(value)).start();
+        return true;
     }
 
     @Override
     public void onDestroy()
     {
-        System.out.println("listenerservice: onDestroy");
+        Communication.getInstance().unregisterDataEventHandler(this);
+        stopService(new Intent(this, DataService.class));
+
         if (null != googleClient)
         {
             if (googleClient.isConnected())
@@ -72,33 +90,11 @@ public class ListenerService extends WearableListenerService implements
     }
 
     @Override
-    public void onDataChanged( DataEventBuffer dataEvents)
-    {
-        System.out.println("listenerservice: onDataChanged called");
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult arg0)
-    {
-        System.out.println("listenerservice: onConnectionFailed called");
-    }
-
-
-    @Override
-    public void onConnectionSuspended(int arg0)
-    {
-        System.out.println("listenerservice: onConnectionSuspended called");
-    }
-
-    @Override
-    public void onMessageReceived( MessageEvent messageEvent) {
+     public void onMessageReceived( MessageEvent messageEvent) {
 
         if( messageEvent.getPath().equals( HANDHELD_DATA_PATH)) {
             final String message = new String( messageEvent.getData());
-            Log.v( "myTag", "Message path received on watch is: " + messageEvent.getPath());
-            Log.v( "myTag", "Message received on watch is: " + message);
 
-            // reagiere auf empfangene Message
             Runnable reactOnMessageRunnable = new Runnable() {
                 @Override
                 public void run() {
@@ -109,23 +105,13 @@ public class ListenerService extends WearableListenerService implements
 
         } else {
             super.onMessageReceived( messageEvent);
-        } // if end
-    } // onMessageReceive end
+        }
+    }
 
-    // reagiere auf empfangene message
     public void reactOnMessage( String receivedMessage) {
         switch ( receivedMessage) {
             case "liveData": {
-                System.out.println("liveData case");
-//                if( runningDataThread != null) {
-//                    runningDataThread.endThread();
-//                    runningDataThread = null;
-//                }
-//                runningDataThread = new DataForWearable( WEARABLE_DATA_PATH, "liveData");
-//                runningDataThread.start();
-                dataMessageToWearable( WEARABLE_DATA_PATH, "liveData");
-                // new DataForWearable( WEARABLE_DATA_PATH, "helloworld").start();
-                // new SendToDataLayerThread( WEARABLE_DATA_PATH, "helloworld").start();
+                //dataMessageToWearable( WEARABLE_DATA_PATH, "liveData");
                 break;
             }
             case "limitWeek": {
@@ -176,7 +162,6 @@ public class ListenerService extends WearableListenerService implements
         new SendToDataLayerThread( path, text + seperator + dataMessage).start();
     }
 
-
     public class SendToDataLayerThread extends Thread {
 
         String path;
@@ -195,11 +180,9 @@ public class ListenerService extends WearableListenerService implements
                 if( result.getStatus().isSuccess()) {
                     Log.v("myTag", "Message: {" + message + "} sent to: " + node.getDisplayName());
                 } else {
-                    // Log on error
-                    Log.v("myTag", "ERROR: failed to send Message");
-                } // if end
-            } // for end
-        } // run end
-    } // class SendToDataLayerThread end
-
-} // class ListenerService end
+                    Log.d("myTag", "ERROR: failed to send Message");
+                }
+            }
+        }
+    }
+}
