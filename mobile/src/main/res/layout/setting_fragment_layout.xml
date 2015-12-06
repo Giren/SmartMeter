@@ -1,5 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="220dp"
+            android:layout_height="50dp"
+            android:id="@+id/weekLimit"
+            android:layout_alignParentStart="true"
+            android:textSize="30sp"
+            android:text="Wochenlimit" />
+
+        <EditText
+            android:layout_width="132dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/edit_week"
+            android:layout_gravity="right"
+            android:textAlignment="center"
+            android:textSize="20dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="220dp"
+            android:layout_height="50dp"
+            android:id="@+id/monthLimit"
+            android:textSize="30sp"
+            android:text="Monatslimit"
+            android:layout_below="@+id/editText2"
+            android:layout_alignParentStart="true" />
+
+        <EditText
+            android:layout_width="132dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/eit_month"
+            android:layout_gravity="right"
+            android:textAlignment="center"
+            android:textSize="20dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="220dp"
+            android:layout_height="50dp"
+            android:id="@+id/yearLimit"
+            android:textSize="30sp"
+            android:text="Jahreslimit"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true" />
+
+        <EditText
+            android:layout_width="132dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/edit_year"
+            android:layout_gravity="right"
+            android:textAlignment="center"
+            android:textSize="20dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/notification"
+            android:textSize="30sp"
+            android:text="Notification"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true" />
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/notification_switch"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.84"
+            android:switchMinWidth="100dp"
+            android:checked="true" />
+    </LinearLayout>
+
 </LinearLayout>
