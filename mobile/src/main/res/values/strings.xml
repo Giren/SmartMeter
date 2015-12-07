@@ -5,4 +5,7 @@
     <string name="statistic_view">Statistik</string>
     <string name="action_settings">Einstellungen</string>
     <string name="help">Hilfe</string>
+
+    <string name="adjust">Anpassen</string>
+    <string name="statistic_settings">Einstellungen</string>
 </resources>
