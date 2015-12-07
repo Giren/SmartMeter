@@ -6,10 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,12 +17,9 @@ import java.util.List;
  */
 public class Communication{
 
-    private static Communication instance;
-
     private DataService dataService;
     private boolean serviceBinded;
-    private boolean isRunning;
-    private boolean contextSet;
+    private boolean isRegistered;
 
     private Context context;
     private List<IDataEventHandler> dataEventHandlers;
@@ -58,41 +53,22 @@ public class Communication{
         }
     };
 
-    public Communication() {
-        isRunning = false;
-        contextSet = false;
-        dataEventHandlers = new ArrayList<IDataEventHandler>();;
-    }
+    public Communication(Context context) {
+        this.context = context;
+        isRegistered = false;
+        dataEventHandlers = new ArrayList<IDataEventHandler>();
 
-    public boolean setContext(Context context) {
-        if(this.context != null) {
-            this.context = context;
-            return true;
-        }
-
-        return false;
-    }
-
-    public static Communication getInstance() {
-        if(instance == null) {
-            instance = new Communication();
-        }
-
-        return instance;
+        //context.startService(new Intent(context, DataService.class));
     }
 
     public void registerDataEventHandler(IDataEventHandler dataEventHandler) {
         if(dataEventHandler != null) {
-            if(!isRunning) {
-                registerReceiver();
-            }
-
-            if(!serviceBinded) {
-                bindService();
-            }
-
             dataEventHandlers.add(dataEventHandler);
             Log.d("DEBUG", "registered: " + dataEventHandler.toString());
+
+            if(!isRegistered) {
+                registerReceiver();
+            }
         }
     }
 
@@ -101,21 +77,25 @@ public class Communication{
             dataEventHandlers.remove(dataEventHandler);
             Log.d("DEBUG", "unregistered: " + dataEventHandler.toString());
         }
+
+        if(dataEventHandlers.isEmpty()) {
+            unregisterReceiver();
+        }
     }
 
     private void registerReceiver() {
-        if(context != null && broadcastReceiver != null && !isRunning) {
+        if(context != null && broadcastReceiver != null && !isRegistered) {
             context.registerReceiver(broadcastReceiver, new IntentFilter(DataService.BROADCAST_ACTION));
             Log.d("DEBUG", "registered broadcast receiver");
-            isRunning = true;
+            isRegistered = true;
         }
     }
 
     private void unregisterReceiver() {
-        if(context != null && broadcastReceiver != null && isRunning) {
+        if(context != null && broadcastReceiver != null && isRegistered) {
             context.registerReceiver(broadcastReceiver, new IntentFilter(DataService.BROADCAST_ACTION));
             Log.d("DEBUG", "unregistered broadcast receiver");
-            isRunning = false;
+            isRegistered = false;
         }
     }
 

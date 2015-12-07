@@ -26,6 +26,7 @@ public class LiveFragment extends Fragment implements IDataEventHandler {
     private Limit limitRed;
     private Limit limitYellow;
     private SeekBar seekBar;
+    private Communication communication;
 
     private DataService dataService;
 
@@ -44,26 +45,34 @@ public class LiveFragment extends Fragment implements IDataEventHandler {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        communication = new Communication(getActivity());
+        communication.registerDataEventHandler(this);
+        communication.bindService();
         return inflater.inflate(R.layout.live_fragment_layout, null);
     }
 
     @Override
     public void onResume() {
-        super.onResume();
-        Communication.getInstance().registerDataEventHandler(this);
         Log.d("DEBUG", "onResume");
+        super.onResume();
     }
 
     @Override
     public void onPause() {
-        super.onPause();
-        Communication.getInstance().unregisterDataEventHandler(this);
         Log.d("DEBUG", "onPause");
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d("DEBUG", "onDestroy");
+        communication.unregisterDataEventHandler(this);
+        communication.unbindService();
+        super.onDestroy();
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
 
         limitRed = new Limit(2000, 2500, Color.RED);
         limitYellow = new Limit(1500, 2000, Color.YELLOW);
@@ -93,8 +102,10 @@ public class LiveFragment extends Fragment implements IDataEventHandler {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                meterView.setMax(seekBar.getProgress()+2500);
+                meterView.setMax(seekBar.getProgress() + 2500);
             }
         });
+
+        super.onViewCreated(view, savedInstanceState);
     }
 }
