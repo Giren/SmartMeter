@@ -24,6 +24,7 @@ public class Communication{
     private DataService dataService;
     private boolean serviceBinded;
     private boolean isRunning;
+    private boolean contextSet;
 
     private Context context;
     private List<IDataEventHandler> dataEventHandlers;
@@ -59,12 +60,17 @@ public class Communication{
 
     public Communication() {
         isRunning = false;
+        contextSet = false;
         dataEventHandlers = new ArrayList<IDataEventHandler>();;
     }
 
-    public void setContext(Context context) {
-        this.context = context;
-        registerReceiver();
+    public boolean setContext(Context context) {
+        if(this.context != null) {
+            this.context = context;
+            return true;
+        }
+
+        return false;
     }
 
     public static Communication getInstance() {
