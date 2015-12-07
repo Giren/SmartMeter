@@ -30,11 +30,12 @@ public class DataService extends Service {
         Log.d("DEBUG", "Service created...");
 
         intent = new Intent(BROADCAST_ACTION);
-        socketThread.start();
+        startReceiver();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
+        Log.d("DEBUG", "SOMEONE BINDED...");
         return mBinder;
     }
 
@@ -67,6 +68,7 @@ public class DataService extends Service {
             while(isRunning){
                 try {
                     if(intent != null) {
+                        Log.d("DEBUG", "Thread tick...");
                         intent.putExtra("value", String.valueOf(0 + (int)(Math.random()*2000)));
                         sendBroadcast(intent);
                     }
