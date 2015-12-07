@@ -58,10 +58,20 @@ public class HelpFragment extends Fragment{
 
         @Override
         protected void onPostExecute(RestData restData) {
-            TextView greetingIdText = (TextView) getActivity().findViewById(R.id.id_value);
-            TextView greetingContentText = (TextView) getActivity().findViewById(R.id.content_value);
-            greetingIdText.setText(String.valueOf(restData.getId()));
-            greetingContentText.setText(String.valueOf(restData.getCurrentEnergy()));
+            if(restData == null){
+                //TODO Meldung das Server nicht erreichbar ist
+                return;
+            }
+
+            try{
+                TextView greetingIdText = (TextView) getActivity().findViewById(R.id.id_value);
+                TextView greetingContentText = (TextView) getActivity().findViewById(R.id.content_value);
+                greetingIdText.setText(String.valueOf(restData.getId()));
+                greetingContentText.setText(String.valueOf(restData.getCurrentEnergy()));
+            } catch (Exception e) {
+                Log.e("HelpFragment", e.getMessage(), e);
+            }
+
         }
     }
 }

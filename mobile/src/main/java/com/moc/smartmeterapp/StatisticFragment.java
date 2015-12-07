@@ -150,7 +150,6 @@ public class StatisticFragment extends Fragment{
 
         for(int i=0; i<size; i++){
             currentValue = Integer.parseInt(values.get(i));
-            System.out.println(currentValue);
             if(currentValue > maxValue){
                 maxValue = currentValue;
             }
