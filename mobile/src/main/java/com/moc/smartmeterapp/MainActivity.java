@@ -1,6 +1,14 @@
 package com.moc.smartmeterapp;
 
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.provider.ContactsContract;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -9,7 +17,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
+
+import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.Communication;
+import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.DataService;
+import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.IDataEventHandler;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -20,6 +35,9 @@ public class MainActivity extends AppCompatActivity{
     private HelpFragment helpFragment;
 
     private Toolbar toolbar;
+    private ServiceConnection dataServiceConnection;
+    private DataService dataService;
+    private boolean serviceBinded;
 
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
@@ -29,6 +47,27 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if( Communication.getInstance().setContext(this) == false) {
+            Log.d("DEBUG:", "MAIN ACTIVITY: CONTEXT ALLREADY SET");
+        }
+
+        dataServiceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                DataService.LocalBinder binder = (DataService.LocalBinder)iBinder;
+                dataService = binder.getService();
+                serviceBinded = true;
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName componentName) {
+
+            }
+        };
+
+        //bindService();
+
         setContentView(R.layout.activity_main);
 
         /**
@@ -111,6 +150,36 @@ public class MainActivity extends AppCompatActivity{
                 R.string.app_name);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
+    }
+
+    @Override
+    protected void onDestroy() {
+        unbindService();
+        super.onDestroy();
+    }
+
+    public void startService() {
+        startService(new Intent(this, DataService.class));
+    }
+
+    public void stopService() {
+        stopService(new Intent(this, DataService.class));
+    }
+
+    public void bindService() {
+        bindService(new Intent(this, DataService.class), dataServiceConnection, Context.BIND_AUTO_CREATE);
+        serviceBinded = true;
+        Toast.makeText(getBaseContext(), "Service binded sucessfully", Toast.LENGTH_LONG).show();
+    }
+
+    public void unbindService() {
+        if(serviceBinded) {
+            unbindService(dataServiceConnection);
+            serviceBinded = false;
+            Toast.makeText(getBaseContext(), "Service unbinded sucessfully", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(getBaseContext(), "Service allready unbinded", Toast.LENGTH_LONG).show();
+        }
     }
 
 }

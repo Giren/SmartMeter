@@ -3,26 +3,13 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_orange_dark" >
+    android:background="@android:color/background_dark" >
 
-    <com.moc.smartmeterapp.MeterView
+    <com.moc.smartmeterapp.MeterView_Wear
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/meterview"
-        android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true" />
-
-    <TextView
-        android:id="@+id/tvLiveFrag"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="26dp"
-        android:text="TextView"
-        android:layout_marginLeft="0dp"
-        android:layout_marginBottom="25dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>

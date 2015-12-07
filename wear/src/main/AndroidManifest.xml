@@ -21,6 +21,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
+    <uses-permission android:name="android.permission.VIBRATE"/>
 </manifest>

@@ -3,16 +3,23 @@ package com.moc.smartmeterapp;
 /**
  * Created by michael on 23.11.15.
  */
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 
-public class LiveFragment extends Fragment {
+import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.Communication;
+import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.DataService;
+import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.IDataEventHandler;
+
+public class LiveFragment extends Fragment implements IDataEventHandler {
 
     private MeterView meterView;
     private Limiter limiter;
@@ -20,10 +27,38 @@ public class LiveFragment extends Fragment {
     private Limit limitYellow;
     private SeekBar seekBar;
 
+    private DataService dataService;
+
+    public void setDataService(DataService dataService) {
+        this.dataService = dataService;
+    }
+
+    @Override
+    public boolean onLiveDataReceived(int value) {
+        if (meterView != null) {
+            meterView.setValue(value);
+        }
+        return true;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.live_fragment_layout,null);
+        return inflater.inflate(R.layout.live_fragment_layout, null);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Communication.getInstance().registerDataEventHandler(this);
+        Log.d("DEBUG", "onResume");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Communication.getInstance().unregisterDataEventHandler(this);
+        Log.d("DEBUG", "onPause");
     }
 
     @Override
@@ -37,13 +72,13 @@ public class LiveFragment extends Fragment {
         limiter.addLimit(limitYellow);
         limiter.addLimit(limitRed);
 
-        meterView = (MeterView)view.findViewById(R.id.meterview);
+        meterView = (MeterView) view.findViewById(R.id.meterview);
         meterView.setMax(2500);
         meterView.setOffsetAngle(45);
         meterView.setAverage(750);
         meterView.setLimiter(limiter);
 
-        seekBar = (SeekBar)view.findViewById(R.id.seekBar);
+        seekBar = (SeekBar) view.findViewById(R.id.seekBar);
         seekBar.setMax(2500);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -58,7 +93,7 @@ public class LiveFragment extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                meterView.setValue(seekBar.getProgress());
+                meterView.setMax(seekBar.getProgress()+2500);
             }
         });
     }
