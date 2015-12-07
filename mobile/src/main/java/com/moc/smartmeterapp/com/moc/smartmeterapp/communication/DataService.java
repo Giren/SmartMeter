@@ -39,12 +39,6 @@ public class DataService extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d("DEBUG", "Service startet...");
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         isRunning = false;
@@ -64,11 +58,6 @@ public class DataService extends Service {
     public void stopReceiver() {
         isRunning = false;
     }
-
-    private Runnable sendUpdatesToUI = new Runnable() {
-        public void run() {
-        }
-    };
 
     private Thread socketThread = new Thread() {
 

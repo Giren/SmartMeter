@@ -50,9 +50,10 @@ public class WearService extends WearableListenerService implements
 
     @Override
     public void onConnected(Bundle bundle) {
-        startService(new Intent(this, DataService.class));
         Communication com = Communication.getInstance();
-        com.setContext(this);
+        if( com.setContext(this) == false) {
+            Log.d("DEBUG:", "WEAR SERVICE: CONTEXT ALLREADY SET");
+        }
         com.registerDataEventHandler(this);
     }
 

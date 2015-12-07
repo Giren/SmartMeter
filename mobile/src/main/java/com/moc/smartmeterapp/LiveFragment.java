@@ -93,7 +93,7 @@ public class LiveFragment extends Fragment implements IDataEventHandler {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                meterView.setValue(seekBar.getProgress());
+                meterView.setMax(seekBar.getProgress()+2500);
             }
         });
     }

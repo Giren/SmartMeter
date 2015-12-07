@@ -45,7 +45,9 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Communication.getInstance().setContext(this);
+        if( Communication.getInstance().setContext(this) == false) {
+            Log.d("DEBUG:", "MAIN ACTIVITY: CONTEXT ALLREADY SET");
+        }
 
         dataServiceConnection = new ServiceConnection() {
             @Override
