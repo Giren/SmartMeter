@@ -1,10 +1,6 @@
 .gradle
 /local.properties
-<<<<<<< HEAD
-/.idea
-=======
 .idea
->>>>>>> c7cb8bb2dca1f38dedc599444846d4bce428d144
 .DS_Store
 /build
 /captures
