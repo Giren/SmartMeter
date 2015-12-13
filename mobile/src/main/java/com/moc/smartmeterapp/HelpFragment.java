@@ -44,7 +44,7 @@ public class HelpFragment extends Fragment{
         @Override
         protected RestData doInBackground(Void... params) {
             try {
-                final String url = "http://192.168.178.26:8080/stats?accessToken=123456";
+                final String url = "http://10.0.0.104:8080/stats?accessToken=123456";
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
                 RestData restData = restTemplate.getForObject(url, RestData.class);
