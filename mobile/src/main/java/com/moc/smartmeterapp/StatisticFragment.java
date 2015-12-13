@@ -35,9 +35,6 @@ import lecho.lib.hellocharts.view.PreviewLineChartView;
  */
 public class StatisticFragment extends Fragment{
 
-    private ArrayList<String> test;
-    private ArrayList<String> test2;
-
     private LineChartView chart;
     private PreviewLineChartView previewChart;
     private LineChartData data;
@@ -56,16 +53,9 @@ public class StatisticFragment extends Fragment{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        test = new ArrayList<String>();
-        for(int i=0; i<MAX_WHEEL_NUMBER; i++){
-            test.add(String.valueOf(i));
+        if(liveList == null) {
+            liveList = new ArrayList<String>();
         }
-        test2 = new ArrayList<String>();
-        for(int i=0; i<MAX_WHEEL_NUMBER; i++){
-            test2.add(String.valueOf(100-i));
-        }
-
-        liveList = new ArrayList<String>();
         return inflater.inflate(R.layout.statistic_fragment_layout,null);
     }
 
@@ -76,16 +66,13 @@ public class StatisticFragment extends Fragment{
         maxNumberToShow = MAX_WHEEL_NUMBER;
 
         chart = (LineChartView) view.findViewById(R.id.chart);
-        previewChart = (PreviewLineChartView) view.findViewById(R.id.chart_preview);
-
         chart.setLineChartData(data);
         chart.setZoomEnabled(false);
         chart.setScrollEnabled(true);
 
+        previewChart = (PreviewLineChartView) view.findViewById(R.id.chart_preview);
         previewChart.setLineChartData(previewData);
         previewChart.setViewportChangeListener(new ViewportListener());
-
-        addDataToChart(test);
 
         Button settingButton = (Button)view.findViewById(R.id.button_statistic_settings);
         settingButton.setOnClickListener(new View.OnClickListener() {
@@ -127,7 +114,7 @@ public class StatisticFragment extends Fragment{
             }
         });
 
-        previewX(false);
+        updateChartView();
     }
 
     public void setMaxValueOfLineChartData(int maxValueOfLineChartData){
