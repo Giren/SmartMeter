@@ -14,9 +14,9 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.BounceInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.view.animation.OvershootInterpolator;
+
+import com.moc.smartmeterapp.model.Limit;
 
 public class MeterView extends View {
 	private final int ANGLE_ORIENTATION = 90;
@@ -236,16 +236,19 @@ public class MeterView extends View {
 		tempPoint = null;
 	}
 
-	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-	}
-
 	public void setMin(int min) {
 		this.min = min;
 	}
 
 	public void setMax(int max) {
+		if(limiter != null) {
+			for(Limit l : limiter.getLimits()) {
+				if(l.getMax() > max) {
+					max = l.getMax();
+				}
+			}
+		}
+
 		this.max = max;
 	}
 
@@ -282,6 +285,13 @@ public class MeterView extends View {
 	}
 
 	public void setLimiter(Limiter limiter) {
+		if(limiter != null) {
+			for(Limit l : limiter.getLimits()) {
+				if(l.getMax() > max) {
+					max = l.getMax();
+				}
+			}
+		}
 		this.limiter = limiter;
 	}
 

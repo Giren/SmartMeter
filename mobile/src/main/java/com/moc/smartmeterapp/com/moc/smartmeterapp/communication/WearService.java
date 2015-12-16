@@ -22,7 +22,7 @@ import java.util.Date;
 public class WearService extends WearableListenerService implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        IDataEventHandler{
+        Communication.ILiveDataEventHandler{
 
     private static final String WEARABLE_DATA_PATH = "/SmartMeterToWearable";
     private static final String HANDHELD_DATA_PATH = "/SmartMeterToHandheld";
@@ -32,7 +32,7 @@ public class WearService extends WearableListenerService implements
 
     @Override
     public void onCreate() {
-        communication = new Communication(getApplicationContext());
+        communication = new Communication(getApplicationContext(), Communication.LIVE_DATA);
         Log.d("DEBUG", "WEAR SERVICE ON CREATE");
 
         if ( googleClient == null) {
