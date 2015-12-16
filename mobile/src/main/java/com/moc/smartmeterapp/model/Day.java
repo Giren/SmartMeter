@@ -13,6 +13,11 @@ public class Day {
 
     public Day() {
         hours = new ArrayList<Hour>();
+
+        for(int i=0; i<24; i++) {
+            hours.add(new Hour());
+        }
+
         date = new Date();
     }
 

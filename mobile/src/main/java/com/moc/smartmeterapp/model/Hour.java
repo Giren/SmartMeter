@@ -5,15 +5,12 @@ package com.moc.smartmeterapp.model;
  */
 public class Hour {
     private MinMeanMax mmm;
-    private int hour;
 
     public Hour() {
         mmm = new MinMeanMax();
-        hour = 1;
     }
 
-    public Hour(MinMeanMax mmm, int hour) {
-        this.hour = hour;
+    public Hour(MinMeanMax mmm) {
         this.mmm = mmm;
     }
 
@@ -23,13 +20,5 @@ public class Hour {
 
     public void setMmm(MinMeanMax mmm) {
         this.mmm = mmm;
-    }
-
-    public int getHour() {
-        return hour;
-    }
-
-    public void setHour(int hour) {
-        this.hour = hour;
     }
 }
