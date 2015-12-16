@@ -10,6 +10,11 @@ import java.util.List;
  */
 public class DatabaseHelper implements IDatabase {
     @Override
+    public void createIfNotCreated() {
+        
+    }
+
+    @Override
     public Day loadDay(Date date) {
         return null;
     }

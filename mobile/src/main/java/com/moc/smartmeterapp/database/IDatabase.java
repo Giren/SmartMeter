@@ -9,6 +9,8 @@ import java.util.List;
  * Created by philipp on 16.12.2015.
  */
 public interface IDatabase {
+    void createIfNotCreated();
+
     Day loadDay(Date date);
     List<Day> loadMonth(Date date);
     List<Day> loadYear(Date date);
