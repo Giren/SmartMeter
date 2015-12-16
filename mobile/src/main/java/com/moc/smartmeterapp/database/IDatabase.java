@@ -1,4 +1,6 @@
-package com.moc.smartmeterapp.model;
+package com.moc.smartmeterapp.database;
+
+import com.moc.smartmeterapp.model.Day;
 
 import java.util.Date;
 import java.util.List;
