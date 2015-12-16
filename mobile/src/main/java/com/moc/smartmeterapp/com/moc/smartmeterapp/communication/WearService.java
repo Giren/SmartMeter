@@ -22,17 +22,18 @@ import java.util.Date;
 public class WearService extends WearableListenerService implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        IDataEventHandler{
+        Communication.ILiveDataEventHandler{
 
     private static final String WEARABLE_DATA_PATH = "/SmartMeterToWearable";
     private static final String HANDHELD_DATA_PATH = "/SmartMeterToHandheld";
 
+    private Communication communication;
     private GoogleApiClient googleClient;
 
     @Override
     public void onCreate() {
+        communication = new Communication(getApplicationContext(), Communication.LIVE_DATA);
         Log.d("DEBUG", "WEAR SERVICE ON CREATE");
-        super.onCreate();
 
         if ( googleClient == null) {
             // Build a new GoogleApiClient for the Wearable API
@@ -46,25 +47,26 @@ public class WearService extends WearableListenerService implements
         if ( !googleClient.isConnected()) {
             googleClient.connect();
         }
+
+        super.onCreate();
     }
 
     @Override
     public void onConnected(Bundle bundle) {
-        Communication com = Communication.getInstance();
-        if( com.setContext(this) == false) {
-            Log.d("DEBUG:", "WEAR SERVICE: CONTEXT ALLREADY SET");
-        }
-        com.registerDataEventHandler(this);
+        communication.registerDataEventHandler(this);
+        communication.bindService();
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        Communication.getInstance().unregisterDataEventHandler(this);
+        communication.unregisterDataEventHandler(this);
+        communication.unbindService();
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Communication.getInstance().unregisterDataEventHandler(this);
+        communication.unregisterDataEventHandler(this);
+        communication.unbindService();
     }
 
     @Override
@@ -77,8 +79,8 @@ public class WearService extends WearableListenerService implements
     @Override
     public void onDestroy()
     {
-        Communication.getInstance().unregisterDataEventHandler(this);
-        stopService(new Intent(this, DataService.class));
+        communication.unregisterDataEventHandler(this);
+        communication.unbindService();
 
         if (null != googleClient)
         {
