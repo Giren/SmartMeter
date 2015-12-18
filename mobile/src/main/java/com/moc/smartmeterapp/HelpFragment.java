@@ -15,8 +15,12 @@ import android.widget.TextView;
 import com.moc.smartmeterapp.database.MeterDataSource;
 
 import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.ComUtils;
+import com.moc.smartmeterapp.model.Day;
 import com.moc.smartmeterapp.model.EntryObject;
+import com.moc.smartmeterapp.model.Hour;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
@@ -46,8 +50,6 @@ public class HelpFragment extends Fragment{
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        //new HttpRequestTask().execute();
 
         Button restButton = (Button) view.findViewById(R.id.button_rest);
         restButton.setOnClickListener(new View.OnClickListener() {
@@ -94,30 +96,36 @@ public class HelpFragment extends Fragment{
             }
         });
 
-//        ListView listView = (ListView) view.findViewById(R.id.listView);
-//        RestData test1 = new RestData(4711,1,1,1,1);
-//        RestData test2 = new RestData(4711,2,1,1,1);
-//        RestData test3 = new RestData(4711,3,1,1,1);
-//        RestData test4 = new RestData(4711,4,1,1,1);
-//        RestData test5 = new RestData(4711,5,1,1,1);
-//        meterDataSource = new MeterDataSource(getActivity().getBaseContext());
-//        meterDataSource.openDataBase();
-//        RestData dbData = meterDataSource.createRestData(test1);
-//        dbData = meterDataSource.createRestData(test2);
-//        dbData = meterDataSource.createRestData(test3);
-//        dbData = meterDataSource.createRestData(test4);
-//        dbData = meterDataSource.createRestData(test5);
-//        listView.setAdapter(showAllDBEntries());
-//        meterDataSource.closeDataBase();
+
+        List<Hour> hours;
+        hours = new ArrayList<Hour>();
+        for(int i=0; i<24; i++) {
+            hours.add(new Hour());
+        }
+
+        Date date = new Date();
+        date.setDate(20);
+        date.setMonth(1);
+        date.setYear(2022);
+        Day day = new Day();
+        day.setDate(date);
+
+        ListView listView = (ListView) view.findViewById(R.id.listView);
+
+        meterDataSource = new MeterDataSource(getActivity().getBaseContext());
+        meterDataSource.openDataBase();
+        meterDataSource.insertDataToDB(day);
+        listView.setAdapter(showAllDBEntries());
+        meterDataSource.closeDataBase();
     }
 
-//    private ArrayAdapter showAllDBEntries(){
-//        List<RestData> dataList = meterDataSource.getAllRestData();
-//
-//        ArrayAdapter<RestData> restDataArrayAdapter = new ArrayAdapter<RestData>(
-//                getActivity().getBaseContext(),
-//                android.R.layout.simple_list_item_multiple_choice,
-//                dataList);
-//        return restDataArrayAdapter;
-//    }
+    private ArrayAdapter showAllDBEntries(){
+        List<Day> dataList = meterDataSource.getAllDBData();
+
+        ArrayAdapter<Day> restDataArrayAdapter = new ArrayAdapter<Day>(
+                getActivity().getBaseContext(),
+                android.R.layout.simple_list_item_multiple_choice,
+                dataList);
+        return restDataArrayAdapter;
+    }
 }

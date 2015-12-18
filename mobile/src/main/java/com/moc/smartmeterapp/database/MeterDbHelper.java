@@ -21,17 +21,14 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
     public static final String TABLE_METER_LIST = "meter_list";
 
     public static final String COLUMN_ID = "id";
-    public static final String COLUMN_ENERGY = "energy";
-    public static final String COLUMN_T1 = "t1";
-    public static final String COLUMN_T2 = "t2";
-    public static final String COLUMN_CURRENT_ENERGY = "currentEnergy";
+    public static final String COLUMN_DATE = "date";
+    public static final String COLUMN_DAY_O = "day_o";
 
     private static final String SQL_CREATE = "CREATE TABLE " + TABLE_METER_LIST + "(" +
             COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            COLUMN_ENERGY + " INTEGER NOT NULL, " +
-            COLUMN_T1 + " INTEGER NOT NULL, " +
-            COLUMN_T2 + " INTEGER NOT NULL, " +
-            COLUMN_CURRENT_ENERGY + " INTEGER NOT NULL);";
+            COLUMN_DATE + " TEXT NOT NULL, " +
+            COLUMN_DAY_O + " BLOB);";
+
 
     public MeterDbHelper(Context context){
         super(context, DB_NAME ,null, DB_VERSION);
