@@ -1,24 +1,27 @@
 package com.moc.smartmeterapp.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by philipp on 14.12.2015.
  */
 public class DataObject {
-    private MinMeanMax characteristics;
-    private ArrayList<DataObject> data;
+    private List<Day> days;
 
-    public MinMeanMax getCharacteristics() {
-        return characteristics;
+    public DataObject(List<Day> days) {
+        this.days = days;
     }
-    public void setCharacteristics(MinMeanMax characteristics) {
-        this.characteristics = characteristics;
+
+    public DataObject() {
+        days = new ArrayList<Day>();
     }
-    public ArrayList<DataObject> getData() {
-        return data;
+
+    public List<Day> getDays() {
+        return days;
     }
-    public void setData(ArrayList<DataObject> data) {
-        this.data = data;
+
+    public void setDays(List<Day> days) {
+        this.days = days;
     }
 }

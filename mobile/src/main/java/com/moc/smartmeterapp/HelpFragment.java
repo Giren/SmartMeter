@@ -111,13 +111,13 @@ public class HelpFragment extends Fragment{
 //        meterDataSource.closeDataBase();
     }
 
-    private ArrayAdapter showAllDBEntries(){
-        List<RestData> dataList = meterDataSource.getAllRestData();
-
-        ArrayAdapter<RestData> restDataArrayAdapter = new ArrayAdapter<RestData>(
-                getActivity().getBaseContext(),
-                android.R.layout.simple_list_item_multiple_choice,
-                dataList);
-        return restDataArrayAdapter;
-    }
+//    private ArrayAdapter showAllDBEntries(){
+//        List<RestData> dataList = meterDataSource.getAllRestData();
+//
+//        ArrayAdapter<RestData> restDataArrayAdapter = new ArrayAdapter<RestData>(
+//                getActivity().getBaseContext(),
+//                android.R.layout.simple_list_item_multiple_choice,
+//                dataList);
+//        return restDataArrayAdapter;
+//    }
 }
