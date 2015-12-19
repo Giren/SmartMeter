@@ -1,10 +1,12 @@
 package com.moc.smartmeterapp;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 /**
@@ -13,7 +15,14 @@ import android.widget.TextView;
 public class StatisticFragment extends CustomFragment {
 
     String fragmentName;
+    String actualValue;
+    String limitValue;
+    String limitPercent;
+    TextView tvActualValue;
+    TextView tvLimitValue;
+    TextView tvPercent;
     TextView tv;
+    ProgressBar progressBar;
     boolean userVisible;
 
     /**
@@ -27,7 +36,59 @@ public class StatisticFragment extends CustomFragment {
         View v = inflater.inflate( R.layout.statistic_frag, container, false);
 
         tv = ( TextView) v.findViewById( R.id.tvStatisticFrag);
-        tv.setText( getArguments().getString( "msg"));
+        String localLabel;
+        switch ( getArguments().getString( "msg")) {
+            case "limitWeek": {
+                localLabel = "Wochenlimit";
+                break;
+            }
+            case "limitMonth": {
+                localLabel = "Monatslimit";
+                break;
+            }
+            case "limitYear": {
+                localLabel = "Jahreslimit";
+                break;
+            }
+            default: {
+                localLabel = "Default";
+                break;
+            }
+        }
+        tv.setText( localLabel);
+
+        tvActualValue = ( TextView) v.findViewById( R.id.tvActualValue);
+        tvLimitValue = ( TextView) v.findViewById( R.id.tvLimitValue);
+        tvPercent = ( TextView) v.findViewById( R.id.tvLimitPercent);
+
+        tvLimitValue.setText( "100");
+
+        progressBar = ( ProgressBar) v.findViewById( R.id.progressBar);
+        progressBar.setMax(100);
+        progressBar.setProgress(0);
+        progressBar.setScaleY(3f);
+        progressBar.setDrawingCacheBackgroundColor(Color.GREEN);
+
+
+        getActivity().runOnUiThread( new Runnable() {
+            @Override
+            public void run() {
+                int progressStatus = 0;
+                while( progressStatus < 100) {
+                    progressBar.setProgress( progressStatus);
+                    tvActualValue.setText( String.valueOf( progressStatus));
+                    tvPercent.setText( String.valueOf( progressStatus));
+                    progressStatus++;
+
+                    try {
+                        Thread.sleep( 300);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
 
         fragmentName = getArguments().getString("msg");
         System.out.println("statistic onCreate");

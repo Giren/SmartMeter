@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_red_light" >
+    android:background="#ffffff" >
 
     <TextView
         android:id="@+id/tvStatisticFrag"
@@ -12,7 +12,98 @@
         android:textSize="26dp"
         android:text="TextView"
         android:layout_marginLeft="0dp"
+        android:textColor="#000000"
+        android:layout_marginBottom="24dp"
+        android:layout_above="@+id/tvActualValue"
+        android:layout_alignEnd="@+id/tvActualValue" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Limit:"
+        android:id="@+id/tvLimitStatic"
+        android:textColor="#000000"
+        android:layout_below="@+id/tvAktuellStatic"
+        android:layout_alignStart="@+id/tvAktuellStatic"
+        android:layout_toStartOf="@+id/tvActualValue" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Aktuell:"
+        android:id="@+id/tvAktuellStatic"
+        android:textColor="#000000"
+        android:layout_alignBaseline="@+id/tvActualValue"
+        android:layout_alignBottom="@+id/tvActualValue"
+        android:layout_alignStart="@+id/tvStatisticFrag" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="00000.00"
+        android:id="@+id/tvActualValue"
+        android:textColor="#000000"
+        android:textAlignment="textEnd"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="[kWh]"
+        android:id="@+id/tvkwhLabel1"
+        android:textColor="#000000"
+        android:layout_above="@+id/tvLimitStatic"
+        android:layout_toEndOf="@+id/tvActualValue" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="00000.00"
+        android:id="@+id/tvLimitValue"
+        android:textColor="#000000"
+        android:textAlignment="textEnd"
+        android:layout_below="@+id/tvAktuellStatic"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="[kWh]"
+        android:id="@+id/tvkwhLabel2"
+        android:textColor="#000000"
+        android:layout_below="@+id/tvActualValue"
+        android:layout_toEndOf="@+id/tvActualValue" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_below="@+id/tvLimitStatic"
+        android:layout_alignStart="@+id/tvLimitStatic"
+        android:layout_alignEnd="@+id/tvkwhLabel2"
+        android:max="100"
+        android:indeterminate="false"
+        android:foreground="#15ff00"
+        android:background="#ffffff"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentStart="false" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="50 %"
+        android:id="@+id/tvLimitPercent"
+        android:layout_below="@+id/progressBar"
+        android:layout_centerHorizontal="true"
+        android:textColor="#000000" />
 
 </RelativeLayout>
