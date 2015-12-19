@@ -15,6 +15,8 @@ import java.util.List;
  */
 public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
 
+    private MeterDataSource meterDataSource;
+
     private static final String DB_NAME = "MeterDB";
     private static final int DB_VERSION = 1;
 
@@ -29,9 +31,22 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
             COLUMN_DATE + " TEXT NOT NULL, " +
             COLUMN_DAY_O + " BLOB);";
 
-
     public MeterDbHelper(Context context){
         super(context, DB_NAME ,null, DB_VERSION);
+        meterDataSource = new MeterDataSource(context);
+        meterDataSource.setMeterDbHelper(this);
+    }
+
+    public void openDatabase(){
+        meterDataSource.openDataBase();
+    }
+
+    public void closeDatabase(){
+        meterDataSource.closeDataBase();
+    }
+
+    public List<Day> getAllEntries(){
+        return meterDataSource.getAllDBData();
     }
 
     @Override
@@ -71,17 +86,17 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
 
     @Override
     public void saveDay(Day day) {
-
+        meterDataSource.insertDataToDB(day);
     }
 
     @Override
     public void saveMonth(List<Day> days) {
-
+        meterDataSource.insertListDataToDB(days);
     }
 
     @Override
     public void saveYear(List<Day> days) {
-
+        meterDataSource.insertListDataToDB(days);
     }
 
     @Override
@@ -101,6 +116,7 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
 
     @Override
     public void deleteAll() {
-
+        System.out.println("deleting.............");
+        meterDataSource.deleteDataBase();
     }
 }

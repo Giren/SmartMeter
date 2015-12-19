@@ -30,12 +30,14 @@ public class MeterDataSource {
     };
 
     public MeterDataSource(Context context){
-        meterDbHelper = new MeterDbHelper(context);
+        //meterDbHelper = new MeterDbHelper(context);
     }
 
-    private void insertListDataToDB(List<Day> days){
+    public void insertListDataToDB(List<Day> days){
+        System.out.println("Gonna put "+days.size()+" objects into Database");
         for(int i=0; i<days.size(); i++){
             insertDataToDB(days.get(i));
+            System.out.println(days.get(i).getDate().getYear());
         }
     }
 
@@ -65,27 +67,8 @@ public class MeterDataSource {
         Gson gson = new Gson();
         Day day = gson.fromJson(json,new TypeToken<Day>(){}.getType());
 
-        System.out.println(day.getDate().getYear());
         return day;
     }
-
-//    public RestData createRestData(RestData restData) {
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(MeterDbHelper.COLUMN_ENERGY, restData.getEnergy());
-//        contentValues.put(MeterDbHelper.COLUMN_T1, restData.getT1());
-//        contentValues.put(MeterDbHelper.COLUMN_T2, restData.getT2());
-//        contentValues.put(MeterDbHelper.COLUMN_CURRENT_ENERGY, restData.getCurrentEnergy());
-//
-//        long insertID = database.insert(MeterDbHelper.TABLE_METER_LIST, null, contentValues);
-//
-//        //check RestData-Object
-//        Cursor cursor = database.query(MeterDbHelper.TABLE_METER_LIST, columns,
-//                MeterDbHelper.COLUMN_ID + "=" + insertID, null, null, null, null);
-//        cursor.moveToFirst();
-//        RestData data = cursorToMeterData(cursor);
-//        cursor.close();
-//        return data;
-//    }
 
     public List<Day> getAllDBData(){
         List<Day> dataList = new ArrayList<>();
@@ -110,6 +93,14 @@ public class MeterDataSource {
     }
 
     public void closeDataBase(){
-        meterDbHelper.close();
+        database.close();
+    }
+
+    public void deleteDataBase(){
+        database.delete(MeterDbHelper.TABLE_METER_LIST, null, null);
+    }
+
+    public void setMeterDbHelper(MeterDbHelper meterDbHelper) {
+        this.meterDbHelper = meterDbHelper;
     }
 }

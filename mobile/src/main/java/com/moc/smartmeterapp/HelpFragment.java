@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.moc.smartmeterapp.database.MeterDataSource;
 
 import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.ComUtils;
+import com.moc.smartmeterapp.database.MeterDbHelper;
 import com.moc.smartmeterapp.model.Day;
 import com.moc.smartmeterapp.model.EntryObject;
 import com.moc.smartmeterapp.model.Hour;
@@ -36,7 +37,7 @@ import java.util.List;
  */
 public class HelpFragment extends Fragment{
 
-    private MeterDataSource meterDataSource;
+    private MeterDbHelper meterDbHelper;
     private ComUtils.IRestTestService restService;
 
     @Nullable
@@ -55,44 +56,46 @@ public class HelpFragment extends Fragment{
         restButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //new HttpRequestTask().execute();
-                Observable.interval(1, 3, TimeUnit.SECONDS)
-                        .subscribe(new Observer<Long>() {
-                            @Override
-                            public void onCompleted() {
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-
-                            }
-
-                            @Override
-                            public void onNext(Long aLong) {
-                                restService.getEntryObjectObservable()
-                                        .subscribeOn(Schedulers.io())
-                                        .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe(new Subscriber<EntryObject>() {
-
-                                            @Override
-                                            public void onCompleted() {
-                                                Log.d("DEBUG", "onComplete");
-                                            }
-
-                                            @Override
-                                            public void onError(Throwable e) {
-                                                Log.d("DEBUG", "onError: " + e.getMessage());
-                                            }
-
-                                            @Override
-                                            public void onNext(EntryObject entryObject) {
-                                                Log.d("DEBUG", "onNext: EntryObject " + entryObject.getCurrentEnergy());
-                                            }
-                                        });
-                            }
-                        });
+                meterDbHelper.openDatabase();
+                meterDbHelper.deleteAll();
+                meterDbHelper.closeDatabase();
+//                //new HttpRequestTask().execute();
+//                Observable.interval(1, 3, TimeUnit.SECONDS)
+//                        .subscribe(new Observer<Long>() {
+//                            @Override
+//                            public void onCompleted() {
+//
+//                            }
+//
+//                            @Override
+//                            public void onError(Throwable e) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onNext(Long aLong) {
+//                                restService.getEntryObjectObservable()
+//                                        .subscribeOn(Schedulers.io())
+//                                        .observeOn(AndroidSchedulers.mainThread())
+//                                        .subscribe(new Subscriber<EntryObject>() {
+//
+//                                            @Override
+//                                            public void onCompleted() {
+//                                                Log.d("DEBUG", "onComplete");
+//                                            }
+//
+//                                            @Override
+//                                            public void onError(Throwable e) {
+//                                                Log.d("DEBUG", "onError: " + e.getMessage());
+//                                            }
+//
+//                                            @Override
+//                                            public void onNext(EntryObject entryObject) {
+//                                                Log.d("DEBUG", "onNext: EntryObject " + entryObject.getCurrentEnergy());
+//                                            }
+//                                        });
+//                            }
+//                        });
             }
         });
 
@@ -103,24 +106,44 @@ public class HelpFragment extends Fragment{
             hours.add(new Hour());
         }
 
+
+        List<Day> dataList = new ArrayList<>();
+
         Date date = new Date();
         date.setDate(20);
         date.setMonth(1);
         date.setYear(2022);
         Day day = new Day();
         day.setDate(date);
+        dataList.add(day);
+
+        Date date1 = new Date();
+        date1.setDate(20);
+        date1.setMonth(1);
+        date1.setYear(2023);
+        Day day1 = new Day();
+        day1.setDate(date1);
+        dataList.add(day1);
+
+        Date date2 = new Date();
+        date2.setDate(20);
+        date2.setMonth(1);
+        date2.setYear(2024);
+        Day day2 = new Day();
+        day2.setDate(date2);
+        dataList.add(day2);
 
         ListView listView = (ListView) view.findViewById(R.id.listView);
 
-        meterDataSource = new MeterDataSource(getActivity().getBaseContext());
-        meterDataSource.openDataBase();
-        meterDataSource.insertDataToDB(day);
+        meterDbHelper = new MeterDbHelper(getActivity().getBaseContext());
+        meterDbHelper.openDatabase();
+        meterDbHelper.saveMonth(dataList);
         listView.setAdapter(showAllDBEntries());
-        meterDataSource.closeDataBase();
+        meterDbHelper.closeDatabase();
     }
 
     private ArrayAdapter showAllDBEntries(){
-        List<Day> dataList = meterDataSource.getAllDBData();
+        List<Day> dataList = meterDbHelper.getAllEntries();
 
         ArrayAdapter<Day> restDataArrayAdapter = new ArrayAdapter<Day>(
                 getActivity().getBaseContext(),
