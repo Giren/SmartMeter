@@ -11,7 +11,7 @@ import java.util.List;
 public class DatabaseHelper implements IDatabase {
     @Override
     public void createIfNotCreated() {
-        
+
     }
 
     @Override

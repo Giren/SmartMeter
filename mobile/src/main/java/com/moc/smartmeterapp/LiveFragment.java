@@ -13,8 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 
+import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.ComUtils;
 import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.Communication;
+import com.moc.smartmeterapp.model.DataObject;
+import com.moc.smartmeterapp.model.EntryObject;
+import com.moc.smartmeterapp.model.Global;
 import com.moc.smartmeterapp.model.Limit;
+
+import java.util.List;
 
 public class LiveFragment extends Fragment implements Communication.ILiveDataEventHandler {
 
@@ -44,10 +50,30 @@ public class LiveFragment extends Fragment implements Communication.ILiveDataEve
         return true;
     }
 
+    @Override
+    public boolean onGlobalDataReceived(Global global) {
+        return false;
+    }
+
+    @Override
+    public boolean onLimitsReceived(List<Limit> limits) {
+        return false;
+    }
+
+    @Override
+    public boolean onMeterDataReceived(DataObject dataObject) {
+        return false;
+    }
+
+    @Override
+    public boolean onTestReceived(EntryObject entryObject) {
+        return false;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        communication = new Communication(getActivity(), Communication.LIVE_DATA, Communication.TEST);
+        communication = new Communication(getActivity(), ComUtils.LIVE_DATA, ComUtils.TEST);
         communication.registerDataEventHandler(this);
         communication.bindService();
         return inflater.inflate(R.layout.live_fragment_layout, null);

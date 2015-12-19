@@ -89,7 +89,7 @@ public class DataService extends Service {
 
                             @Override
                             public void onCompleted() {
-                                Log.d("DEBUG", "onComplete");
+                                Log.d("DEBUG", "onComplete Test");
                             }
 
                             @Override
@@ -99,7 +99,9 @@ public class DataService extends Service {
 
                             @Override
                             public void onNext(EntryObject entryObject) {
-                                Log.d("DEBUG", "onNext: EntryObject " + entryObject.getCurrentEnergy());
+                                Log.d("DEBUG", "Test Object: " + entryObject.getCurrentEnergy());
+                                intent.putExtra(String.valueOf(ComUtils.RECIVED_TEST), entryObject);
+                                sendBroadcast(intent);
                             }
                         });
             }
@@ -143,7 +145,7 @@ public class DataService extends Service {
                         message = inFromServer.readLine();
                         if(message != null) {
                             Log.d("DEBUG", "Live Data: " + message);
-                            intent.putExtra("value", message);
+                            intent.putExtra(String.valueOf(ComUtils.RECIVED_LIVE_DATA), message);
                             sendBroadcast(intent);
                         } else {
                             break;

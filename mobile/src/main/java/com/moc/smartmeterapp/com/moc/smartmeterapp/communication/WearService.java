@@ -12,9 +12,13 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
+import com.moc.smartmeterapp.model.DataObject;
+import com.moc.smartmeterapp.model.EntryObject;
+import com.moc.smartmeterapp.model.Limit;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by philipp on 26.11.2015.
@@ -32,7 +36,7 @@ public class WearService extends WearableListenerService implements
 
     @Override
     public void onCreate() {
-        communication = new Communication(getApplicationContext(), Communication.LIVE_DATA);
+        communication = new Communication(getApplicationContext(), ComUtils.LIVE_DATA);
         Log.d("DEBUG", "WEAR SERVICE ON CREATE");
 
         if ( googleClient == null) {
@@ -74,6 +78,26 @@ public class WearService extends WearableListenerService implements
         Log.d("DEBUG", "SEND DATA TO WEAR");
         new SendToDataLayerThread( WEARABLE_DATA_PATH, "liveData" + ";" + String.valueOf(value)).start();
         return true;
+    }
+
+    @Override
+    public boolean onGlobalDataReceived(int value) {
+        return false;
+    }
+
+    @Override
+    public boolean onLimitsReceived(List<Limit> limits) {
+        return false;
+    }
+
+    @Override
+    public boolean onMeterDataReceived(DataObject dataObject) {
+        return false;
+    }
+
+    @Override
+    public boolean onTestReceived(EntryObject entryObject) {
+        return false;
     }
 
     @Override

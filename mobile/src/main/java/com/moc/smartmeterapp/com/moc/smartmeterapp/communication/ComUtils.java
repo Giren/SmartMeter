@@ -14,7 +14,19 @@ import retrofit.http.GET;
  * Created by philipp on 14.12.2015.
  */
 public class ComUtils {
-    public static String SERVICE_ENDPOINT = "http://10.0.0.20:8080";
+    public final static String SERVICE_ENDPOINT = "http://10.0.0.20:8080";
+
+    public final static int LIVE_DATA = 0;
+    public final static int GLOBAL_DATA = 1;
+    public final static int LIMITS = 2;
+    public final static int METER_DATA = 3;
+    public final static int TEST = 4;
+
+    public final static int RECIVED_LIVE_DATA = 10;
+    public final static int RECIVED_GLOBAL_DATA = 11;
+    public final static int RECIVED_LIMITS = 12;
+    public final static int RECIVED_METER_DATA = 13;
+    public final static int RECIVED_TEST = 14;
 
     public interface IRestTestService {
         @GET("/stats?accessToken=123456")
