@@ -68,11 +68,13 @@ public class HelpFragment extends Fragment{
                 meterDbHelper.openDatabase();
                 //Day newDay = meterDbHelper.loadDay(nDate);
                 //meterDbHelper.loadMonth(nDate);
-                //meterDbHelper.loadYear(nDate);
-                //meterDbHelper.deleteMonth(nDate);
-                //meterDbHelper.deleteYear(nDate);
-                meterDbHelper.deleteDay(day.getDate());
-                listView.setAdapter(showAllDBEntries());
+                //meterDbHelper.loadYear(day1.getDate());
+                //meterDbHelper.deleteMonth(day1.getDate());
+                //meterDbHelper.deleteYear(day.getDate());
+                //meterDbHelper.deleteDay(day.getDate());
+
+                listView.setAdapter(listToArrayadapter(meterDbHelper.loadMonth(day1.getDate())));
+                //listView.setAdapter(showAllDBEntries());
                 meterDbHelper.closeDatabase();
 
 //                //new HttpRequestTask().execute();
@@ -175,13 +177,21 @@ public class HelpFragment extends Fragment{
         meterDbHelper.closeDatabase();
     }
 
+    private ArrayAdapter listToArrayadapter(List<Day> list){
+        ArrayAdapter<Day> adapter = new ArrayAdapter<Day>(
+                getActivity().getBaseContext(),
+                android.R.layout.simple_list_item_multiple_choice,
+                list);
+        return adapter;
+    }
+
     private ArrayAdapter showAllDBEntries(){
         List<Day> dataList = meterDbHelper.getAllEntries();
 
-        ArrayAdapter<Day> restDataArrayAdapter = new ArrayAdapter<Day>(
+        ArrayAdapter<Day> adapter = new ArrayAdapter<Day>(
                 getActivity().getBaseContext(),
                 android.R.layout.simple_list_item_multiple_choice,
                 dataList);
-        return restDataArrayAdapter;
+        return adapter;
     }
 }
