@@ -70,24 +70,24 @@ public class StatisticFragment extends CustomFragment {
         progressBar.setDrawingCacheBackgroundColor(Color.GREEN);
 
 
-        getActivity().runOnUiThread( new Runnable() {
-            @Override
-            public void run() {
-                int progressStatus = 0;
-                while( progressStatus < 100) {
-                    progressBar.setProgress( progressStatus);
-                    tvActualValue.setText( String.valueOf( progressStatus));
-                    tvPercent.setText( String.valueOf( progressStatus));
-                    progressStatus++;
-
-                    try {
-                        Thread.sleep( 300);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
+//        getActivity().runOnUiThread( new Runnable() {
+//            @Override
+//            public void run() {
+//                int progressStatus = 0;
+//                while( progressStatus < 100) {
+//                    progressBar.setProgress( progressStatus);
+//                    tvActualValue.setText( String.valueOf( progressStatus));
+//                    tvPercent.setText( String.valueOf( progressStatus));
+//                    progressStatus++;
+//
+//                    try {
+//                        Thread.sleep( 300);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        });
 
 
         fragmentName = getArguments().getString("msg");
@@ -102,7 +102,16 @@ public class StatisticFragment extends CustomFragment {
     @Override
     public void UpdateFragmentContent( String update) {
         System.out.println(" Statistic UpdateFragmentContent" + update);
-        tv.setText(update);
+        String[] msgSplit = update.split(";");
+
+        tvLimitValue.setText( msgSplit[1]);
+        tvActualValue.setText(  msgSplit[2]);
+
+        int percenthelp = ( Integer.valueOf( msgSplit[2]) * 100) / Integer.valueOf(msgSplit[1]);
+        tvPercent.setText( String.valueOf( percenthelp));
+        progressBar.setProgress( percenthelp);
+
+        //tv.setText(update);
     }
 
     @Override

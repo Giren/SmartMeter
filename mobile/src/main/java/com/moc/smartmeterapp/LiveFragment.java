@@ -3,8 +3,6 @@ package com.moc.smartmeterapp;
 /**
  * Created by michael on 23.11.15.
  */
-import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,10 +14,9 @@ import android.view.ViewGroup;
 import android.widget.SeekBar;
 
 import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.Communication;
-import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.DataService;
-import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.IDataEventHandler;
+import com.moc.smartmeterapp.model.Limit;
 
-public class LiveFragment extends Fragment implements IDataEventHandler {
+public class LiveFragment extends Fragment implements Communication.ILiveDataEventHandler {
 
     private MeterView meterView;
     private Limiter limiter;
@@ -28,15 +25,20 @@ public class LiveFragment extends Fragment implements IDataEventHandler {
     private SeekBar seekBar;
     private Communication communication;
 
-    private DataService dataService;
-
-    public void setDataService(DataService dataService) {
-        this.dataService = dataService;
-    }
+    private int meterViewMax = 1000;
+    private int meterViewAVG = 300;
 
     @Override
     public boolean onLiveDataReceived(int value) {
         if (meterView != null) {
+            if(value > meterViewMax){
+                meterViewMax = value;
+                meterView.setMax(meterViewMax);
+            }
+
+            meterViewAVG = (meterViewAVG + value) / 2;
+
+            meterView.setAverage(meterViewAVG);
             meterView.setValue(value);
         }
         return true;
@@ -45,7 +47,7 @@ public class LiveFragment extends Fragment implements IDataEventHandler {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        communication = new Communication(getActivity());
+        communication = new Communication(getActivity(), Communication.LIVE_DATA, Communication.TEST);
         communication.registerDataEventHandler(this);
         communication.bindService();
         return inflater.inflate(R.layout.live_fragment_layout, null);
@@ -82,9 +84,7 @@ public class LiveFragment extends Fragment implements IDataEventHandler {
         limiter.addLimit(limitRed);
 
         meterView = (MeterView) view.findViewById(R.id.meterview);
-        meterView.setMax(2500);
         meterView.setOffsetAngle(45);
-        meterView.setAverage(750);
         meterView.setLimiter(limiter);
 
         seekBar = (SeekBar) view.findViewById(R.id.seekBar);

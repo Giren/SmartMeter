@@ -22,7 +22,7 @@ import java.util.Date;
 public class WearService extends WearableListenerService implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        IDataEventHandler{
+        Communication.ILiveDataEventHandler{
 
     private static final String WEARABLE_DATA_PATH = "/SmartMeterToWearable";
     private static final String HANDHELD_DATA_PATH = "/SmartMeterToHandheld";
@@ -32,7 +32,7 @@ public class WearService extends WearableListenerService implements
 
     @Override
     public void onCreate() {
-        communication = new Communication(getApplicationContext());
+        communication = new Communication(getApplicationContext(), Communication.LIVE_DATA, Communication.LIMITS);
         Log.d("DEBUG", "WEAR SERVICE ON CREATE");
 
         if ( googleClient == null) {
@@ -119,17 +119,20 @@ public class WearService extends WearableListenerService implements
             }
             case "limitWeek": {
                 System.out.println("limitWeek case");
+                dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitWeek", "2500");
                 dataMessageToWearable(WEARABLE_DATA_PATH, "limitWeek");
                 break;
             }
             case "limitMonth": {
-                System.out.println( "limitMonth case");
-                dataMessageToWearable(WEARABLE_DATA_PATH, "limitMonth");
+                System.out.println("limitMonth case");
+                dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitWeek", "10000");
+                //dataMessageToWearable(WEARABLE_DATA_PATH, "limitMonth");
                 break;
             }
             case "limitYear": {
-                System.out.println( "limitYear case");
-                dataMessageToWearable(WEARABLE_DATA_PATH, "limitYear");
+                System.out.println("limitYear case");
+                dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitWeek", "12000");
+                //dataMessageToWearable(WEARABLE_DATA_PATH, "limitYear");
                 break;
             }
             case "goodbye": {
@@ -140,6 +143,31 @@ public class WearService extends WearableListenerService implements
                 System.out.println("default case");
                 break;
         }
+    }
+
+    public void dataMessageToWearableLimit(String path, String text, String limit) {
+
+        String seperator = ";";
+        String dataMessage = limit + seperator;
+
+        SimpleDateFormat sdf = new SimpleDateFormat( "dd.MM.yyyy HH:mm:ss");
+        String myTime = sdf.format( new Date());
+
+        // Datenvorbereitung
+        // dataMessage += "\n";
+        dataMessage += String.valueOf( 0 + ( (int)( Math.random() * Integer.valueOf( limit))));
+
+
+        // TODO Datenbeschaffung innerhalb des Threads und anschließend senden
+
+        // vor dem senden nochmal warten
+        try {
+            Thread.sleep( 2000);
+        } catch (Exception e) {
+            System.out.println( e.getMessage());
+        }
+        // send Data on messagePath
+        new SendToDataLayerThread( path, text + seperator + dataMessage).start();
     }
 
     public void dataMessageToWearable(String path, String text) {

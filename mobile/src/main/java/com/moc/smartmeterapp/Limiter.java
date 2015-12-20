@@ -1,5 +1,7 @@
 package com.moc.smartmeterapp;
 
+import com.moc.smartmeterapp.model.Limit;
+
 import java.util.ArrayList;
 import java.util.List;
 

@@ -9,7 +9,12 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.moc.smartmeterapp.model.DataObject;
+import com.moc.smartmeterapp.model.Global;
+import com.moc.smartmeterapp.model.Limit;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,12 +22,35 @@ import java.util.List;
  */
 public class Communication{
 
+    public interface ILiveDataEventHandler {
+        boolean onLiveDataReceived(int value);
+    }
+
+    public interface IGlobalDataEventHandler {
+        boolean onGlobalDataReceived(Global value);
+    }
+
+    public interface ILimitsEventHandler {
+        boolean onLimitsReceived(List<Limit> value);
+    }
+
+    public interface IMeterDataEventHandler {
+        boolean onMeterDataReceived(DataObject value);
+    }
+
     private DataService dataService;
     private boolean serviceBinded;
     private boolean isRegistered;
 
+    public final static int LIVE_DATA = 0;
+    public final static int GLOBAL_DATA = 1;
+    public final static int LIMITS = 2;
+    public final static int METER_DATA = 3;
+    public final static int TEST = 4;
+
     private Context context;
-    private List<IDataEventHandler> dataEventHandlers;
+    private List<ILiveDataEventHandler> dataEventHandlers;
+    private Integer[] flags;
 
     private ServiceConnection dataServiceConnection = new ServiceConnection() {
         @Override
@@ -30,6 +58,31 @@ public class Communication{
             DataService.LocalBinder binder = (DataService.LocalBinder)iBinder;
             dataService = binder.getService();
             serviceBinded = true;
+
+            Log.d("DEBUG", "Service binded sucessfully");
+            Log.d("DEBUG", "Flags: ");
+
+            for(int f : flags) {
+                switch(f) {
+                    case LIVE_DATA:
+                        Log.d("DEBUG", "LIVE_DATA");
+                        dataService.startReceiverIfNotRunning();
+                        break;
+                    case GLOBAL_DATA:
+                        Log.d("DEBUG", "GLOBAL_DATA");
+                        break;
+                    case LIMITS:
+                        Log.d("DEBUG", "LIMITS");
+                        break;
+                    case METER_DATA:
+                        Log.d("DEBUG", "METER_DATA");
+                        break;
+                    case TEST:
+                        dataService.startRestTest();
+                        Log.d("DEBUG", "TEST");
+                        break;
+                }
+            }
         }
 
         @Override
@@ -38,10 +91,17 @@ public class Communication{
         }
     };
 
+    public DataService getServiceHandle() {
+        if(dataService != null && serviceBinded)
+            return dataService;
+
+        return null;
+    }
+
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            for(IDataEventHandler e : dataEventHandlers) {
+            for(ILiveDataEventHandler e : dataEventHandlers) {
                 if(e!=null && !e.onLiveDataReceived(Integer.valueOf(intent.getStringExtra("value")))) {
                     unregisterDataEventHandler(e);
                 }
@@ -53,15 +113,14 @@ public class Communication{
         }
     };
 
-    public Communication(Context context) {
+    public Communication(Context context, Integer... flags) {
+        dataEventHandlers = new ArrayList<ILiveDataEventHandler>();
+        this.flags = flags;
         this.context = context;
         isRegistered = false;
-        dataEventHandlers = new ArrayList<IDataEventHandler>();
-
-        //context.startService(new Intent(context, DataService.class));
     }
 
-    public void registerDataEventHandler(IDataEventHandler dataEventHandler) {
+    public void registerDataEventHandler(ILiveDataEventHandler dataEventHandler) {
         if(dataEventHandler != null) {
             dataEventHandlers.add(dataEventHandler);
             Log.d("DEBUG", "registered: " + dataEventHandler.toString());
@@ -72,7 +131,7 @@ public class Communication{
         }
     }
 
-    public void unregisterDataEventHandler(IDataEventHandler dataEventHandler) {
+    public void unregisterDataEventHandler(ILiveDataEventHandler dataEventHandler) {
         if(dataEventHandler != null) {
             dataEventHandlers.remove(dataEventHandler);
             Log.d("DEBUG", "unregistered: " + dataEventHandler.toString());
@@ -91,7 +150,7 @@ public class Communication{
         }
     }
 
-    private void unregisterReceiver() {
+    public void unregisterReceiver() {
         if(context != null && broadcastReceiver != null && isRegistered) {
             context.registerReceiver(broadcastReceiver, new IntentFilter(DataService.BROADCAST_ACTION));
             Log.d("DEBUG", "unregistered broadcast receiver");
@@ -99,10 +158,9 @@ public class Communication{
         }
     }
 
-    public void bindService() {
+    public void  bindService() {
         if(context != null && broadcastReceiver != null && !serviceBinded) {
             context.bindService(new Intent(context, DataService.class), dataServiceConnection, Context.BIND_AUTO_CREATE);
-            Log.d("DEBUG", "Service binded sucessfully");
         }
     }
 
