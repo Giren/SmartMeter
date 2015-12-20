@@ -148,6 +148,24 @@ public class MeterDataSource {
         return null;
     }
 
+    public void deleteDayFromDataBase(Date date){
+        database.delete(MeterDbHelper.TABLE_METER_LIST,
+                MeterDbHelper.COLUMN_DATE + "=?",
+                new String[] { dateToString(date) });
+    }
+
+    public void deleteMonthFromDataBase(Date date){
+        database.delete(MeterDbHelper.TABLE_METER_LIST,
+                MeterDbHelper.COLUMN_DATE + " like ?",
+                new String[]{String.valueOf(date.getYear()) + "-" + String.valueOf(date.getMonth()) + "%"});
+    }
+
+    public void deleteYearFromDataBase(Date date){
+        database.delete(MeterDbHelper.TABLE_METER_LIST,
+                MeterDbHelper.COLUMN_DATE + " like ?",
+                new String[] { String.valueOf(date.getYear())+"%"} );
+    }
+
     public void openDataBase(){
         database = meterDbHelper.getWritableDatabase();
     }

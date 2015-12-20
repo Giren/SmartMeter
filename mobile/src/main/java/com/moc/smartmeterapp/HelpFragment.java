@@ -21,7 +21,9 @@ import com.moc.smartmeterapp.model.EntryObject;
 import com.moc.smartmeterapp.model.Hour;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
@@ -40,6 +42,13 @@ public class HelpFragment extends Fragment{
     private MeterDbHelper meterDbHelper;
     private ComUtils.IRestTestService restService;
 
+    private ListView listView;
+    private Day day;
+    private Day day1;
+    private Day day2;
+    private Day day3;
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,15 +65,14 @@ public class HelpFragment extends Fragment{
         restButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Date nDate = new Date();
-                nDate.setDate(20);
-                nDate.setMonth(5);
-                nDate.setYear(2016);
                 meterDbHelper.openDatabase();
                 //Day newDay = meterDbHelper.loadDay(nDate);
-                //System.out.println(newDay.getDate().getYear());
                 //meterDbHelper.loadMonth(nDate);
-                meterDbHelper.loadYear(nDate);
+                //meterDbHelper.loadYear(nDate);
+                //meterDbHelper.deleteMonth(nDate);
+                //meterDbHelper.deleteYear(nDate);
+                meterDbHelper.deleteDay(day.getDate());
+                listView.setAdapter(showAllDBEntries());
                 meterDbHelper.closeDatabase();
 
 //                //new HttpRequestTask().execute();
@@ -117,36 +125,52 @@ public class HelpFragment extends Fragment{
 
         List<Day> dataList = new ArrayList<>();
 
+//        Calendar calendar1 = new GregorianCalendar(2016,2,2);
+//        Calendar calendar2 = new GregorianCalendar(2016,1,15);
+//        Calendar calendar3 = new GregorianCalendar(2016,1,27);
+//        Calendar calendar4 = new GregorianCalendar(2017,1,3);
+
         Date date = new Date();
-        date.setDate(1);
-        date.setMonth(1);
+        date.setDate(2);
+        date.setMonth(2);
         date.setYear(2016);
-        Day day = new Day();
+        day = new Day();
         day.setDate(date);
         dataList.add(day);
 
         Date date1 = new Date();
-        date1.setDate(2);
+        date1.setDate(15);
         date1.setMonth(1);
         date1.setYear(2016);
-        Day day1 = new Day();
+        day1 = new Day();
         day1.setDate(date1);
         dataList.add(day1);
 
         Date date2 = new Date();
-        date2.setDate(3);
+        date2.setDate(27);
         date2.setMonth(1);
         date2.setYear(2016);
-        Day day2 = new Day();
+        day2 = new Day();
         day2.setDate(date2);
         dataList.add(day2);
 
-        ListView listView = (ListView) view.findViewById(R.id.listView);
+        Date date3 = new Date();
+        date3.setDate(3);
+        date3.setMonth(1);
+        date3.setYear(2017);
+        day3 = new Day();
+        day3.setDate(date3);
+        dataList.add(day3);
+
+        listView = (ListView) view.findViewById(R.id.listView);
 
         meterDbHelper = new MeterDbHelper(getActivity().getBaseContext());
         meterDbHelper.openDatabase();
         meterDbHelper.deleteAll();
-        meterDbHelper.saveMonth(dataList);
+        meterDbHelper.saveDay(day);
+        meterDbHelper.saveDay(day1);
+        meterDbHelper.saveDay(day2);
+        meterDbHelper.saveDay(day3);
         listView.setAdapter(showAllDBEntries());
         meterDbHelper.closeDatabase();
     }

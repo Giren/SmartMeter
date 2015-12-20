@@ -101,17 +101,17 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
 
     @Override
     public void deleteDay(Date date) {
-
+        meterDataSource.deleteDayFromDataBase(date);
     }
 
     @Override
     public void deleteMonth(Date date) {
-
+        meterDataSource.deleteMonthFromDataBase(date);
     }
 
     @Override
     public void deleteYear(Date date) {
-
+        meterDataSource.deleteYearFromDataBase(date);
     }
 
     @Override
