@@ -71,17 +71,17 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
 
     @Override
     public Day loadDay(Date date) {
-        return null;
+        return meterDataSource.getDayFromDataBase(date);
     }
 
     @Override
     public List<Day> loadMonth(Date date) {
-        return null;
+        return meterDataSource.getMonthFromDataBase(date);
     }
 
     @Override
     public List<Day> loadYear(Date date) {
-        return null;
+        return meterDataSource.getYearFromDataBase(date);
     }
 
     @Override

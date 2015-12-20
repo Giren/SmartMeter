@@ -34,10 +34,9 @@ public class MeterDataSource {
     }
 
     public void insertListDataToDB(List<Day> days){
-        System.out.println("Gonna put "+days.size()+" objects into Database");
+        System.out.println("Gonna put " + days.size() + " objects into Database");
         for(int i=0; i<days.size(); i++){
             insertDataToDB(days.get(i));
-            System.out.println(days.get(i).getDate().getYear());
         }
     }
 
@@ -52,8 +51,7 @@ public class MeterDataSource {
     }
 
     private String dateToString(Date date){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        return dateFormat.format(date);
+        return ( date.getYear()+"-"+date.getMonth()+"-"+date.getDay());
     }
 
     private Day cursorToMeterData(Cursor cursor){
@@ -61,6 +59,8 @@ public class MeterDataSource {
         int dbDate = cursor.getColumnIndex(MeterDbHelper.COLUMN_DATE);
         Long id = cursor.getLong(dbIndex);
         String da = cursor.getString(dbDate);
+
+        System.out.println(">>>>>>>>>> "+da+" <<<<<<<<<");
 
         byte[] blob = cursor.getBlob(cursor.getColumnIndex(MeterDbHelper.COLUMN_DAY_O));
         String json = new String(blob);
@@ -70,11 +70,25 @@ public class MeterDataSource {
         return day;
     }
 
+    private List<Day> cursorToMeterList(Cursor cursor){
+        System.out.println("Found something: "+cursor.getCount());
+        cursor.moveToFirst();
+        List<Day> dataList = new ArrayList<>();
+        Day day;
+
+        while(!cursor.isAfterLast()){
+            day = cursorToMeterData(cursor);
+            dataList.add(day);
+            cursor.moveToNext();
+        }
+        return dataList;
+    }
+
     public List<Day> getAllDBData(){
         List<Day> dataList = new ArrayList<>();
 
         Cursor cursor = database.query(MeterDbHelper.TABLE_METER_LIST, columns,
-                null,null,null,null,null);
+                null, null, null, null, null);
         cursor.moveToFirst();
         Day day;
 
@@ -86,7 +100,53 @@ public class MeterDataSource {
         cursor.close();
 
         return dataList;
-   }
+    }
+
+    public Day getDayFromDataBase(Date date){
+        Cursor cursor =
+                database.query(MeterDbHelper.TABLE_METER_LIST,
+                        columns,
+                        MeterDbHelper.COLUMN_DATE + "=?",
+                        new String[] { dateToString(date) },
+                        null,null,null,null);
+        cursor.moveToFirst();
+
+        if(cursor.getCount() > 0){
+            Day day = cursorToMeterData(cursor);
+            System.out.println("found Date: " + day.getDate().getYear());
+            return day;
+        }
+        System.out.println("No Date found in DataBase");
+        return null;
+    }
+
+    public List<Day> getMonthFromDataBase(Date date){
+        Cursor cursor = database.query(MeterDbHelper.TABLE_METER_LIST,
+                columns,
+                MeterDbHelper.COLUMN_DATE + " like ?",
+                new String[] { String.valueOf(date.getYear())+"-"+String.valueOf(date.getMonth())+"%" },
+                null, null, null, null);
+
+        if(cursor.getCount() > 0){
+            return cursorToMeterList(cursor);
+        }
+        System.out.println("Found nothing ........");
+        return null;
+    }
+
+    public List<Day> getYearFromDataBase(Date date){
+        Cursor cursor = database.query(MeterDbHelper.TABLE_METER_LIST,
+                columns,
+                MeterDbHelper.COLUMN_DATE + " like ?",
+                new String[] { String.valueOf(date.getYear())+"%" },
+                null, null, null, null);
+
+        if(cursor.getCount() > 0){
+            return cursorToMeterList(cursor);
+        }
+        System.out.println("Found nothing ........");
+        return null;
+    }
 
     public void openDataBase(){
         database = meterDbHelper.getWritableDatabase();

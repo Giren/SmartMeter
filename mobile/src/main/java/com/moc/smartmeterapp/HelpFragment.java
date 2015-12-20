@@ -56,9 +56,17 @@ public class HelpFragment extends Fragment{
         restButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Date nDate = new Date();
+                nDate.setDate(20);
+                nDate.setMonth(5);
+                nDate.setYear(2016);
                 meterDbHelper.openDatabase();
-                meterDbHelper.deleteAll();
+                //Day newDay = meterDbHelper.loadDay(nDate);
+                //System.out.println(newDay.getDate().getYear());
+                //meterDbHelper.loadMonth(nDate);
+                meterDbHelper.loadYear(nDate);
                 meterDbHelper.closeDatabase();
+
 //                //new HttpRequestTask().execute();
 //                Observable.interval(1, 3, TimeUnit.SECONDS)
 //                        .subscribe(new Observer<Long>() {
@@ -110,25 +118,25 @@ public class HelpFragment extends Fragment{
         List<Day> dataList = new ArrayList<>();
 
         Date date = new Date();
-        date.setDate(20);
+        date.setDate(1);
         date.setMonth(1);
-        date.setYear(2022);
+        date.setYear(2016);
         Day day = new Day();
         day.setDate(date);
         dataList.add(day);
 
         Date date1 = new Date();
-        date1.setDate(20);
+        date1.setDate(2);
         date1.setMonth(1);
-        date1.setYear(2023);
+        date1.setYear(2016);
         Day day1 = new Day();
         day1.setDate(date1);
         dataList.add(day1);
 
         Date date2 = new Date();
-        date2.setDate(20);
+        date2.setDate(3);
         date2.setMonth(1);
-        date2.setYear(2024);
+        date2.setYear(2016);
         Day day2 = new Day();
         day2.setDate(date2);
         dataList.add(day2);
@@ -137,6 +145,7 @@ public class HelpFragment extends Fragment{
 
         meterDbHelper = new MeterDbHelper(getActivity().getBaseContext());
         meterDbHelper.openDatabase();
+        meterDbHelper.deleteAll();
         meterDbHelper.saveMonth(dataList);
         listView.setAdapter(showAllDBEntries());
         meterDbHelper.closeDatabase();
