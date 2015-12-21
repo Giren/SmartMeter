@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">SmartMeterApp</string>
+    <string name="tvLimitUnitLimit">[kWh]</string>
+    <string name="tvLimitUnitCurrent">[kWh]</string>
+    <string name="tvCurrentText">Aktuell:</string>
+    <string name="tvLimitText">Limit:</string>
 </resources>

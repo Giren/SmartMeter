@@ -3,6 +3,7 @@ package com.moc.smartmeterapp;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,14 +16,14 @@ import android.widget.TextView;
 public class StatisticFragment extends CustomFragment {
 
     String fragmentName;
-    String actualValue;
+    String currentValue;
     String limitValue;
     String limitPercent;
-    TextView tvActualValue;
+    TextView tvCurrentValue;
     TextView tvLimitValue;
-    TextView tvPercent;
+    TextView tvLimitPercent;
     TextView tv;
-    ProgressBar progressBar;
+    ProgressBar pbLimit;
     boolean userVisible;
 
     /**
@@ -35,7 +36,7 @@ public class StatisticFragment extends CustomFragment {
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate( R.layout.statistic_frag, container, false);
 
-        tv = ( TextView) v.findViewById( R.id.tvStatisticFrag);
+        tv = ( TextView) v.findViewById( R.id.tvLimitView);
         String localLabel;
         switch ( getArguments().getString( "msg")) {
             case "limitWeek": {
@@ -57,17 +58,21 @@ public class StatisticFragment extends CustomFragment {
         }
         tv.setText( localLabel);
 
-        tvActualValue = ( TextView) v.findViewById( R.id.tvActualValue);
+        tvCurrentValue = ( TextView) v.findViewById( R.id.tvCurrentValue);
         tvLimitValue = ( TextView) v.findViewById( R.id.tvLimitValue);
-        tvPercent = ( TextView) v.findViewById( R.id.tvLimitPercent);
+        tvLimitPercent = ( TextView) v.findViewById( R.id.tvLimitPercent);
 
         tvLimitValue.setText( "100");
 
-        progressBar = ( ProgressBar) v.findViewById( R.id.progressBar);
-        progressBar.setMax(100);
-        progressBar.setProgress(0);
-        progressBar.setScaleY(3f);
-        progressBar.setDrawingCacheBackgroundColor(Color.GREEN);
+        pbLimit = ( ProgressBar) v.findViewById( R.id.pbLimit);
+        pbLimit.setMax(100);
+        pbLimit.setProgress(0);
+        pbLimit.setScaleY(3f);
+        pbLimit.setDrawingCacheBackgroundColor(Color.GREEN);
+
+        tvCurrentValue.setText( "0");
+        tvLimitValue.setText( "0");
+        tvLimitPercent.setText( "0 %");
 
 
 //        getActivity().runOnUiThread( new Runnable() {
@@ -89,10 +94,9 @@ public class StatisticFragment extends CustomFragment {
 //            }
 //        });
 
-
         fragmentName = getArguments().getString("msg");
-        System.out.println("statistic onCreate");
 
+        Log.d("DEBUG", "StatisticFragment - onCreateView() - " + fragmentName);
         return v;
     }
 
@@ -101,15 +105,19 @@ public class StatisticFragment extends CustomFragment {
      */
     @Override
     public void UpdateFragmentContent( String update) {
-        System.out.println(" Statistic UpdateFragmentContent" + update);
+        Log.d("DEBUG", "StatisticFragment - UpdateFragmentContent() - " + update);
+        /*
+            Format des empfangenen Strings:
+            <fragmentKürzel>;<LimitValue>;<CurrentValue>
+         */
         String[] msgSplit = update.split(";");
 
         tvLimitValue.setText( msgSplit[1]);
-        tvActualValue.setText(  msgSplit[2]);
+        tvCurrentValue.setText( msgSplit[2]);
 
         int percenthelp = ( Integer.valueOf( msgSplit[2]) * 100) / Integer.valueOf(msgSplit[1]);
-        tvPercent.setText( String.valueOf( percenthelp));
-        progressBar.setProgress( percenthelp);
+        tvLimitPercent.setText( String.valueOf( percenthelp) + " %");
+        pbLimit.setProgress( percenthelp);
 
         //tv.setText(update);
     }
@@ -129,14 +137,13 @@ public class StatisticFragment extends CustomFragment {
         this.setUserVisible( isVisibleToUser);
 
         if ( this.getUserVisible()) {
-            System.out.println( "this fragment is now visible");
+            Log.d("DEBUG", "StatisticFragment - setUserVisibleHint() - visible");
             ((MainActivity)getActivity()).sendDataToHandheld( fragmentName);
         } else if( !this.getUserVisible()) {
-            System.out.println( "this fragment is now invisible");
+            Log.d("DEBUG", "StatisticFragment - setUserVisibleHint() - invisible");
             fragmentName = getArguments().getString("msg");
         }
-
-        System.out.println("setUserVisibleHint called");
+        Log.d("DEBUG", "StatisticFragment - setUserVisibleHint()");
     }
 
     public boolean getUserVisible() {

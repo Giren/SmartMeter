@@ -15,6 +15,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -54,7 +55,7 @@ public class MainActivity extends FragmentActivity implements
     @Override
     protected void onCreate( Bundle savedInstanceState) {
         super.onCreate( savedInstanceState);
-        setContentView(R.layout.main_activity);
+        setContentView( R.layout.main_activity);
 
         pager = ( ViewPager) findViewById( R.id.viewPager);
         pager.setAdapter( new MyPagerAdapter( getSupportFragmentManager()));
@@ -72,7 +73,8 @@ public class MainActivity extends FragmentActivity implements
                 .build();
 
 
-        // TODO send "hello" to handheld
+        getWindow().addFlags( WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // TODO onCreate
     }
 
     /**
@@ -87,12 +89,15 @@ public class MainActivity extends FragmentActivity implements
             googleClient.disconnect();
         }
         super.onStop();
+        Log.d("DEBUG", "MainActivity - onStop()");
         System.out.println("onStop called");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        Log.d("DEBUG", "MainActivity - onDestroy()");
         System.out.println("onDestroy called");
     }
 
@@ -103,31 +108,36 @@ public class MainActivity extends FragmentActivity implements
     protected void onStart() {
         super.onStart();
         googleClient.connect();
+        Log.d("DEBUG", "MainActivity - onStart()");
     }
 
     @Override
     public void onConnected( Bundle connectionHint) {
         // register MessageListener
         Wearable.MessageApi.addListener(googleClient, this);
+        Log.d("DEBUG", "MainActivity - onConnected()");
     }
 
     // Placeholders for required connection callbacks
     @Override
-    public void onConnectionSuspended( int cause) { }
+    public void onConnectionSuspended( int cause) {
+        Log.d("DEBUG", "MainActivity - onConnectionSuspend()");}
 
     @Override
-    public void onConnectionFailed( ConnectionResult connectionResult) { }
+    public void onConnectionFailed( ConnectionResult connectionResult) {
+        Log.d("DEBUG", "MainActivity - onConnectionFailed()");}
 
     public void sendDataToHandheld(String toHandheld) {
         new SendToDataLayerThread( HANDHELD_DATA_PATH, toHandheld).start();
+        Log.d("DEBUG", "MainActivity - sendDataToHandheld()");
     }
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         if( messageEvent.getPath().equals( WEARABLE_DATA_PATH)) {
             final String message = new String( messageEvent.getData());
-            Log.v("myTag", "Message path received on watch is: " + messageEvent.getPath());
-            Log.v("myTag", "Message received on watch is: " + message);
+            Log.d("DEBUG", "Message path received on watch is: " + messageEvent.getPath());
+            Log.d("DEBUG", "Message received on watch is: " + message);
 
             // verarbeite die empfangene message
             runOnUiThread(new Runnable() {
@@ -149,6 +159,7 @@ public class MainActivity extends FragmentActivity implements
     public void handleReceivedMessage(String message) {
         // String message = intent.getStringExtra( "message");
         // Display message in UI
+        Log.d("DEBUG", "MainActivity - handleReceivedMessage(): " + message);
         System.out.println("onReceive MainActivity" + message);
         // System.out.println( actualFragment.getActivity().getSupportFragmentManager().);
         List<Fragment> allFragments = getSupportFragmentManager().getFragments();
@@ -173,7 +184,7 @@ public class MainActivity extends FragmentActivity implements
                             @Override
                             public void run() {
                                 try {
-                                    Thread.sleep( 2000);
+                                    Thread.sleep( 1000);
                                 } catch (Exception e) {
                                     System.out.println( e.getMessage());
                                 }
@@ -267,10 +278,10 @@ public class MainActivity extends FragmentActivity implements
             for( Node node : nodes.getNodes()) {
                 MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(googleClient, node.getId(), path, message.getBytes()).await();
                 if( result.getStatus().isSuccess()) {
-                    Log.v("myTag", "Message: {" + message + "} sent to: " + node.getDisplayName());
+                    Log.d("DEBUG", "Message: {" + message + "} sent to: " + node.getDisplayName());
                 } else {
                     // Log on error
-                    Log.v("myTag", "ERROR: failed to send Message");
+                    Log.d("DEBUG", "ERROR: failed to send Message");
                 } // if end
             } // for end
         } // run end
