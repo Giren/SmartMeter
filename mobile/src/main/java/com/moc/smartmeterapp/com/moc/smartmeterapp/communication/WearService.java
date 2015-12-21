@@ -1,6 +1,5 @@
 package com.moc.smartmeterapp.com.moc.smartmeterapp.communication;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -12,9 +11,14 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
+import com.moc.smartmeterapp.model.DataObject;
+import com.moc.smartmeterapp.model.EntryObject;
+import com.moc.smartmeterapp.model.Global;
+import com.moc.smartmeterapp.model.Limit;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by philipp on 26.11.2015.
@@ -22,7 +26,7 @@ import java.util.Date;
 public class WearService extends WearableListenerService implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        Communication.ILiveDataEventHandler{
+        Communication.IDataEvent {
 
     private static final String WEARABLE_DATA_PATH = "/SmartMeterToWearable";
     private static final String HANDHELD_DATA_PATH = "/SmartMeterToHandheld";
@@ -32,7 +36,11 @@ public class WearService extends WearableListenerService implements
 
     @Override
     public void onCreate() {
+<<<<<<< HEAD
         communication = new Communication(getApplicationContext(), Communication.LIVE_DATA, Communication.LIMITS);
+=======
+        communication = new Communication(getApplicationContext(), ComUtils.LIVE_DATA);
+>>>>>>> 0e92aa1e427e071528b50742204052f4e64ce8b7
         Log.d("DEBUG", "WEAR SERVICE ON CREATE");
 
         if ( googleClient == null) {
@@ -74,6 +82,26 @@ public class WearService extends WearableListenerService implements
         Log.d("DEBUG", "SEND DATA TO WEAR");
         new SendToDataLayerThread( WEARABLE_DATA_PATH, "liveData" + ";" + String.valueOf(value)).start();
         return true;
+    }
+
+    @Override
+    public boolean onGlobalDataReceived(Global global) {
+        return false;
+    }
+
+    @Override
+    public boolean onLimitsReceived(List<Limit> limits) {
+        return false;
+    }
+
+    @Override
+    public boolean onMeterDataReceived(DataObject dataObject) {
+        return false;
+    }
+
+    @Override
+    public boolean onTestReceived(EntryObject entryObject) {
+        return false;
     }
 
     @Override
