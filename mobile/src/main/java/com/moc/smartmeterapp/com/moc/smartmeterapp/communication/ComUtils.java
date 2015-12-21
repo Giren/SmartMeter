@@ -6,15 +6,18 @@ import com.moc.smartmeterapp.model.Global;
 import com.moc.smartmeterapp.model.Limit;
 
 import java.util.List;
+import java.util.Map;
 
 import retrofit.RestAdapter;
 import retrofit.http.GET;
+import retrofit.http.Path;
+import retrofit.http.QueryMap;
 
 /**
  * Created by philipp on 14.12.2015.
  */
 public class ComUtils {
-    public final static String SERVICE_ENDPOINT = "http://10.0.0.20:8080";
+    public final static String SERVICE_ENDPOINT = "http://192.168.1.65:8080";
 
     public final static int LIVE_DATA = 0;
     public final static int GLOBAL_DATA = 1;
@@ -28,24 +31,9 @@ public class ComUtils {
     public final static int RECIVED_METER_DATA = 13;
     public final static int RECIVED_TEST = 14;
 
-    public interface IRestTestService {
-        @GET("/stats?accessToken=123456")
-        rx.Observable<EntryObject> getEntryObjectObservable();
-    }
-
-    public interface IGlobalRestService {
-        @GET("/stats?accessToken=123456")
-        rx.Observable<Global> getGlobalObservable();
-    }
-
-    public interface ILimitListRestService {
-        @GET("/stats?accessToken=123456")
-        rx.Observable<List<Limit>> getLimitListObservable();
-    }
-
-    public interface IDataObjectRestService {
-        @GET("/stats?accessToken=123456")
-        rx.Observable<DataObject> getDataObjectObservable();
+    public interface IRestService {
+        @GET("/{path}")
+        rx.Observable<EntryObject> getEntryObjectObservable(@Path("path") String path, @QueryMap Map<String, String> params);
     }
 
     public static <T> T createRetrofitService(final Class<T> c) {

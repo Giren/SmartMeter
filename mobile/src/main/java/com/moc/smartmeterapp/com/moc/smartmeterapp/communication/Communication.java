@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class Communication{
 
-    public interface ILiveDataEventHandler {
+    public interface IDataEvent {
         boolean onLiveDataReceived(int value);
         boolean onGlobalDataReceived(Global global);
         boolean onLimitsReceived(List<Limit> limits);
@@ -36,7 +36,7 @@ public class Communication{
     private boolean isRegistered;
 
     private Context context;
-    private List<ILiveDataEventHandler> dataEventHandlers;
+    private List<IDataEvent> dataEventHandlers;
     private List<Integer> flags;
 
     private ServiceConnection dataServiceConnection = new ServiceConnection() {
@@ -53,7 +53,7 @@ public class Communication{
                 switch(f) {
                     case ComUtils.LIVE_DATA:
                         Log.d("DEBUG", "LIVE_DATA");
-                        dataService.startReceiverIfNotRunning();
+                        dataService.startReceiver();
                         break;
                     case ComUtils.GLOBAL_DATA:
                         Log.d("DEBUG", "GLOBAL_DATA");
@@ -89,15 +89,17 @@ public class Communication{
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            for(ILiveDataEventHandler e : dataEventHandlers) {
+            for(IDataEvent e : dataEventHandlers) {
                 if(e!=null) {
 
                     //Handle Live Data
                     if(flags.contains(ComUtils.LIVE_DATA)) {
                         String temp = intent.getStringExtra(String.valueOf(ComUtils.RECIVED_LIVE_DATA));
 
-                        if(temp != null && !e.onLiveDataReceived(Integer.valueOf(temp))) {
-                            unregisterDataEventHandler(e);
+                        if(temp != null && !temp.isEmpty()) {
+                            if(!e.onLiveDataReceived(Integer.valueOf(temp))) {
+                                unregisterDataEventHandler(e);
+                            }
                         }
                     }
 
@@ -105,8 +107,10 @@ public class Communication{
                     if(flags.contains(ComUtils.GLOBAL_DATA)) {
                         Global global = (Global) intent.getSerializableExtra(String.valueOf(ComUtils.RECIVED_GLOBAL_DATA));
 
-                        if(global != null && !e.onGlobalDataReceived(global)) {
-                            unregisterDataEventHandler(e);
+                        if(global != null) {
+                            if(!e.onGlobalDataReceived(global)) {
+                                unregisterDataEventHandler(e);
+                            }
                         }
                     }
 
@@ -114,8 +118,10 @@ public class Communication{
                     if(flags.contains(ComUtils.LIMITS)) {
                         List<Limit> limits = (ArrayList<Limit>) intent.getSerializableExtra(String.valueOf(ComUtils.RECIVED_LIMITS));
 
-                        if (limits != null && !e.onLimitsReceived(limits)) {
-                            unregisterDataEventHandler(e);
+                        if (limits != null) {
+                            if(!e.onLimitsReceived(limits)) {
+                                unregisterDataEventHandler(e);
+                            }
                         }
                     }
 
@@ -123,8 +129,10 @@ public class Communication{
                     if(flags.contains(ComUtils.METER_DATA)) {
                         DataObject dataObject = (DataObject) intent.getSerializableExtra(String.valueOf(ComUtils.RECIVED_METER_DATA));
 
-                        if (dataObject != null && !e.onMeterDataReceived(dataObject)) {
-                            unregisterDataEventHandler(e);
+                        if (dataObject != null) {
+                            if(!e.onMeterDataReceived(dataObject))  {
+                                unregisterDataEventHandler(e);
+                            }
                         }
                     }
 
@@ -132,8 +140,10 @@ public class Communication{
                     if(flags.contains(ComUtils.TEST)) {
                         EntryObject entryObject = (EntryObject) intent.getSerializableExtra(String.valueOf(ComUtils.RECIVED_TEST));
 
-                        if (entryObject != null && !e.onTestReceived(entryObject)) {
-                            unregisterDataEventHandler(e);
+                        if (entryObject != null) {
+                            if(!e.onTestReceived(entryObject)) {
+                                unregisterDataEventHandler(e);
+                            }
                         }
                     }
                 }
@@ -146,13 +156,13 @@ public class Communication{
     };
 
     public Communication(Context context, Integer... flags) {
-        dataEventHandlers = new ArrayList<ILiveDataEventHandler>();
+        dataEventHandlers = new ArrayList<IDataEvent>();
         this.flags = Arrays.asList(flags);
         this.context = context;
         isRegistered = false;
     }
 
-    public void registerDataEventHandler(ILiveDataEventHandler dataEventHandler) {
+    public void registerDataEventHandler(IDataEvent dataEventHandler) {
         if(dataEventHandler != null) {
             dataEventHandlers.add(dataEventHandler);
             Log.d("DEBUG", "registered: " + dataEventHandler.toString());
@@ -163,7 +173,7 @@ public class Communication{
         }
     }
 
-    public void unregisterDataEventHandler(ILiveDataEventHandler dataEventHandler) {
+    public void unregisterDataEventHandler(IDataEvent dataEventHandler) {
         if(dataEventHandler != null) {
             dataEventHandlers.remove(dataEventHandler);
             Log.d("DEBUG", "unregistered: " + dataEventHandler.toString());
@@ -184,20 +194,20 @@ public class Communication{
 
     public void unregisterReceiver() {
         if(context != null && broadcastReceiver != null && isRegistered) {
-            context.registerReceiver(broadcastReceiver, new IntentFilter(DataService.BROADCAST_ACTION));
+            context.unregisterReceiver(broadcastReceiver);
             Log.d("DEBUG", "unregistered broadcast receiver");
             isRegistered = false;
         }
     }
 
     public void  bindService() {
-        if(context != null && broadcastReceiver != null && !serviceBinded) {
+        if(context != null && !serviceBinded) {
             context.bindService(new Intent(context, DataService.class), dataServiceConnection, Context.BIND_AUTO_CREATE);
         }
     }
 
     public void unbindService() {
-        if(context != null && broadcastReceiver != null && dataServiceConnection != null) {
+        if(context != null && dataServiceConnection != null) {
             if(serviceBinded) {
                 context.unbindService(dataServiceConnection);
                 Log.d("DEBUG", "Service unbinded sucessfully");

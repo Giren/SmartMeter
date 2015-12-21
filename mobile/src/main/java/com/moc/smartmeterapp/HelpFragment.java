@@ -12,6 +12,8 @@ import android.widget.Button;
 import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.ComUtils;
 import com.moc.smartmeterapp.model.EntryObject;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
@@ -24,12 +26,12 @@ import rx.schedulers.Schedulers;
  * Created by michael on 24.11.15.
  */
 public class HelpFragment extends Fragment{
-    private ComUtils.IRestTestService restService;
+    private ComUtils.IRestService restService;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        restService = ComUtils.createRetrofitService(ComUtils.IRestTestService.class);
+        restService = ComUtils.createRetrofitService(ComUtils.IRestService.class);
 
         return inflater.inflate(R.layout.help_fragment_layout,null);
     }
@@ -60,7 +62,10 @@ public class HelpFragment extends Fragment{
 
                             @Override
                             public void onNext(Long aLong) {
-                                restService.getEntryObjectObservable()
+                                Map<String, String> map = new HashMap<String, String>();
+                                map.put("accessToken", "123456"); // "stats?accessToken=123456"
+
+                                restService.getEntryObjectObservable("stats", map)
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe(new Subscriber<EntryObject>() {
@@ -72,7 +77,7 @@ public class HelpFragment extends Fragment{
 
                                             @Override
                                             public void onError(Throwable e) {
-                                                Log.d("DEBUG", "onError: " + e.getMessage());
+                                                Log.d("DEBUG", "onError: " + e.getStackTrace());
                                             }
 
                                             @Override

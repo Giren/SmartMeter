@@ -13,12 +13,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -26,19 +29,22 @@ import rx.schedulers.Schedulers;
  */
 public class DataService extends Service {
 
+    private static final int DELAY = 7;
+
     private final IBinder mBinder = new LocalBinder();
-    private boolean isRunning = false;
     private static final String TAG = "BroadcastService";
     public static final String BROADCAST_ACTION = "com.mov.smartmeterapp.DataService";
+
+    private boolean receiverIsRunning = false;
+    private boolean testIsRunning = false;
 
     private Socket clientSocket;
     private BufferedReader inFromServer;
     public String message;
     private Intent intent;
 
-    private ComUtils.IRestTestService restService = ComUtils.createRetrofitService(ComUtils.IRestTestService.class);
-    private Observable test = Observable.interval(1, 3, TimeUnit.SECONDS);
-
+    private ComUtils.IRestService restService = ComUtils.createRetrofitService(ComUtils.IRestService.class);
+    private Observable networkObservable = Observable.interval(7, 7, TimeUnit.SECONDS);
 
     @Override
     public void onCreate() {
@@ -56,9 +62,10 @@ public class DataService extends Service {
 
     @Override
     public void onDestroy() {
+        stopReceiver();
+        stopRestTest();
+        Log.d("DEBUG", "Service destroyed...");
         super.onDestroy();
-        isRunning = false;
-        Log.d("DEBUG", "Service destroy...");
     }
 
     public class LocalBinder extends Binder {
@@ -68,85 +75,84 @@ public class DataService extends Service {
         }
     }
 
+    //TEST DATA RECEIVER
+
+   private Subscriber testSubscriber = new Subscriber() {
+        @Override
+        public void onCompleted() {
+            testIsRunning = false;
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            Log.e("ERROR: ", e.getMessage());
+            testIsRunning = false;
+        }
+
+        @Override
+        public void onNext(Object o) {
+            testIsRunning = true;
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("accessToken", "123456"); // "stats?accessToken=123456"
+
+            restService.getEntryObjectObservable("stats", map)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<EntryObject>() {
+                        @Override
+                        public void onCompleted() {
+
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e("ERROR: ", e.getMessage());
+                        }
+
+                        @Override
+                        public void onNext(EntryObject entryObject) {
+                            Log.i("Info: DataService", "Got TestData: " + entryObject.getCurrentEnergy());
+                            intent.putExtra(String.valueOf(ComUtils.RECIVED_TEST), entryObject);
+                            sendBroadcast(intent);
+                        }
+                    });
+        }
+    };
+
     public void startRestTest() {
-        test.subscribe(new Observer<Long>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onNext(Long aLong) {
-                restService.getEntryObjectObservable()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Subscriber<EntryObject>() {
-
-                            @Override
-                            public void onCompleted() {
-                                Log.d("DEBUG", "onComplete Test");
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                Log.d("DEBUG", "onError: " + e.getMessage());
-                            }
-
-                            @Override
-                            public void onNext(EntryObject entryObject) {
-                                Log.d("DEBUG", "Test Object: " + entryObject.getCurrentEnergy());
-                                intent.putExtra(String.valueOf(ComUtils.RECIVED_TEST), entryObject);
-                                sendBroadcast(intent);
-                            }
-                        });
-            }
-        });
+        if(!testIsRunning) {
+            networkObservable.subscribe(testSubscriber);
+            Log.d("DEBUG: ", "sucessfully subscribed rest test");
+        }
     }
 
     private void stopRestTest() {
-       //DO UNSUBSCRIBE
-    }
-
-    public void startReceiver() {
-        socketThread.start();
-    }
-
-    public boolean startReceiverIfNotRunning() {
-        if(!isRunning) {
-            startReceiver();
-            return true;
+        if(testIsRunning) {
+            testSubscriber.unsubscribe();
+            Log.d("DEBUG: ", "sucessfully unsubscribed rest test");
         }
-
-        return false;
     }
 
-    public void stopReceiver() {
-        isRunning = false;
-    }
+    //LIVE DATA RECEIVER
 
     private Thread socketThread = new Thread() {
 
         public void run() {
-            isRunning = true;
+            receiverIsRunning = true;
             Log.d("DEBUG", "Thread startet...");
-            while(isRunning){
+            while(receiverIsRunning){
 
                 Log.d("DEBUG", "Connectiong to socket...");
                 try {
-                    clientSocket = new Socket("10.0.0.20", 9999);
+                    clientSocket = new Socket("192.168.1.65", 9999);
 
                     while (clientSocket.isConnected()) {
                         inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                         message = inFromServer.readLine();
                         if(message != null) {
-                            Log.d("DEBUG", "Live Data: " + message);
                             intent.putExtra(String.valueOf(ComUtils.RECIVED_LIVE_DATA), message);
                             sendBroadcast(intent);
+                            Log.i("Info: DataService", "Got LiveData: " + message);
                         } else {
                             break;
                         }
@@ -170,4 +176,17 @@ public class DataService extends Service {
             Log.d("DEBUG", "Thread stopped...");
         }
     };
+
+    public boolean startReceiver() {
+        if(!receiverIsRunning) {
+            socketThread.start();
+            return true;
+        }
+
+        return false;
+    }
+
+    public void stopReceiver() {
+        receiverIsRunning = false;
+    }
 }

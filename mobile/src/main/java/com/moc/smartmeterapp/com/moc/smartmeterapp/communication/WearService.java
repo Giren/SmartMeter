@@ -1,6 +1,5 @@
 package com.moc.smartmeterapp.com.moc.smartmeterapp.communication;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -14,6 +13,7 @@ import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 import com.moc.smartmeterapp.model.DataObject;
 import com.moc.smartmeterapp.model.EntryObject;
+import com.moc.smartmeterapp.model.Global;
 import com.moc.smartmeterapp.model.Limit;
 
 import java.text.SimpleDateFormat;
@@ -26,7 +26,7 @@ import java.util.List;
 public class WearService extends WearableListenerService implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        Communication.ILiveDataEventHandler{
+        Communication.IDataEvent {
 
     private static final String WEARABLE_DATA_PATH = "/SmartMeterToWearable";
     private static final String HANDHELD_DATA_PATH = "/SmartMeterToHandheld";
@@ -81,7 +81,7 @@ public class WearService extends WearableListenerService implements
     }
 
     @Override
-    public boolean onGlobalDataReceived(int value) {
+    public boolean onGlobalDataReceived(Global global) {
         return false;
     }
 
