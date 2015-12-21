@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.moc.smartmeterapp" >
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -22,16 +22,19 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".com.moc.smartmeterapp.communication.WearService">
+        <service android:name=".com.moc.smartmeterapp.communication.WearService" >
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>
         </service>
-
         <service
             android:name=".com.moc.smartmeterapp.communication.DataService"
-            android:exported="true"/>
+            android:exported="true" />
 
+        <activity
+            android:name=".wdaeFSGGSRGSrg"
+            android:label="@string/title_activity_wdae_fsggsrgsrg" >
+        </activity>
     </application>
 
 </manifest>

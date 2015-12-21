@@ -8,25 +8,34 @@
         android:layout_height="wrap_content"
         android:id="@+id/id_value"
         android:text="[id]"
-        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="119dp" />
+        android:layout_alignParentTop="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/content_value"
         android:text="[content]"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_below="@+id/id_value"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="47dp" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="refresh"
         android:id="@+id/button_rest"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/content_value"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="192dp" />
+        android:layout_marginTop="34dp" />
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/listView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="45dp"
+        android:layout_below="@+id/button_rest" />
+
 
 </RelativeLayout>
