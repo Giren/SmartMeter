@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:weightSum="1">
 
@@ -75,7 +77,8 @@
             android:id="@+id/edit_year"
             android:layout_gravity="right"
             android:textAlignment="center"
-            android:textSize="20dp" />
+            android:textSize="20dp"
+            style="@android:style/Widget.Holo.EditText"/>
     </LinearLayout>
 
     <LinearLayout
@@ -100,7 +103,9 @@
             android:layout_gravity="center_horizontal"
             android:layout_weight="0.84"
             android:switchMinWidth="100dp"
-            android:checked="true" />
+            android:checked="true"
+            android:textOn="On"
+            android:textOff="Off"/>
     </LinearLayout>
 
 </LinearLayout>
