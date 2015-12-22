@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.moc.smartmeterapp.model.Day;
+import com.moc.smartmeterapp.model.MyPreferences;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,6 +28,18 @@ public class MeterDataSource {
                 MeterDbHelper.COLUMN_ID,
                 MeterDbHelper.COLUMN_DATE,
                 MeterDbHelper.COLUMN_DAY_O
+    };
+
+    private String[] prefColumns = {
+            MeterDbHelper.COLUMN_PREF_ID,
+            MeterDbHelper.COLUMN_PREF_WEEK_LIMIT,
+            MeterDbHelper.COLUMN_PREF_WEEK_LIMIT_COLOR,
+            MeterDbHelper.COLUMN_PREF_MONTH_LIMIT,
+            MeterDbHelper.COLUMN_PREF_MONTH_LIMIT_COLOR,
+            MeterDbHelper.COLUMN_PREF_YEAR_LIMIT,
+            MeterDbHelper.COLUMN_PREF_YEAR_LIMIT_COLOR,
+            MeterDbHelper.COLUMN_PREF_IP,
+            MeterDbHelper.COLUMN_PREF_NOTIFICATION
     };
 
     public MeterDataSource(Context context){
@@ -52,6 +65,8 @@ public class MeterDataSource {
 
     private String dateToString(Date date){
         return ( date.getYear()+"-"+date.getMonth()+"-"+date.getDay());
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+//        return( dateFormat.format(date) );
     }
 
     private Day cursorToMeterData(Cursor cursor){
@@ -91,8 +106,7 @@ public class MeterDataSource {
     }
 
     public Day getDayFromDataBase(Date date){
-        Cursor cursor =
-                database.query(MeterDbHelper.TABLE_METER_LIST,
+        Cursor cursor = database.query(MeterDbHelper.TABLE_METER_LIST,
                         columns,
                         MeterDbHelper.COLUMN_DATE + "=?",
                         new String[] { dateToString(date) },
@@ -155,6 +169,74 @@ public class MeterDataSource {
                 new String[] { String.valueOf(date.getYear())+"%"} );
     }
 
+    private MyPreferences cursorToPreferences(Cursor cursor){
+        int dbIndex = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_ID);
+        int dbWeekLimit = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_WEEK_LIMIT);
+        int dbWeekLimitColor = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_WEEK_LIMIT_COLOR);
+        int dbMonthLimit = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_MONTH_LIMIT);
+        int dbMonthLimitColor = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_MONTH_LIMIT_COLOR);
+        int dbYearLimit = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_YEAR_LIMIT);
+        int dbYearLimitColor = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_YEAR_LIMIT_COLOR);
+
+        int dbIp = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_IP);
+        int dbNotification = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_NOTIFICATION);
+
+        Long id = cursor.getLong(dbIndex);
+        int weekLimit = cursor.getInt(dbWeekLimit);
+        String weekLimitColor = cursor.getString(dbWeekLimitColor);
+        int monthLimit = cursor.getInt(dbMonthLimit);
+        String monthLimitColor = cursor.getString(dbMonthLimitColor);
+        int yearLimit = cursor.getInt(dbYearLimit);
+        String yearLimitColor = cursor.getString(dbYearLimitColor);
+
+        String ip = cursor.getString(dbIp);
+        Boolean notification = Boolean.parseBoolean(cursor.getString(dbNotification));
+
+        MyPreferences preferences = new MyPreferences(weekLimit,
+                weekLimitColor,
+                monthLimit,
+                monthLimitColor,
+                yearLimit,
+                yearLimitColor,
+                ip,
+                notification);
+
+        return preferences;
+    }
+
+    public void savePreferences(MyPreferences myPreferences){
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(MeterDbHelper.COLUMN_PREF_WEEK_LIMIT, myPreferences.getWeekLimit());
+        contentValues.put(MeterDbHelper.COLUMN_PREF_WEEK_LIMIT_COLOR, myPreferences.getWeekLimitColor());
+        contentValues.put(MeterDbHelper.COLUMN_PREF_MONTH_LIMIT, myPreferences.getWeekLimit());
+        contentValues.put(MeterDbHelper.COLUMN_PREF_MONTH_LIMIT_COLOR, myPreferences.getWeekLimitColor());
+        contentValues.put(MeterDbHelper.COLUMN_PREF_YEAR_LIMIT, myPreferences.getWeekLimit());
+        contentValues.put(MeterDbHelper.COLUMN_PREF_YEAR_LIMIT_COLOR, myPreferences.getWeekLimitColor());
+
+        contentValues.put(MeterDbHelper.COLUMN_PREF_IP, myPreferences.getIpAddress());
+        contentValues.put(MeterDbHelper.COLUMN_PREF_NOTIFICATION, String.valueOf(myPreferences.getNotification()));
+
+        long insertID = database.insert(MeterDbHelper.TABLE_PREFS, null, contentValues);
+    }
+
+    public MyPreferences loadPreferences(){
+        Cursor cursor = database.query(MeterDbHelper.TABLE_PREFS,
+                prefColumns,
+                null, null, null, null, null);
+        cursor.moveToFirst();
+
+        if(cursor.getCount() > 0){
+            MyPreferences preferences = cursorToPreferences(cursor);
+            System.out.println("found Preferences: " + cursor.getCount());
+            cursor.close();
+            return preferences;
+        }
+        System.out.println("No Preferences found in DataBase");
+        cursor.close();
+        return null;
+    }
+
     public void openDataBase(){
         database = meterDbHelper.getWritableDatabase();
     }
@@ -165,6 +247,7 @@ public class MeterDataSource {
 
     public void deleteDataBase(){
         database.delete(MeterDbHelper.TABLE_METER_LIST, null, null);
+        database.delete(MeterDbHelper.TABLE_PREFS, null, null);
     }
 
     public void setMeterDbHelper(MeterDbHelper meterDbHelper) {
