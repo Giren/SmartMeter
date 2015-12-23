@@ -99,6 +99,11 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
     }
 
     @Override
+    public Day loadLatestDay() {
+        return meterDataSource.getLatestDayFromDB();
+    }
+
+    @Override
     public List<Day> loadMonth(Date date) {
         return meterDataSource.getMonthFromDataBase(date);
     }
@@ -142,6 +147,16 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
     public void deleteAll() {
         System.out.println("deleting.............");
         meterDataSource.deleteDataBase();
+    }
+
+    @Override
+    public void deleteMeterList() {
+        meterDataSource.deleteMeterList();
+    }
+
+    @Override
+    public void deleteMeterPref() {
+        meterDataSource.deleteMeterPref();
     }
 
     @Override
