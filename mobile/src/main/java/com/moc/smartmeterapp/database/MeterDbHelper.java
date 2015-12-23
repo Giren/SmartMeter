@@ -60,14 +60,17 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
         meterDataSource.setMeterDbHelper(this);
     }
 
+    @Override
     public void openDatabase(){
         meterDataSource.openDataBase();
     }
 
+    @Override
     public void closeDatabase(){
         meterDataSource.closeDataBase();
     }
 
+    @Override
     public List<Day> getAllEntries(){
         return meterDataSource.getAllDBData();
     }

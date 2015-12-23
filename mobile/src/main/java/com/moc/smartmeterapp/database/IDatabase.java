@@ -11,11 +11,14 @@ import java.util.List;
  */
 public interface IDatabase {
     void createIfNotCreated();
+    void openDatabase();
+    void closeDatabase();
 
     Day loadDay(Date date);
     Day loadLatestDay();
     List<Day> loadMonth(Date date);
     List<Day> loadYear(Date date);
+    List<Day> getAllEntries();
 
     void saveDay(Day day);
     void saveMonth(List<Day> days);
