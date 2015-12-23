@@ -74,15 +74,15 @@ public class HelpFragment extends Fragment{
                 //meterDbHelper.deleteDay(day.getDate());
                 //listView.setAdapter(listToArrayadapter(meterDbHelper.loadMonth(day1.getDate())));
                 //listView.setAdapter(showAllDBEntries());
-                MyPreferences pref = meterDbHelper.loadPreferences();
-                text.setText("WeekLimit: "+pref.getWeekLimit()+"\n"+
-                        "WeekLimitColor: "+pref.getWeekLimitColor()+"\n"+
-                        "MonthLimit: "+ pref.getMonthLimit()+"\n"+
-                        "MonthLimitColor: "+pref.getMonthLimitColor()+"\n"+
-                        "YearLimit: "+ pref.getYearLimit()+"\n"+
-                        "YearLimitColor: "+ pref.getYearLimitColor()+"\n"+
-                        "IP Address: "+ pref.getIpAddress()+"\n"+
-                        "Notification: "+ pref.getNotification()+"\n");
+                MyPreferences prefs = meterDbHelper.loadPreferences();
+                text.setText("WeekLimit: "+prefs.getWeekLimit()+"\n"+
+                        "WeekLimitColor: "+prefs.getWeekLimitColor()+"\n"+
+                        "MonthLimit: "+ prefs.getMonthLimit()+"\n"+
+                        "MonthLimitColor: "+prefs.getMonthLimitColor()+"\n"+
+                        "YearLimit: "+ prefs.getYearLimit()+"\n"+
+                        "YearLimitColor: "+ prefs.getYearLimitColor()+"\n"+
+                        "IP Address: "+ prefs.getIpAddress()+"\n"+
+                        "Notification: "+ prefs.getNotification()+"\n");
                 meterDbHelper.closeDatabase();
             }
         });
