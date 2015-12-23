@@ -31,10 +31,12 @@
             android:name=".com.moc.smartmeterapp.communication.DataService"
             android:exported="true" />
 
+
         <activity
             android:name=".wdaeFSGGSRGSrg"
             android:label="@string/title_activity_wdae_fsggsrgsrg" >
         </activity>
+
     </application>
 
 </manifest>

@@ -38,7 +38,6 @@ import java.util.List;
 public class HelpFragment extends Fragment{
 
     private MeterDbHelper meterDbHelper;
-    private ComUtils.IRestTestService restService;
 
     private EditText text;
     private Day day;
@@ -50,7 +49,6 @@ public class HelpFragment extends Fragment{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        restService = ComUtils.createRetrofitService(ComUtils.IRestTestService.class);
 
         return inflater.inflate(R.layout.help_fragment_layout,null);
     }

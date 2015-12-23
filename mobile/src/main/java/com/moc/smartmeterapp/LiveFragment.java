@@ -13,10 +13,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 
+import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.ComUtils;
 import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.Communication;
+import com.moc.smartmeterapp.model.DataObject;
+import com.moc.smartmeterapp.model.EntryObject;
+import com.moc.smartmeterapp.model.Global;
 import com.moc.smartmeterapp.model.Limit;
+import com.moc.smartmeterapp.ui.Limiter;
+import com.moc.smartmeterapp.ui.MeterView;
 
-public class LiveFragment extends Fragment implements Communication.ILiveDataEventHandler {
+import java.util.List;
+
+public class LiveFragment extends Fragment implements Communication.IDataEvent {
 
     private MeterView meterView;
     private Limiter limiter;
@@ -41,13 +49,34 @@ public class LiveFragment extends Fragment implements Communication.ILiveDataEve
             meterView.setAverage(meterViewAVG);
             meterView.setValue(value);
         }
+
+        return true;
+    }
+
+    @Override
+    public boolean onGlobalDataReceived(Global global) {
+        return true;
+    }
+
+    @Override
+    public boolean onLimitsReceived(List<Limit> limits) {
+        return true;
+    }
+
+    @Override
+    public boolean onMeterDataReceived(DataObject dataObject) {
+        return true;
+    }
+
+    @Override
+    public boolean onTestReceived(EntryObject entryObject) {
         return true;
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        communication = new Communication(getActivity(), Communication.LIVE_DATA, Communication.TEST);
+        communication = new Communication(getActivity(), ComUtils.LIVE_DATA, ComUtils.TEST);
         communication.registerDataEventHandler(this);
         communication.bindService();
         return inflater.inflate(R.layout.live_fragment_layout, null);
@@ -68,7 +97,7 @@ public class LiveFragment extends Fragment implements Communication.ILiveDataEve
     @Override
     public void onDestroy() {
         Log.d("DEBUG", "onDestroy");
-        communication.unregisterDataEventHandler(this);
+        communication.unregisterReceiver();
         communication.unbindService();
         super.onDestroy();
     }
