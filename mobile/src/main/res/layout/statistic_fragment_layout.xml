@@ -27,20 +27,18 @@
         <Button
             android:layout_width="180dp"
             android:layout_height="fill_parent"
-            android:text="@string/adjust"
-            android:id="@+id/button_adjust"
+            android:text="@string/statistik_left"
+            android:id="@+id/button_left"
             android:background="@color/orange"/>
 
         <Button
             android:layout_width="180dp"
             android:layout_height="fill_parent"
-            android:text="@string/statistic_settings"
-            android:id="@+id/button_statistic_settings"
+            android:text="@string/statistic_right"
+            android:id="@+id/button_right"
             android:layout_gravity="right"
             android:background="@color/orange"/>
 
     </LinearLayout>
-
-
 
 </LinearLayout>
