@@ -118,7 +118,6 @@ public class StatisticFragment extends Fragment{
                     @Override
                     public void onClick(View v) {
                         userChoice = numberPicker.getValue();
-                        //updateChartView();
                         dialogSelect.dismiss();
                         dateButton.callOnClick();
                     }
@@ -265,21 +264,13 @@ public class StatisticFragment extends Fragment{
 
     private String dateToString(Date date){
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        date.setYear(date.getYear()-1900);
         return format.format(date);
     }
 
     private void handleUserChoice(){
-//        List<Hour> hours;
-//        hours = new ArrayList<Hour>();
-//        for(int i=0; i<24; i++) {
-//            hours.add(new Hour(new MinMeanMax(200,50,100,150)));
-//        }
-//        Day day = new Day(hours,new Date());
-
         Day d;
         List<Day> datalist = new ArrayList<Day>();
-        Date date = new Date(datePicker.getYear(),
+        Date date = new Date(datePicker.getYear()-1900,
                 datePicker.getMonth(),
                 datePicker.getDayOfMonth());
 
