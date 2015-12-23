@@ -15,7 +15,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.moc.smartmeterapp.database.MeterDataSource;
 
-import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.ComUtils;
 import com.moc.smartmeterapp.database.MeterDbHelper;
 import com.moc.smartmeterapp.model.Day;
 import com.moc.smartmeterapp.model.EntryObject;
@@ -105,7 +104,7 @@ public class HelpFragment extends Fragment{
         Date date = new Date();
         date.setDate(2);
         date.setMonth(2);
-        date.setYear(2016);
+        date.setYear(116);
         day = new Day();
         day.setDate(date);
         dataList.add(day);
@@ -113,7 +112,7 @@ public class HelpFragment extends Fragment{
         Date date1 = new Date();
         date1.setDate(15);
         date1.setMonth(1);
-        date1.setYear(2016);
+        date1.setYear(116);
         day1 = new Day();
         day1.setDate(date1);
         dataList.add(day1);
@@ -121,7 +120,7 @@ public class HelpFragment extends Fragment{
         Date date2 = new Date();
         date2.setDate(27);
         date2.setMonth(1);
-        date2.setYear(2016);
+        date2.setYear(116);
         day2 = new Day();
         day2.setDate(date2);
         dataList.add(day2);
@@ -129,13 +128,14 @@ public class HelpFragment extends Fragment{
         Date date3 = new Date();
         date3.setDate(3);
         date3.setMonth(1);
-        date3.setYear(2017);
+        date3.setYear(116);
         day3 = new Day();
         day3.setDate(date3);
         dataList.add(day3);
 
         meterDbHelper = new MeterDbHelper(getActivity().getBaseContext());
         meterDbHelper.openDatabase();
+//        meterDbHelper.deleteMeterList();
 //        meterDbHelper.saveDay(day);
 //        meterDbHelper.saveDay(day1);
 //        meterDbHelper.saveDay(day2);

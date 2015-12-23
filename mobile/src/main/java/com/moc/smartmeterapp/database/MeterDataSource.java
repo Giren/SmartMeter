@@ -10,8 +10,10 @@ import com.google.gson.reflect.TypeToken;
 import com.moc.smartmeterapp.model.Day;
 import com.moc.smartmeterapp.model.MyPreferences;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -23,6 +25,10 @@ public class MeterDataSource {
 
     private SQLiteDatabase database;
     private MeterDbHelper meterDbHelper;
+
+    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    public static final DateFormat MONTH_FORMAT = new SimpleDateFormat("yyyy-MM");
+    public static final DateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy");
 
     private String[] columns = {
                 MeterDbHelper.COLUMN_ID,
@@ -48,8 +54,8 @@ public class MeterDataSource {
 
     public void insertListDataToDB(List<Day> days){
         System.out.println("Gonna put " + days.size() + " objects into Database");
-        for(int i=0; i<days.size(); i++){
-            insertDataToDB(days.get(i));
+        for(Day d : days) {
+            insertDataToDB(d);
         }
     }
 
@@ -64,9 +70,15 @@ public class MeterDataSource {
     }
 
     private String dateToString(Date date){
-        return ( date.getYear()+"-"+date.getMonth()+"-"+date.getDay());
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
-//        return( dateFormat.format(date) );
+        return DATE_FORMAT.format(date);
+    }
+
+    private String monthToString(Date date){
+        return MONTH_FORMAT.format(date);
+    }
+
+    private String yearToString(Date date){
+        return YEAR_FORMAT.format(date);
     }
 
     private Day cursorToMeterData(Cursor cursor){
@@ -113,7 +125,7 @@ public class MeterDataSource {
 
         if(cursor.moveToFirst()){
             Day day = cursorToMeterData(cursor);
-            System.out.println("found Date: " + day.getDate().getYear());
+            System.out.println("found Date: " + dateToString(day.getDate()));
             cursor.close();
             return day;
         }
@@ -126,7 +138,7 @@ public class MeterDataSource {
         Cursor cursor = database.query(MeterDbHelper.TABLE_METER_LIST,
                 columns,
                 MeterDbHelper.COLUMN_DATE + " like ?",
-                new String[] { String.valueOf(date.getYear())+"-"+String.valueOf(date.getMonth())+"%" },
+                new String[] { monthToString(date) +"%" },
                 null, null, null, null);
 
         return cursorToMeterList(cursor);
@@ -136,7 +148,7 @@ public class MeterDataSource {
         Cursor cursor = database.query(MeterDbHelper.TABLE_METER_LIST,
                 columns,
                 MeterDbHelper.COLUMN_DATE + " like ?",
-                new String[] { String.valueOf(date.getYear())+"%" },
+                new String[]{ yearToString(date) + "%"},
                 null, null, null, null);
 
         return cursorToMeterList(cursor);
@@ -158,13 +170,13 @@ public class MeterDataSource {
     public void deleteMonthFromDataBase(Date date){
         database.delete(MeterDbHelper.TABLE_METER_LIST,
                 MeterDbHelper.COLUMN_DATE + " like ?",
-                new String[]{String.valueOf(date.getYear()) + "-" + String.valueOf(date.getMonth()) + "%"});
+                new String[]{ monthToString(date)+"%"} );
     }
 
     public void deleteYearFromDataBase(Date date){
         database.delete(MeterDbHelper.TABLE_METER_LIST,
                 MeterDbHelper.COLUMN_DATE + " like ?",
-                new String[] { String.valueOf(date.getYear())+"%"} );
+                new String[]{ yearToString(date)+"%"} );
     }
 
     public Day getLatestDayFromDB() {

@@ -14,10 +14,16 @@ import android.widget.NumberPicker;
 import com.moc.smartmeterapp.database.MeterDbHelper;
 import com.moc.smartmeterapp.model.Day;
 
+import com.moc.smartmeterapp.database.IDatabase;
+import com.moc.smartmeterapp.database.MeterDataSource;
+import com.moc.smartmeterapp.database.MeterDbHelper;
+import com.moc.smartmeterapp.model.Day;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import lecho.lib.hellocharts.gesture.ZoomType;
@@ -145,7 +151,25 @@ public class StatisticFragment extends Fragment{
                 dialog.show();
             }
         });
-
+//
+//        //TODO:
+//        Date d = null;
+//        try {
+//            d = MeterDataSource.DATE_FORMAT.parse("01-01-2015");
+//            IDatabase db = new MeterDbHelper(getActivity());
+//            db.openDatabase();
+//            List<String> data = new ArrayList<String>();
+//            List<Day> days = db.getAllEntries();
+//            if(days != null && days.size() > 0) {
+//                for(Day day : days) {
+//                    data.add(String.valueOf(day.getMmm().getMean()));
+//                }
+//            }
+//            addDataToChart(data);
+//            db.closeDatabase();
+//        } catch (ParseException e) {
+//
+//        }
         updateChartView();
     }
 
@@ -239,6 +263,12 @@ public class StatisticFragment extends Fragment{
         previewX(false);
     }
 
+    private String dateToString(Date date){
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        date.setYear(date.getYear()-1900);
+        return format.format(date);
+    }
+
     private void handleUserChoice(){
 //        List<Hour> hours;
 //        hours = new ArrayList<Hour>();
@@ -250,10 +280,10 @@ public class StatisticFragment extends Fragment{
         Day d;
         List<Day> datalist = new ArrayList<Day>();
         Date date = new Date(datePicker.getYear(),
-                datePicker.getMonth() + 1,
+                datePicker.getMonth(),
                 datePicker.getDayOfMonth());
 
-        System.out.println("Day to insert in Chart: " + date.getYear() + "-" + date.getMonth() + "-" + date.getDay());
+        System.out.println("Day to insert in Chart: " + dateToString(date));
 
         meterDbHelper.openDatabase();
         switch (userChoice){
@@ -277,14 +307,14 @@ public class StatisticFragment extends Fragment{
             case MONTH:
                 maxNumberToShow = 31;
                 datalist = meterDbHelper.loadMonth(date);
-                if(!datalist.isEmpty()){
+                if(datalist != null){
                     addListToChart(datalist);
                 }
                 break;
             case YEAR:
                 maxNumberToShow = 365;
                 datalist = meterDbHelper.loadYear(date);
-                if(!datalist.isEmpty()){
+                if(datalist != null){
                     addListToChart(datalist);
                 }
                 break;

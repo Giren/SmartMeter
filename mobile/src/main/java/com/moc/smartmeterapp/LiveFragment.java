@@ -13,31 +13,36 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 
-import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.ComUtils;
-import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.Communication;
+import com.moc.smartmeterapp.communication.LiveCommunication;
+import com.moc.smartmeterapp.communication.RestCommunication;
+import com.moc.smartmeterapp.database.IDatabase;
+import com.moc.smartmeterapp.database.MeterDbHelper;
 import com.moc.smartmeterapp.model.DataObject;
+import com.moc.smartmeterapp.model.Day;
 import com.moc.smartmeterapp.model.EntryObject;
 import com.moc.smartmeterapp.model.Global;
+import com.moc.smartmeterapp.model.Hour;
 import com.moc.smartmeterapp.model.Limit;
 import com.moc.smartmeterapp.ui.Limiter;
 import com.moc.smartmeterapp.ui.MeterView;
 
 import java.util.List;
 
-public class LiveFragment extends Fragment implements Communication.IDataEvent {
+public class LiveFragment extends Fragment implements LiveCommunication.ILiveDataEvent {
 
     private MeterView meterView;
     private Limiter limiter;
     private Limit limitRed;
     private Limit limitYellow;
     private SeekBar seekBar;
-    private Communication communication;
+    private LiveCommunication liveCommunication;
+    private RestCommunication restCommunication;
 
     private int meterViewMax = 1000;
     private int meterViewAVG = 300;
 
     @Override
-    public boolean onLiveDataReceived(int value) {
+    public void onLiveDataReceived(int value) {
         if (meterView != null) {
             if(value > meterViewMax){
                 meterViewMax = value;
@@ -50,35 +55,18 @@ public class LiveFragment extends Fragment implements Communication.IDataEvent {
             meterView.setValue(value);
         }
 
-        return true;
-    }
-
-    @Override
-    public boolean onGlobalDataReceived(Global global) {
-        return true;
-    }
-
-    @Override
-    public boolean onLimitsReceived(List<Limit> limits) {
-        return true;
-    }
-
-    @Override
-    public boolean onMeterDataReceived(DataObject dataObject) {
-        return true;
-    }
-
-    @Override
-    public boolean onTestReceived(EntryObject entryObject) {
-        return true;
+        Log.i("Info: LiveDataService", "Got LiveData");
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        communication = new Communication(getActivity(), ComUtils.LIVE_DATA, ComUtils.TEST);
-        communication.registerDataEventHandler(this);
-        communication.bindService();
+
+        liveCommunication = new LiveCommunication(getActivity());
+        liveCommunication.create();
+        liveCommunication.registerDataEventHandler(this);
+        //liveCommunication.bindService();
+
         return inflater.inflate(R.layout.live_fragment_layout, null);
     }
 
@@ -97,8 +85,7 @@ public class LiveFragment extends Fragment implements Communication.IDataEvent {
     @Override
     public void onDestroy() {
         Log.d("DEBUG", "onDestroy");
-        communication.unregisterReceiver();
-        communication.unbindService();
+        liveCommunication.destroy();
         super.onDestroy();
     }
 

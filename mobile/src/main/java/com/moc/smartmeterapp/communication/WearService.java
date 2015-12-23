@@ -1,4 +1,4 @@
-package com.moc.smartmeterapp.com.moc.smartmeterapp.communication;
+package com.moc.smartmeterapp.communication;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -26,17 +26,17 @@ import java.util.List;
 public class WearService extends WearableListenerService implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        Communication.IDataEvent {
+        LiveCommunication.ILiveDataEvent {
 
     private static final String WEARABLE_DATA_PATH = "/SmartMeterToWearable";
     private static final String HANDHELD_DATA_PATH = "/SmartMeterToHandheld";
 
-    private Communication communication;
+    private LiveCommunication liveCommunication;
     private GoogleApiClient googleClient;
 
     @Override
     public void onCreate() {
-        communication = new Communication(getApplicationContext(), ComUtils.LIVE_DATA);
+        liveCommunication = new LiveCommunication(getApplicationContext());
 
         Log.d("DEBUG", "WEAR SERVICE ON CREATE");
 
@@ -59,61 +59,30 @@ public class WearService extends WearableListenerService implements
     @Override
     public void onConnected(Bundle bundle) {
         Log.d("DEBUG", "WEAR SERVICE ON CONNECTED");
-        communication.registerDataEventHandler(this);
-        communication.bindService();
+
+        liveCommunication.create();
+        liveCommunication.registerDataEventHandler(this);
     }
 
     @Override
     public void onConnectionSuspended(int i) {
         Log.d("DEBUG", "WEAR SERVICE ON CONNECTION SUSPENDED");
-        communication.unregisterDataEventHandler(this);
-        communication.unbindService();
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.d("DEBUG", "WEAR SERVICE ON CONNECTION FAILED");
-        communication.unregisterDataEventHandler(this);
-        communication.unbindService();
     }
 
     @Override
-    public boolean onLiveDataReceived(int value) {
+    public void onLiveDataReceived(int value) {
         Log.d("DEBUG", "SEND DATA TO WEAR - ON LIVE DATA RECEIVED");
         new SendToDataLayerThread( WEARABLE_DATA_PATH, "liveData" + ";" + String.valueOf(value)).start();
-        return true;
     }
 
     @Override
-    public boolean onGlobalDataReceived(Global global) {
-        Log.d("DEBUG", "SEND DATA TO WEAR - ON GLOBAL DATA RECEIVED");
-        return false;
-    }
-
-    @Override
-    public boolean onLimitsReceived(List<Limit> limits) {
-        Log.d("DEBUG", "SEND DATA TO WEAR - ON LIMITS RECEIVED");
-        return false;
-    }
-
-    @Override
-    public boolean onMeterDataReceived(DataObject dataObject) {
-        Log.d("DEBUG", "SEND DATA TO WEAR - ON METER DATA RECEIVED");
-        return false;
-    }
-
-    @Override
-    public boolean onTestReceived(EntryObject entryObject) {
-        Log.d("DEBUG", "SEND DATA TO WEAR - ON TEST RECEIVED");
-        return false;
-    }
-
-    @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         Log.d("DEBUG", "ON DESTROY");
-        //communication.unregisterDataEventHandler(this);
-        //communication.unbindService();
 
         if (null != googleClient)
         {

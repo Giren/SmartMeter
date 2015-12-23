@@ -3,6 +3,8 @@
     package="com.moc.smartmeterapp" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"></uses-permission>
 
     <application
         android:allowBackup="true"
@@ -22,13 +24,13 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".com.moc.smartmeterapp.communication.WearService" >
+        <service android:name=".communication.WearService" >
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>
         </service>
         <service
-            android:name=".com.moc.smartmeterapp.communication.DataService"
+            android:name=".communication.LiveDataService"
             android:exported="true" />
 
 
@@ -36,6 +38,17 @@
             android:name=".wdaeFSGGSRGSrg"
             android:label="@string/title_activity_wdae_fsggsrgsrg" >
         </activity>
+
+        <receiver android:name=".alarm.AlarmReceiver"></receiver>
+
+        <receiver android:name=".alarm.BootReceiver"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+            </intent-filter>
+        </receiver>
+        <service android:name=".alarm.SyncService" />
+
 
     </application>
 
