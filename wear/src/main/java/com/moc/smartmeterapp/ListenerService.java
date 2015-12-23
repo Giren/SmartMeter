@@ -21,14 +21,15 @@ public class ListenerService extends WearableListenerService {
 
         if( messageEvent.getPath().equals( WEARABLE_DATA_PATH)) {
             final String message = new String( messageEvent.getData());
-            Log.v("myTag", "Message path received on watch is: " + messageEvent.getPath());
-            Log.v( "myTag", "Message received on watch is: " + message);
+            Log.d( "DEBUG", "Message path received on watch is123: " + messageEvent.getPath());
+            Log.d( "DEBUG", "Message received on watch is123: " + message);
 
             // Broadcast message to wearable activity for display
             Intent messageIntent = new Intent();
             messageIntent.setAction( Intent.ACTION_SEND);
-            messageIntent.putExtra( "message", message);
-            LocalBroadcastManager.getInstance(this).sendBroadcast( messageIntent);
+            messageIntent.putExtra("message", message);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(messageIntent);
+            Log.d("DEBUG", "Broadcast received message on wearable");
         } else {
             super.onMessageReceived( messageEvent);
         } // if end

@@ -3,28 +3,19 @@ package com.moc.smartmeterapp;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
-import com.moc.smartmeterapp.database.MeterDataSource;
 
-import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.ComUtils;
 import com.moc.smartmeterapp.database.MeterDbHelper;
 import com.moc.smartmeterapp.model.Day;
-import com.moc.smartmeterapp.model.EntryObject;
 import com.moc.smartmeterapp.model.Hour;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Observer;

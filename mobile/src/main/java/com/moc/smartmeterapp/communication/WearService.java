@@ -1,4 +1,4 @@
-package com.moc.smartmeterapp.com.moc.smartmeterapp.communication;
+package com.moc.smartmeterapp.communication;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -26,17 +26,18 @@ import java.util.List;
 public class WearService extends WearableListenerService implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        Communication.IDataEvent {
+        LiveCommunication.ILiveDataEvent {
 
     private static final String WEARABLE_DATA_PATH = "/SmartMeterToWearable";
     private static final String HANDHELD_DATA_PATH = "/SmartMeterToHandheld";
 
-    private Communication communication;
+    private LiveCommunication liveCommunication;
     private GoogleApiClient googleClient;
 
     @Override
     public void onCreate() {
-        communication = new Communication(getApplicationContext(), ComUtils.LIVE_DATA);
+        liveCommunication = new LiveCommunication(getApplicationContext());
+
         Log.d("DEBUG", "WEAR SERVICE ON CREATE");
 
         if ( googleClient == null) {
@@ -57,54 +58,37 @@ public class WearService extends WearableListenerService implements
 
     @Override
     public void onConnected(Bundle bundle) {
-        communication.registerDataEventHandler(this);
-        communication.bindService();
+        Log.d("DEBUG", "WEAR SERVICE ON CONNECTED");
+        liveCommunication.registerDataEventHandler(this);
+        liveCommunication.bindService();
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        communication.unregisterDataEventHandler(this);
-        communication.unbindService();
+        Log.d("DEBUG", "WEAR SERVICE ON CONNECTION SUSPENDED");
+        liveCommunication.unregisterDataEventHandler(this);
+        liveCommunication.unbindService();
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        communication.unregisterDataEventHandler(this);
-        communication.unbindService();
+        Log.d("DEBUG", "WEAR SERVICE ON CONNECTION FAILED");
+        liveCommunication.unregisterDataEventHandler(this);
+        liveCommunication.unbindService();
     }
 
     @Override
-    public boolean onLiveDataReceived(int value) {
-        Log.d("DEBUG", "SEND DATA TO WEAR");
+    public void onLiveDataReceived(int value) {
+        Log.d("DEBUG", "SEND DATA TO WEAR - ON LIVE DATA RECEIVED");
         new SendToDataLayerThread( WEARABLE_DATA_PATH, "liveData" + ";" + String.valueOf(value)).start();
-        return true;
-    }
-
-    @Override
-    public boolean onGlobalDataReceived(Global global) {
-        return false;
-    }
-
-    @Override
-    public boolean onLimitsReceived(List<Limit> limits) {
-        return false;
-    }
-
-    @Override
-    public boolean onMeterDataReceived(DataObject dataObject) {
-        return false;
-    }
-
-    @Override
-    public boolean onTestReceived(EntryObject entryObject) {
-        return false;
     }
 
     @Override
     public void onDestroy()
     {
-        communication.unregisterDataEventHandler(this);
-        communication.unbindService();
+        Log.d("DEBUG", "ON DESTROY");
+        //liveCommunication.unregisterDataEventHandler(this);
+        //liveCommunication.unbindService();
 
         if (null != googleClient)
         {
@@ -118,7 +102,7 @@ public class WearService extends WearableListenerService implements
 
     @Override
      public void onMessageReceived( MessageEvent messageEvent) {
-
+        Log.d("DEBUG", "ON MESSAGE RECEIVED + message: " + new String( messageEvent.getData()));
         if( messageEvent.getPath().equals( HANDHELD_DATA_PATH)) {
             final String message = new String( messageEvent.getData());
 
@@ -136,34 +120,69 @@ public class WearService extends WearableListenerService implements
     }
 
     public void reactOnMessage( String receivedMessage) {
+        Log.d("DEBUG", "REACT ON MESSAGE + message: " + receivedMessage);
         switch ( receivedMessage) {
             case "liveData": {
+                Log.d("DEBUG", "liveData case");
                 //dataMessageToWearable( WEARABLE_DATA_PATH, "liveData");
                 break;
             }
             case "limitWeek": {
                 System.out.println("limitWeek case");
-                dataMessageToWearable(WEARABLE_DATA_PATH, "limitWeek");
+                Log.d("DEBUG", "limitWeekCase");
+                dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitWeek", "2500");
+                //dataMessageToWearable(WEARABLE_DATA_PATH, "limitWeek");
                 break;
             }
             case "limitMonth": {
-                System.out.println( "limitMonth case");
-                dataMessageToWearable(WEARABLE_DATA_PATH, "limitMonth");
+                Log.d("DEBUG", "limitMonth case");
+                System.out.println("limitMonth case");
+                dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitMonth", "10000");
+                //dataMessageToWearable(WEARABLE_DATA_PATH, "limitMonth");
                 break;
             }
             case "limitYear": {
-                System.out.println( "limitYear case");
-                dataMessageToWearable(WEARABLE_DATA_PATH, "limitYear");
+                Log.d("DEBUG", "limitYear case");
+                System.out.println("limitYear case");
+                dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitYear", "120000");
+                //dataMessageToWearable(WEARABLE_DATA_PATH, "limitYear");
                 break;
             }
             case "goodbye": {
+                Log.d("DEBUG", "goodbye case");
                 System.out.println( "goodbye case");
                 break;
             }
             default:
+                Log.d("DEBUG", "default case");
                 System.out.println("default case");
                 break;
         }
+    }
+
+    public void dataMessageToWearableLimit(String path, String text, String limit) {
+
+        String seperator = ";";
+        String dataMessage = limit + seperator;
+
+        SimpleDateFormat sdf = new SimpleDateFormat( "dd.MM.yyyy HH:mm:ss");
+        String myTime = sdf.format( new Date());
+
+        // Datenvorbereitung
+        // dataMessage += "\n";
+        dataMessage += String.valueOf( 0 + ( (int)( Math.random() * Integer.valueOf( limit))));
+
+
+        // TODO Datenbeschaffung innerhalb des Threads und anschließend senden
+
+        // vor dem senden nochmal warten
+        try {
+            Thread.sleep( 500);
+        } catch (Exception e) {
+            System.out.println( e.getMessage());
+        }
+        // send Data on messagePath
+        new SendToDataLayerThread( path, text + seperator + dataMessage).start();
     }
 
     public void dataMessageToWearable(String path, String text) {
@@ -181,7 +200,7 @@ public class WearService extends WearableListenerService implements
 
         // vor dem senden nochmal warten
         try {
-            Thread.sleep( 2000);
+            Thread.sleep( 1000);
         } catch (Exception e) {
             System.out.println( e.getMessage());
         }
@@ -201,13 +220,14 @@ public class WearService extends WearableListenerService implements
         }
 
         public void run() {
+            Log.d("DEBUG", "SendToDataLayerThread run()");
             NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(googleClient).await();
             for( Node node : nodes.getNodes()) {
                 MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(googleClient, node.getId(), path, message.getBytes()).await();
                 if( result.getStatus().isSuccess()) {
-                    Log.v("myTag", "Message: {" + message + "} sent to: " + node.getDisplayName());
+                    Log.d("DEBUG", "Message: {" + message + "} sent to: " + node.getDisplayName());
                 } else {
-                    Log.d("myTag", "ERROR: failed to send Message");
+                    Log.d("DEBUG", "ERROR: failed to send Message");
                 }
             }
         }

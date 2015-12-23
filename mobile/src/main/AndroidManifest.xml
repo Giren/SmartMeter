@@ -22,13 +22,13 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".com.moc.smartmeterapp.communication.WearService" >
+        <service android:name=".communication.WearService" >
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>
         </service>
         <service
-            android:name=".com.moc.smartmeterapp.communication.DataService"
+            android:name=".communication.LiveDataService"
             android:exported="true" />
 
         <activity

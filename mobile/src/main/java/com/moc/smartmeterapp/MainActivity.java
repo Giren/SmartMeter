@@ -9,11 +9,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-import com.moc.smartmeterapp.com.moc.smartmeterapp.communication.DataService;
+import com.moc.smartmeterapp.communication.LiveDataService;
+import com.moc.smartmeterapp.communication.RestCommunication;
+import com.moc.smartmeterapp.database.IDatabase;
+import com.moc.smartmeterapp.database.MeterDbHelper;
+import com.moc.smartmeterapp.model.DataObject;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -25,13 +29,15 @@ public class MainActivity extends AppCompatActivity{
 
     private Toolbar toolbar;
     private ServiceConnection dataServiceConnection;
-    private DataService dataService;
+    private LiveDataService liveDataService;
     private boolean serviceBinded;
 
-    DrawerLayout mDrawerLayout;
-    NavigationView mNavigationView;
-    FragmentManager mFragmentManager;
-    FragmentTransaction mFragmentTransaction;
+    private DrawerLayout mDrawerLayout;
+    private NavigationView mNavigationView;
+    private FragmentManager mFragmentManager;
+    private FragmentTransaction mFragmentTransaction;
+
+    private RestCommunication restCommunication;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +125,35 @@ public class MainActivity extends AppCompatActivity{
                 R.string.app_name);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
+
+        restCommunication = new RestCommunication();
+        restCommunication.fetchYearData(0, new RestCommunication.IDataReceiver() {
+            @Override
+            public void onDataReceived(DataObject dataObject) {
+                Toast toast = Toast.makeText(getApplicationContext(), "Synchronisierung läuft...", Toast.LENGTH_LONG);
+                toast.show();
+                if(dataObject != null) {
+                    IDatabase dbHelper = new MeterDbHelper(getApplicationContext());
+                    dbHelper.createIfNotCreated();
+                    dbHelper.saveYear(dataObject.getDays());
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                if(message != null)
+                    Log.e("ERROR:", message);
+
+                Toast toast = Toast.makeText(getApplicationContext(), "Synchronisierung fehlgeschlagen...", Toast.LENGTH_LONG);
+                toast.show();
+            }
+
+            @Override
+            public void onComplete() {
+                Toast toast = Toast.makeText(getApplicationContext(), "Synchronisierung erfolgreich...", Toast.LENGTH_LONG);
+                toast.show();
+            }
+        });
     }
 
 }
