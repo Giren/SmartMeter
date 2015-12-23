@@ -8,6 +8,9 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.moc.smartmeterapp.MainActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -97,7 +100,12 @@ public class LiveCommunication {
         }
     }
 
-    private void registerReceiver() {
+    public void create() {
+        registerReceiver();
+        bindService();
+    }
+
+    public void registerReceiver() {
         if(context != null && broadcastReceiver != null && !isRegistered) {
             context.registerReceiver(broadcastReceiver, new IntentFilter(LiveDataService.BROADCAST_ACTION));
             Log.d("DEBUG", "registered broadcast receiver");

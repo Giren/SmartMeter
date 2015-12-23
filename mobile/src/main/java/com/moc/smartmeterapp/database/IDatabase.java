@@ -1,6 +1,7 @@
 package com.moc.smartmeterapp.database;
 
 import com.moc.smartmeterapp.model.Day;
+import com.moc.smartmeterapp.model.MyPreferences;
 
 import java.util.Date;
 import java.util.List;
@@ -10,10 +11,14 @@ import java.util.List;
  */
 public interface IDatabase {
     void createIfNotCreated();
+    void openDatabase();
+    void closeDatabase();
 
     Day loadDay(Date date);
+    Day loadLatestDay();
     List<Day> loadMonth(Date date);
     List<Day> loadYear(Date date);
+    List<Day> getAllEntries();
 
     void saveDay(Day day);
     void saveMonth(List<Day> days);
@@ -23,4 +28,9 @@ public interface IDatabase {
     void deleteMonth(Date date);
     void deleteYear(Date date);
     void deleteAll();
+    void deleteMeterList();
+    void deleteMeterPref();
+
+    void savePreferences(MyPreferences pref);
+    MyPreferences loadPreferences();
 }

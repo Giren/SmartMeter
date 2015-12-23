@@ -36,6 +36,7 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
     private Limit limitYellow;
     private SeekBar seekBar;
     private LiveCommunication liveCommunication;
+    private RestCommunication restCommunication;
 
     private int meterViewMax = 1000;
     private int meterViewAVG = 300;
@@ -60,9 +61,11 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         liveCommunication = new LiveCommunication(getActivity());
+        liveCommunication.create();
         liveCommunication.registerDataEventHandler(this);
-        liveCommunication.bindService();
+        //liveCommunication.bindService();
 
         return inflater.inflate(R.layout.live_fragment_layout, null);
     }
@@ -82,8 +85,7 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
     @Override
     public void onDestroy() {
         Log.d("DEBUG", "onDestroy");
-        liveCommunication.unregisterReceiver();
-        liveCommunication.unbindService();
+        liveCommunication.destroy();
         super.onDestroy();
     }
 

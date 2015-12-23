@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.moc.smartmeterapp.alarm.AlarmReceiver;
 import com.moc.smartmeterapp.communication.LiveDataService;
 import com.moc.smartmeterapp.communication.RestCommunication;
 import com.moc.smartmeterapp.database.IDatabase;
@@ -39,9 +40,13 @@ public class MainActivity extends AppCompatActivity{
 
     private RestCommunication restCommunication;
 
+    private AlarmReceiver alarm = new AlarmReceiver();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        alarm.setAlarm(this);
 
         setContentView(R.layout.activity_main);
 
@@ -132,11 +137,6 @@ public class MainActivity extends AppCompatActivity{
             public void onDataReceived(DataObject dataObject) {
                 Toast toast = Toast.makeText(getApplicationContext(), "Synchronisierung läuft...", Toast.LENGTH_LONG);
                 toast.show();
-                if(dataObject != null) {
-                    IDatabase dbHelper = new MeterDbHelper(getApplicationContext());
-                    dbHelper.createIfNotCreated();
-                    dbHelper.saveYear(dataObject.getDays());
-                }
             }
 
             @Override

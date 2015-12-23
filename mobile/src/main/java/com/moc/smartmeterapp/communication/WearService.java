@@ -59,22 +59,19 @@ public class WearService extends WearableListenerService implements
     @Override
     public void onConnected(Bundle bundle) {
         Log.d("DEBUG", "WEAR SERVICE ON CONNECTED");
+
+        liveCommunication.create();
         liveCommunication.registerDataEventHandler(this);
-        liveCommunication.bindService();
     }
 
     @Override
     public void onConnectionSuspended(int i) {
         Log.d("DEBUG", "WEAR SERVICE ON CONNECTION SUSPENDED");
-        liveCommunication.unregisterDataEventHandler(this);
-        liveCommunication.unbindService();
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.d("DEBUG", "WEAR SERVICE ON CONNECTION FAILED");
-        liveCommunication.unregisterDataEventHandler(this);
-        liveCommunication.unbindService();
     }
 
     @Override
@@ -84,11 +81,8 @@ public class WearService extends WearableListenerService implements
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         Log.d("DEBUG", "ON DESTROY");
-        //liveCommunication.unregisterDataEventHandler(this);
-        //liveCommunication.unbindService();
 
         if (null != googleClient)
         {

@@ -1,5 +1,6 @@
 package com.moc.smartmeterapp;
 
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,10 +13,19 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.NumberPicker;
+import android.widget.Toast;
 
+import com.moc.smartmeterapp.database.IDatabase;
+import com.moc.smartmeterapp.database.MeterDataSource;
+import com.moc.smartmeterapp.database.MeterDbHelper;
+import com.moc.smartmeterapp.model.Day;
+
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -43,11 +53,15 @@ public class StatisticFragment extends Fragment{
     private ArrayList<String> liveList;
     private int maxValueOfLineChartData;
 
+    private Button dateButton;
+
     private Dialog dialog;
+    private Dialog dialogSelect;
+    private DatePicker datePicker;
     private NumberPicker numberPicker;
-    private String dialogTilte = "Anzahl sichtbarer Punkte";
-    private int MAX_WHEEL_NUMBER = 100;
-    private int MIN_WHEEL_NUMBER = 10;
+    private String dialogSelectTilte = "Welcher Zeitraum ?";
+    private String[] selectString = { "Tag", "Woche", "Monat", "Jahr" };
+    private int DEFAULT_NUMBER_TO_SHOW = 31;
     private int maxNumberToShow;
 
     @Nullable
@@ -63,7 +77,7 @@ public class StatisticFragment extends Fragment{
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        maxNumberToShow = MAX_WHEEL_NUMBER;
+        maxNumberToShow = DEFAULT_NUMBER_TO_SHOW;
 
         chart = (LineChartView) view.findViewById(R.id.chart);
         chart.setLineChartData(data);
@@ -74,18 +88,40 @@ public class StatisticFragment extends Fragment{
         previewChart.setLineChartData(previewData);
         previewChart.setViewportChangeListener(new ViewportListener());
 
-        Button settingButton = (Button)view.findViewById(R.id.button_statistic_settings);
-        settingButton.setOnClickListener(new View.OnClickListener() {
+        Button selectButton = (Button)view.findViewById(R.id.button_left);
+        selectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Random r = new Random();
-                int i1 = r.nextInt(3000 - 0 + 1);
-                addValueToChart(String.valueOf(i1));
+                if (dialogSelect == null) {
+                    dialogSelect = new Dialog(v.getContext());
+                }
+
+                dialogSelect.setContentView(R.layout.dialog_select);
+                dialogSelect.setTitle(dialogSelectTilte);
+
+                numberPicker = (NumberPicker) dialogSelect.findViewById(R.id.number_picker);
+                numberPicker.setMinValue(0);
+                numberPicker.setMaxValue(3);
+                numberPicker.setDisplayedValues(selectString);
+                numberPicker.setWrapSelectorWheel(true);
+
+                Button dialogButton = (Button) dialogSelect.findViewById(R.id.apply_button_select);
+                dialogButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        System.out.println("Ausgewählt: " + numberPicker.getValue());
+                        updateChartView();
+                        dialogSelect.dismiss();
+                        dateButton.callOnClick();
+                    }
+                });
+
+                dialogSelect.show();
             }
         });
 
-        Button adjustButton = (Button)view.findViewById(R.id.button_adjust);
-        adjustButton.setOnClickListener(new View.OnClickListener() {
+        dateButton = (Button)view.findViewById(R.id.button_right);
+        dateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (dialog == null) {
@@ -93,18 +129,15 @@ public class StatisticFragment extends Fragment{
                 }
 
                 dialog.setContentView(R.layout.dialog);
-                dialog.setTitle(dialogTilte);
+                //dialog.setTitle(dialogTilte);
 
-                numberPicker = (NumberPicker) dialog.findViewById(R.id.number_picker);
-                numberPicker.setMinValue(MIN_WHEEL_NUMBER);
-                numberPicker.setMaxValue(MAX_WHEEL_NUMBER);
-                numberPicker.setWrapSelectorWheel(true);
+                datePicker = (DatePicker) dialog.findViewById(R.id.dpResult);
 
                 Button dialogButton = (Button) dialog.findViewById(R.id.apply_button);
                 dialogButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        maxNumberToShow = numberPicker.getValue();
+                        System.out.println(datePicker.getYear()+"-"+datePicker.getMonth()+"-"+datePicker.getDayOfMonth());
                         updateChartView();
                         dialog.dismiss();
                     }
@@ -114,6 +147,27 @@ public class StatisticFragment extends Fragment{
             }
         });
 
+        //TODO:
+        Date d = null;
+        try {
+            d = MeterDataSource.DATE_FORMAT.parse("01-01-2015");
+            IDatabase db = new MeterDbHelper(getActivity());
+            db.openDatabase();
+            List<String> data = new ArrayList<String>();
+            List<Day> days = db.getAllEntries();
+            if(days != null && days.size() > 0) {
+                for(Day day : days) {
+                    data.add(String.valueOf(day.getMmm().getMean()));
+                }
+            }
+            addDataToChart(data);
+            db.closeDatabase();
+        } catch (ParseException e) {
+
+        }
+
+
+
         updateChartView();
     }
 
@@ -122,14 +176,14 @@ public class StatisticFragment extends Fragment{
     }
 
     public void addValueToChart(String value) {
-        if(liveList.size() >= MAX_WHEEL_NUMBER){
+        if(liveList.size() >= maxNumberToShow){
             liveList.remove(0);
         }
         liveList.add(value);
         addDataToChart(liveList);
     }
 
-    public void addDataToChart(ArrayList<String> values){
+    public void addDataToChart(List<String> values){
         int maxValue = 0;
         int currentValue;
         int size = values.size();
