@@ -244,11 +244,10 @@ public class MeterDataSource {
         Cursor cursor = database.query(MeterDbHelper.TABLE_PREFS,
                 prefColumns,
                 null, null, null, null, null);
-        cursor.moveToFirst();
 
-        if(cursor.getCount() > 0){
-            MyPreferences preferences = cursorToPreferences(cursor);
+        if(cursor.moveToFirst()){
             System.out.println("found Preferences: " + cursor.getCount());
+            MyPreferences preferences = cursorToPreferences(cursor);
             cursor.close();
             return preferences;
         }
