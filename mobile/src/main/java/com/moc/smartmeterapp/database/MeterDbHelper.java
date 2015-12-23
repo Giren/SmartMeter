@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * Created by michael on 13.12.15.
  */
+
 public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
 
     private MeterDataSource meterDataSource;

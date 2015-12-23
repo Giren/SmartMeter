@@ -1,26 +1,24 @@
 package com.moc.smartmeterapp;
 
-import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.NumberPicker;
-import android.widget.Toast;
+
+import com.moc.smartmeterapp.database.MeterDbHelper;
+import com.moc.smartmeterapp.model.Day;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Random;
 
 import lecho.lib.hellocharts.gesture.ZoomType;
 import lecho.lib.hellocharts.listener.ViewportChangeListener;
@@ -43,25 +41,36 @@ public class StatisticFragment extends Fragment{
     private LineChartData data;
     private LineChartData previewData;
     private Line dataLine;
-    private ArrayList<String> liveList;
+    private ArrayList<Day> liveList;
     private int maxValueOfLineChartData;
 
     private Button dateButton;
-
     private Dialog dialog;
     private Dialog dialogSelect;
     private DatePicker datePicker;
     private NumberPicker numberPicker;
+
     private String dialogSelectTilte = "Welcher Zeitraum ?";
     private String[] selectString = { "Tag", "Woche", "Monat", "Jahr" };
     private int DEFAULT_NUMBER_TO_SHOW = 31;
     private int maxNumberToShow;
 
+    private final int DAY = 0;
+    private final int WEEK = 1;
+    private final int MONTH = 2;
+    private final int YEAR = 3;
+    private int userChoice;
+
+    private MeterDbHelper meterDbHelper;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if(liveList == null) {
-            liveList = new ArrayList<String>();
+            liveList = new ArrayList<Day>();
+        }
+        if(meterDbHelper == null){
+            meterDbHelper = new MeterDbHelper(getActivity().getBaseContext());
         }
         return inflater.inflate(R.layout.statistic_fragment_layout,null);
     }
@@ -71,6 +80,7 @@ public class StatisticFragment extends Fragment{
         super.onViewCreated(view, savedInstanceState);
 
         maxNumberToShow = DEFAULT_NUMBER_TO_SHOW;
+        userChoice = 0;
 
         chart = (LineChartView) view.findViewById(R.id.chart);
         chart.setLineChartData(data);
@@ -88,13 +98,12 @@ public class StatisticFragment extends Fragment{
                 if (dialogSelect == null) {
                     dialogSelect = new Dialog(v.getContext());
                 }
-
                 dialogSelect.setContentView(R.layout.dialog_select);
                 dialogSelect.setTitle(dialogSelectTilte);
 
                 numberPicker = (NumberPicker) dialogSelect.findViewById(R.id.number_picker);
                 numberPicker.setMinValue(0);
-                numberPicker.setMaxValue(3);
+                numberPicker.setMaxValue(selectString.length-1);
                 numberPicker.setDisplayedValues(selectString);
                 numberPicker.setWrapSelectorWheel(true);
 
@@ -102,8 +111,8 @@ public class StatisticFragment extends Fragment{
                 dialogButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        System.out.println("Ausgewählt: " + numberPicker.getValue());
-                        updateChartView();
+                        userChoice = numberPicker.getValue();
+                        //updateChartView();
                         dialogSelect.dismiss();
                         dateButton.callOnClick();
                     }
@@ -120,17 +129,14 @@ public class StatisticFragment extends Fragment{
                 if (dialog == null) {
                     dialog = new Dialog(v.getContext());
                 }
-
                 dialog.setContentView(R.layout.dialog);
-                //dialog.setTitle(dialogTilte);
-
                 datePicker = (DatePicker) dialog.findViewById(R.id.dpResult);
 
                 Button dialogButton = (Button) dialog.findViewById(R.id.apply_button);
                 dialogButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        System.out.println(datePicker.getYear()+"-"+datePicker.getMonth()+"-"+datePicker.getDayOfMonth());
+                        handleUserChoice();
                         updateChartView();
                         dialog.dismiss();
                     }
@@ -143,28 +149,24 @@ public class StatisticFragment extends Fragment{
         updateChartView();
     }
 
-    public void setMaxValueOfLineChartData(int maxValueOfLineChartData){
-        this.maxValueOfLineChartData = maxValueOfLineChartData;
-    }
-
-    public void addValueToChart(String value) {
+    public void addValueToChart(Day day) {
         if(liveList.size() >= maxNumberToShow){
             liveList.remove(0);
         }
-        liveList.add(value);
-        addDataToChart(liveList);
+        liveList.add(day);
+        addListToChart(liveList);
     }
 
-    public void addDataToChart(ArrayList<String> values){
+    public void addListToChart(List<Day> days){
         int maxValue = 0;
         int currentValue;
-        int size = values.size();
+        int size = days.size();
         List<PointValue> valuePoints = new ArrayList<PointValue>();
 
         for(int i=0; i<size; i++){
-            currentValue = Integer.parseInt(values.get(i));
+            currentValue = days.get(i).getMmm().getMean();
             if(currentValue > maxValue){
-                maxValue = currentValue;
+                maxValueOfLineChartData = currentValue;
             }
             valuePoints.add(new PointValue(i, currentValue));
         }
@@ -186,7 +188,6 @@ public class StatisticFragment extends Fragment{
         chart.setLineChartData(data);
         previewChart.setLineChartData(previewData);
 
-        setMaxValueOfLineChartData(maxValue);
         updateChartView();
     }
 
@@ -236,6 +237,59 @@ public class StatisticFragment extends Fragment{
         chart.setCurrentViewport(viewport);
         previewChart.setMaximumViewport(viewport);
         previewX(false);
+    }
+
+    private void handleUserChoice(){
+//        List<Hour> hours;
+//        hours = new ArrayList<Hour>();
+//        for(int i=0; i<24; i++) {
+//            hours.add(new Hour(new MinMeanMax(200,50,100,150)));
+//        }
+//        Day day = new Day(hours,new Date());
+
+        Day d;
+        List<Day> datalist = new ArrayList<Day>();
+        Date date = new Date(datePicker.getYear(),
+                datePicker.getMonth() + 1,
+                datePicker.getDayOfMonth());
+
+        System.out.println("Day to insert in Chart: " + date.getYear() + "-" + date.getMonth() + "-" + date.getDay());
+
+        meterDbHelper.openDatabase();
+        switch (userChoice){
+            case DAY:
+                maxNumberToShow = 1;
+                d = meterDbHelper.loadDay(date);
+                if(d != null){
+                    addValueToChart(d);
+                }
+                break;
+            case WEEK:
+                maxNumberToShow = 7;
+                for(int i=0; i<maxNumberToShow; i++){
+                    d = meterDbHelper.loadDay(date);
+                    if(d != null){
+                        datalist.add(d);
+                    }
+                    date.setDate(date.getDay()+1);
+                }
+                break;
+            case MONTH:
+                maxNumberToShow = 31;
+                datalist = meterDbHelper.loadMonth(date);
+                if(!datalist.isEmpty()){
+                    addListToChart(datalist);
+                }
+                break;
+            case YEAR:
+                maxNumberToShow = 365;
+                datalist = meterDbHelper.loadYear(date);
+                if(!datalist.isEmpty()){
+                    addListToChart(datalist);
+                }
+                break;
+        }
+        meterDbHelper.closeDatabase();
     }
 
 }

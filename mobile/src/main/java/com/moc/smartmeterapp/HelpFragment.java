@@ -136,7 +136,6 @@ public class HelpFragment extends Fragment{
 
         meterDbHelper = new MeterDbHelper(getActivity().getBaseContext());
         meterDbHelper.openDatabase();
-//        meterDbHelper.deleteAll();
 //        meterDbHelper.saveDay(day);
 //        meterDbHelper.saveDay(day1);
 //        meterDbHelper.saveDay(day2);
