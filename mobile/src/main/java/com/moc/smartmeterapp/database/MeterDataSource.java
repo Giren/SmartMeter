@@ -86,9 +86,8 @@ public class MeterDataSource {
     }
 
     private List<Day> cursorToMeterList(Cursor cursor){
-        if(cursor.getCount() > 0){
-            System.out.println("Found something: "+cursor.getCount());
-            cursor.moveToFirst();
+        if(cursor.moveToFirst()){
+            System.out.println("Found something: " + cursor.getCount());
             List<Day> dataList = new ArrayList<>();
             Day day;
 
@@ -111,9 +110,8 @@ public class MeterDataSource {
                         MeterDbHelper.COLUMN_DATE + "=?",
                         new String[] { dateToString(date) },
                         null,null,null,null);
-        cursor.moveToFirst();
 
-        if(cursor.getCount() > 0){
+        if(cursor.moveToFirst()){
             Day day = cursorToMeterData(cursor);
             System.out.println("found Date: " + day.getDate().getYear());
             cursor.close();
@@ -168,6 +166,28 @@ public class MeterDataSource {
                 MeterDbHelper.COLUMN_DATE + " like ?",
                 new String[] { String.valueOf(date.getYear())+"%"} );
     }
+
+    public Day getLatestDayFromDB() {
+        Cursor cursor = database.query(MeterDbHelper.TABLE_METER_LIST,
+                null,
+                null,
+                null,
+                null,
+                null,
+                MeterDbHelper.COLUMN_DATE+" DESC LIMIT 1");
+
+        if(cursor.moveToFirst()){
+            System.out.println("hole letztes Datum aus der DB");
+            Day day = cursorToMeterData(cursor);
+            cursor.close();
+            return day;
+        }
+        System.out.println("Nichts fefunden");
+        return null;
+    }
+
+
+
 
     private MyPreferences cursorToPreferences(Cursor cursor){
         int dbIndex = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_ID);
@@ -237,6 +257,9 @@ public class MeterDataSource {
         return null;
     }
 
+
+
+
     public void openDataBase(){
         database = meterDbHelper.getWritableDatabase();
     }
@@ -247,6 +270,14 @@ public class MeterDataSource {
 
     public void deleteDataBase(){
         database.delete(MeterDbHelper.TABLE_METER_LIST, null, null);
+        database.delete(MeterDbHelper.TABLE_PREFS, null, null);
+    }
+
+    public void deleteMeterList(){
+        database.delete(MeterDbHelper.TABLE_METER_LIST, null, null);
+    }
+
+    public void deleteMeterPref(){
         database.delete(MeterDbHelper.TABLE_PREFS, null, null);
     }
 

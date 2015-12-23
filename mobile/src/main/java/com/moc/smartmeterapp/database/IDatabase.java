@@ -13,6 +13,7 @@ public interface IDatabase {
     void createIfNotCreated();
 
     Day loadDay(Date date);
+    Day loadLatestDay();
     List<Day> loadMonth(Date date);
     List<Day> loadYear(Date date);
 
@@ -24,6 +25,8 @@ public interface IDatabase {
     void deleteMonth(Date date);
     void deleteYear(Date date);
     void deleteAll();
+    void deleteMeterList();
+    void deleteMeterPref();
 
     void savePreferences(MyPreferences pref);
     MyPreferences loadPreferences();

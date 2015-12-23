@@ -65,22 +65,24 @@ public class HelpFragment extends Fragment{
             public void onClick(View v) {
                 meterDbHelper.openDatabase();
                 //Day newDay = meterDbHelper.loadDay(nDate);
-                //meterDbHelper.loadMonth(nDate);
-                //meterDbHelper.loadYear(day1.getDate());
+                meterDbHelper.getAllEntries();
+                meterDbHelper.loadMonth(day2.getDate());
+                meterDbHelper.loadYear(day1.getDate());
                 //meterDbHelper.deleteMonth(day1.getDate());
                 //meterDbHelper.deleteYear(day.getDate());
                 //meterDbHelper.deleteDay(day.getDate());
                 //listView.setAdapter(listToArrayadapter(meterDbHelper.loadMonth(day1.getDate())));
                 //listView.setAdapter(showAllDBEntries());
-                MyPreferences prefs = meterDbHelper.loadPreferences();
-                text.setText("WeekLimit: "+prefs.getWeekLimit()+"\n"+
-                        "WeekLimitColor: "+prefs.getWeekLimitColor()+"\n"+
-                        "MonthLimit: "+ prefs.getMonthLimit()+"\n"+
-                        "MonthLimitColor: "+prefs.getMonthLimitColor()+"\n"+
-                        "YearLimit: "+ prefs.getYearLimit()+"\n"+
-                        "YearLimitColor: "+ prefs.getYearLimitColor()+"\n"+
-                        "IP Address: "+ prefs.getIpAddress()+"\n"+
-                        "Notification: "+ prefs.getNotification()+"\n");
+//                MyPreferences prefs = meterDbHelper.loadPreferences();
+//                text.setText("WeekLimit: "+prefs.getWeekLimit()+"\n"+
+//                        "WeekLimitColor: "+prefs.getWeekLimitColor()+"\n"+
+//                        "MonthLimit: "+ prefs.getMonthLimit()+"\n"+
+//                        "MonthLimitColor: "+prefs.getMonthLimitColor()+"\n"+
+//                        "YearLimit: "+ prefs.getYearLimit()+"\n"+
+//                        "YearLimitColor: "+ prefs.getYearLimitColor()+"\n"+
+//                        "IP Address: "+ prefs.getIpAddress()+"\n"+
+//                        "Notification: "+ prefs.getNotification()+"\n");
+                meterDbHelper.loadLatestDay();
                 meterDbHelper.closeDatabase();
             }
         });
@@ -140,7 +142,7 @@ public class HelpFragment extends Fragment{
 //        meterDbHelper.saveDay(day2);
 //        meterDbHelper.saveDay(day3);
 //        listView.setAdapter(showAllDBEntries());
-        MyPreferences pref = new MyPreferences(100,"#11",100,"#11",100,"#11","10.0.0.1",true);
+        //MyPreferences pref = new MyPreferences(100,"#11",100,"#11",100,"#11","10.0.0.1",true);
         //meterDbHelper.savePreferences(pref);
         meterDbHelper.closeDatabase();
     }
