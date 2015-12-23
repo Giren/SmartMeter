@@ -144,33 +144,34 @@ public class DataService extends Service {
 
                 Log.d("DEBUG", "Connectiong to socket...");
                 try {
-                    //clientSocket = new Socket("192.168.1.65", 9999);
+                    clientSocket = new Socket("192.168.1.65", 9999);
 
-                   // while (!clientSocket.isConnected()) {
-                    while( true) {
-                        //inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                        //message = inFromServer.readLine();
-                        message = String.valueOf( 0 + ( (int)( Math.random() * 2500)));
+                    while (!clientSocket.isConnected()) {
+                    // while( true) {
+                        inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                        message = inFromServer.readLine();
+                        //message = String.valueOf( 0 + ( (int)( Math.random() * 2500)));
                         if(message != null) {
                             intent.putExtra(String.valueOf(ComUtils.RECIVED_LIVE_DATA), message);
                             sendBroadcast(intent);
                             Log.i("Info: DataService", "Got LiveData: " + message);
-                            Thread.sleep( 750);
+                            //Thread.sleep( 750);
                         } else {
                             break;
                         }
                     }
 
-                    //clientSocket.close();
+                    clientSocket.close();
                     Log.d("DEBUG", "Connectiong closed...");
 
-//                } catch(UnknownHostException e1) {
-//                    Log.d("DEBUG", "UnknownHostException");
-//                } catch(IOException e1) {
-//                    Log.d("DEBUG", "IOException");
-                } catch ( Exception e) {
-                    Log.d( "DEBUG", "Exception: " + e.getMessage());
+                } catch(UnknownHostException e1) {
+                    Log.d("DEBUG", "UnknownHostException");
+                } catch(IOException e1) {
+                    Log.d("DEBUG", "IOException");
                 }
+//                } catch ( Exception e) {
+//                    Log.d( "DEBUG", "Exception: " + e.getMessage());
+//                }
 
                 try {
                     Thread.sleep(3000);
