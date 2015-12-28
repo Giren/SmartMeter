@@ -37,7 +37,7 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
     public static final String COLUMN_PREF_YEAR_LIMIT = "year_limit";
     public static final String COLUMN_PREF_YEAR_LIMIT_COLOR = "year_limit_color";
     public static final String COLUMN_PREF_IP = "ip_address";
-    public static final String COLUMN_PREF_NOTIFICATION = "notificatiion";
+    public static final String COLUMN_PREF_SYNC = "sync";
 
     private static final String SQL_CREATE = "CREATE TABLE " + TABLE_METER_LIST + "(" +
             COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -53,7 +53,7 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
             COLUMN_PREF_YEAR_LIMIT + " INTEGER NOT NULL, " +
             COLUMN_PREF_YEAR_LIMIT_COLOR + " TEXT NOT NULL, " +
             COLUMN_PREF_IP + " TEXT NOT NULL, " +
-            COLUMN_PREF_NOTIFICATION + " TEXT NOT NULL);";
+            COLUMN_PREF_SYNC + " TEXT NOT NULL);";
 
     public MeterDbHelper(Context context){
         super(context, DB_NAME ,null, DB_VERSION);
@@ -119,16 +119,19 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
 
     @Override
     public void saveDay(Day day) {
+        meterDataSource.deleteDayFromDataBase(day.getDate()); //to avoid duplicates
         meterDataSource.insertDataToDB(day);
     }
 
     @Override
     public void saveMonth(List<Day> days) {
+        meterDataSource.deleteMonthFromDataBase(days.get(0).getDate());//to avoid duplicates
         meterDataSource.insertListDataToDB(days);
     }
 
     @Override
     public void saveYear(List<Day> days) {
+        meterDataSource.deleteYearFromDataBase(days.get(0).getDate());//to avoid duplicates
         meterDataSource.insertListDataToDB(days);
     }
 

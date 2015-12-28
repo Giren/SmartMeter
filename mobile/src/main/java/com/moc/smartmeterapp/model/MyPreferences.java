@@ -13,11 +13,11 @@ public class MyPreferences {
     private String yearLimitColor;
 
     private String ipAddress;
-    private Boolean notification;
+    private Boolean sync;
 
     public MyPreferences(Integer weekLimit, String weekLimitColor, Integer monthLimit,
                          String monthLimitColor, Integer yearLimit, String yearLimitColor,
-                         String ipAddress, Boolean notification){
+                         String ipAddress, Boolean sync){
         this.weekLimit = weekLimit;
         this.weekLimitColor = weekLimitColor;
         this.monthLimit = monthLimit;
@@ -25,7 +25,7 @@ public class MyPreferences {
         this.yearLimit = yearLimit;
         this.yearLimitColor = yearLimitColor;
         this.ipAddress = ipAddress;
-        this.notification = notification;
+        this.sync = sync;
     }
 
     public MyPreferences(){
@@ -71,8 +71,8 @@ public class MyPreferences {
         return ipAddress;
     }
 
-    public Boolean getNotification() {
-        return notification;
+    public Boolean getSync() {
+        return sync;
     }
 
     public void setWeekLimit(Integer weekLimit) {
@@ -91,7 +91,7 @@ public class MyPreferences {
         this.ipAddress = ipAddress;
     }
 
-    public void setNotification(Boolean notification) {
-        this.notification = notification;
+    public void setSync(Boolean sync) {
+        this.sync = sync;
     }
 }
