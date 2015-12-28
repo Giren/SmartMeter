@@ -19,6 +19,8 @@ import com.moc.smartmeterapp.communication.RestCommunication;
 import com.moc.smartmeterapp.database.IDatabase;
 import com.moc.smartmeterapp.database.MeterDbHelper;
 import com.moc.smartmeterapp.model.DataObject;
+import com.moc.smartmeterapp.model.Day;
+import com.moc.smartmeterapp.model.Hour;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -38,9 +40,9 @@ public class MainActivity extends AppCompatActivity{
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
 
-    private RestCommunication restCommunication;
-
     private AlarmReceiver alarm = new AlarmReceiver();
+
+    private RestCommunication restCommunication;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,26 +134,29 @@ public class MainActivity extends AppCompatActivity{
         mDrawerToggle.syncState();
 
         restCommunication = new RestCommunication();
-        restCommunication.fetchYearData(0, new RestCommunication.IDataReceiver() {
+        restCommunication.fetchMonthData(0, new RestCommunication.IDataReceiver() {
             @Override
             public void onDataReceived(DataObject dataObject) {
-                Toast toast = Toast.makeText(getApplicationContext(), "Synchronisierung läuft...", Toast.LENGTH_LONG);
-                toast.show();
+                for(Day d : dataObject.getDays()) {
+                    for(Hour h : d.getHours()) {
+                        Log.d("DEBUG:", String.valueOf(h.getMmm().getMean()));
+                    }
+                }
+                IDatabase helper = new MeterDbHelper(getApplicationContext());
+                helper.openDatabase();
+                helper.deleteAll();
+                helper.saveMonth(dataObject.getDays());
+                helper.closeDatabase();
             }
 
             @Override
             public void onError(String message) {
-                if(message != null)
-                    Log.e("ERROR:", message);
-
-                Toast toast = Toast.makeText(getApplicationContext(), "Synchronisierung fehlgeschlagen...", Toast.LENGTH_LONG);
-                toast.show();
+                Log.d("DEBUG:", message);
             }
 
             @Override
             public void onComplete() {
-                Toast toast = Toast.makeText(getApplicationContext(), "Synchronisierung erfolgreich...", Toast.LENGTH_LONG);
-                toast.show();
+
             }
         });
     }

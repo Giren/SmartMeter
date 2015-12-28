@@ -37,6 +37,8 @@ public class WearService extends WearableListenerService implements
     @Override
     public void onCreate() {
         liveCommunication = new LiveCommunication(getApplicationContext());
+        liveCommunication.create();
+        liveCommunication.registerDataEventHandler(this);
 
         Log.d("DEBUG", "WEAR SERVICE ON CREATE");
 
@@ -59,9 +61,6 @@ public class WearService extends WearableListenerService implements
     @Override
     public void onConnected(Bundle bundle) {
         Log.d("DEBUG", "WEAR SERVICE ON CONNECTED");
-
-        liveCommunication.create();
-        liveCommunication.registerDataEventHandler(this);
     }
 
     @Override
@@ -91,6 +90,9 @@ public class WearService extends WearableListenerService implements
                 googleClient.disconnect();
             }
         }
+
+        liveCommunication.destroy();
+
         super.onDestroy();
     }
 

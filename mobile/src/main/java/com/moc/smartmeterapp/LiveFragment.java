@@ -91,6 +91,7 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         limitRed = new Limit(2000, 2500, Color.RED);
         limitYellow = new Limit(1500, 2000, Color.YELLOW);
@@ -121,7 +122,5 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
                 meterView.setMax(seekBar.getProgress() + 2500);
             }
         });
-
-        super.onViewCreated(view, savedInstanceState);
     }
 }

@@ -10,7 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.moc.smartmeterapp.ui.MeterView;
+
 public class HomeMonthFragment extends Fragment {
+
+    private MeterView meterView;
 
     @Nullable
     @Override
@@ -18,5 +22,11 @@ public class HomeMonthFragment extends Fragment {
         return inflater.inflate(R.layout.home_month_fragment_layout,null);
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
+        meterView = (MeterView) view.findViewById(R.id.month_meterview);
+        meterView.setOffsetAngle(45);
+    }
 }

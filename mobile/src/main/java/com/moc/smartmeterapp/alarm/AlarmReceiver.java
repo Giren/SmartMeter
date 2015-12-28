@@ -44,8 +44,8 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         if (hasNetwork) {
             // schedule service for every 15 minutes
             alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime() + 60000,
-                    60000, alarmIntent);
+                    SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_HALF_HOUR,
+                    AlarmManager.INTERVAL_HALF_HOUR, alarmIntent);
         } else {
             alarmMgr.cancel(alarmIntent);
         }

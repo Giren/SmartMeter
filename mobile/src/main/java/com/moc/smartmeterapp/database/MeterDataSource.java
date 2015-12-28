@@ -87,8 +87,6 @@ public class MeterDataSource {
         Long id = cursor.getLong(dbIndex);
         String da = cursor.getString(dbDate);
 
-        System.out.println(">>>>>>>>>> "+da+" <<<<<<<<<");
-
         byte[] blob = cursor.getBlob(cursor.getColumnIndex(MeterDbHelper.COLUMN_DAY_O));
         String json = new String(blob);
         Gson gson = new Gson();

@@ -10,9 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class HomeWeekFragment extends Fragment {
+import com.moc.smartmeterapp.ui.MeterView;
 
-    private PercentView percentView;
+public class HomeWeekFragment extends Fragment {
+    private MeterView meterView;
 
     @Nullable
     @Override
@@ -22,9 +23,9 @@ public class HomeWeekFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-
-        percentView = (PercentView) view.findViewById(R.id.percentView);
-
         super.onViewCreated(view, savedInstanceState);
+
+        meterView = (MeterView) view.findViewById(R.id.week_meterview);
+        meterView.setOffsetAngle(45);
     }
 }
