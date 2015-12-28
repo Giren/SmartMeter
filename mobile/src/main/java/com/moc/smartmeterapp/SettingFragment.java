@@ -59,7 +59,7 @@ public class SettingFragment extends Fragment {
         meterDbHelper.openDatabase();
         MyPreferences pref = meterDbHelper.loadPreferences();
         meterDbHelper.closeDatabase();
-        
+
         if(pref != null)
             setPreferenceView(pref);
 
