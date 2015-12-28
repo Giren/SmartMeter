@@ -12,7 +12,7 @@ import android.widget.TextView;
 /**
  * Created by David on 23.11.2015.
  */
-public class StatisticFragment extends CustomFragment {
+public class LimitFragment extends CustomFragment {
 
     String fragmentName;
     TextView tvCurrentValue;
@@ -54,27 +54,27 @@ public class StatisticFragment extends CustomFragment {
         tvLimitValue.setText( "0");
         tvLimitPercent.setText( "0 %");
 
-        Log.d("DEBUG", "StatisticFragment - onCreateView() - " + fragmentName);
+        Log.d("DEBUG", "LimitFragment - onCreateView() - " + fragmentName);
         return v;
     }
 
     public String getLimitViewName( String fragmentName) {
-        Log.d("DEBUG", "StatisticFragment - getLimitViewName() for:" + fragmentName);
+        Log.d("DEBUG", "LimitFragment - getLimitViewName() for:" + fragmentName);
         switch ( fragmentName) {
             case "limitWeek": {
-                Log.d("DEBUG", "StatisticFragment - getLimitViewName() - return: Wochenlimit");
+                Log.d("DEBUG", "LimitFragment - getLimitViewName() - return: Wochenlimit");
                 return "Wochenlimit";
             }
             case "limitMonth": {
-                Log.d("DEBUG", "StatisticFragment - getLimitViewName() - return: Monatslimit");
+                Log.d("DEBUG", "LimitFragment - getLimitViewName() - return: Monatslimit");
                 return "Monatslimit";
             }
             case "limitYear": {
-                Log.d("DEBUG", "StatisticFragment - getLimitViewName() - return: Jahreslimit");
+                Log.d("DEBUG", "LimitFragment - getLimitViewName() - return: Jahreslimit");
                 return "Jahreslimit";
             }
             default: {
-                Log.d("DEBUG", "StatisticFragment - getLimitViewName() - return: Default");
+                Log.d("DEBUG", "LimitFragment - getLimitViewName() - return: Default");
                 return "Default";
             }
         }
@@ -85,7 +85,7 @@ public class StatisticFragment extends CustomFragment {
      */
     @Override
     public void UpdateFragmentContent( String update) {
-        Log.d("DEBUG", "StatisticFragment - UpdateFragmentContent() - " + update);
+        Log.d("DEBUG", "LimitFragment - UpdateFragmentContent() - " + update);
         /*
             Format of received string:
             <fragmentName>;<LimitValue>;<CurrentValue>
@@ -117,13 +117,13 @@ public class StatisticFragment extends CustomFragment {
         this.setUserVisible( isVisibleToUser);
 
         if ( this.getUserVisible()) {
-            Log.d("DEBUG", "StatisticFragment - setUserVisibleHint() - visible");
+            Log.d("DEBUG", "LimitFragment - setUserVisibleHint() - visible");
             ((MainActivity)getActivity()).sendDataToHandheld( fragmentName);
         } else if( !this.getUserVisible()) {
-            Log.d("DEBUG", "StatisticFragment - setUserVisibleHint() - invisible");
+            Log.d("DEBUG", "LimitFragment - setUserVisibleHint() - invisible");
             fragmentName = getArguments().getString("msg");
         }
-        Log.d("DEBUG", "StatisticFragment - setUserVisibleHint()");
+        Log.d("DEBUG", "LimitFragment - setUserVisibleHint()");
     }
 
     public boolean getUserVisible() {
@@ -134,9 +134,9 @@ public class StatisticFragment extends CustomFragment {
         this.userVisible = status;
     }
 
-    public static StatisticFragment newInstance(String text) {
+    public static LimitFragment newInstance(String text) {
 
-        StatisticFragment f = new StatisticFragment();
+        LimitFragment f = new LimitFragment();
         Bundle b = new Bundle();
         b.putString( "msg", text);
 

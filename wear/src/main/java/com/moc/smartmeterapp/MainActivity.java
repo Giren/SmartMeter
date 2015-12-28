@@ -32,9 +32,9 @@ public class MainActivity extends FragmentActivity implements
     private static final String HANDHELD_DATA_PATH = "/SmartMeterToHandheld";
 
     LiveFragment liveFragment;
-    StatisticFragment limitWeek;
-    StatisticFragment limitMonth;
-    StatisticFragment limitYear;
+    LimitFragment limitWeek;
+    LimitFragment limitMonth;
+    LimitFragment limitYear;
 
     ViewPager pager;
     GoogleApiClient googleClient;
@@ -60,12 +60,8 @@ public class MainActivity extends FragmentActivity implements
 
         // Set flag keep screen on
         getWindow().addFlags( WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        // TODO onCreate
     }
 
-    /**
-     *
-     */
     @Override
     protected void onStop() {
         // sendDataToHandheld("goodbye");
@@ -134,7 +130,6 @@ public class MainActivity extends FragmentActivity implements
         } // if end
     }
 
-
     public void handleReceivedMessage(String message) {
         Log.d("DEBUG", "MainActivity - handleReceivedMessage(): " + message);
         List<Fragment> allFragments = getSupportFragmentManager().getFragments();
@@ -192,21 +187,21 @@ public class MainActivity extends FragmentActivity implements
                     if( limitWeek != null)
                         return limitWeek;
                     else
-                        return StatisticFragment.newInstance("limitWeek");
+                        return LimitFragment.newInstance("limitWeek");
                 }
                 case 2: {
                     System.out.println( "limitMonth");
                     if( limitMonth != null)
                         return limitMonth;
                     else
-                        return StatisticFragment.newInstance("limitMonth");
+                        return LimitFragment.newInstance("limitMonth");
                 }
                 case 3: {
                     System.out.println( "limitYear");
                     if( limitYear != null)
                         return  limitYear;
                     else
-                        return StatisticFragment.newInstance("limitYear");
+                        return LimitFragment.newInstance("limitYear");
                 }
                 default: {
                     System.out.println( "Default");
