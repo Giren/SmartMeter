@@ -225,7 +225,8 @@ public class MeterDataSource {
                 limit2,
                 limit3,
                 ip,
-                sync);
+                sync
+        );
 
         return preferences;
     }
