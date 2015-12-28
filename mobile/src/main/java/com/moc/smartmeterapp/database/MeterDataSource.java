@@ -8,15 +8,13 @@ import android.database.sqlite.SQLiteDatabase;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.moc.smartmeterapp.model.Day;
-import com.moc.smartmeterapp.model.MyPreferences;
+import com.moc.smartmeterapp.preferences.MyPreferences;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by michael on 13.12.15.

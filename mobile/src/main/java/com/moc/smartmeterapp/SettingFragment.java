@@ -1,7 +1,7 @@
 package com.moc.smartmeterapp;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,7 +12,7 @@ import android.widget.EditText;
 import android.widget.Switch;
 
 import com.moc.smartmeterapp.database.MeterDbHelper;
-import com.moc.smartmeterapp.model.MyPreferences;
+import com.moc.smartmeterapp.preferences.MyPreferences;
 
 
 /**
@@ -20,7 +20,11 @@ import com.moc.smartmeterapp.model.MyPreferences;
  */
 public class SettingFragment extends Fragment {
 
+    private static final String INTENT_IDENTIFIER = "PREFERENCES_BROADCAST";
+    public static final String MESSAGE_IDENTIFIER = "PREFS";
+
     private MeterDbHelper meterDbHelper;
+    private Intent intent;
 
     private EditText editWeek;
     private EditText editWeekColor;
@@ -39,6 +43,8 @@ public class SettingFragment extends Fragment {
         if(meterDbHelper == null){
             meterDbHelper = new MeterDbHelper(getActivity().getBaseContext());
         }
+
+        intent = new Intent(INTENT_IDENTIFIER);
 
         return inflater.inflate(R.layout.setting_fragment_layout,null,false);
     }
@@ -80,8 +86,14 @@ public class SettingFragment extends Fragment {
                 meterDbHelper.openDatabase();
                 meterDbHelper.savePreferences(preferences);
                 meterDbHelper.closeDatabase();
+
+                sendBroadcast(preferences);
             }
         });
+    }
+
+    private void sendBroadcast(MyPreferences pref){
+        intent.putExtra(MESSAGE_IDENTIFIER, pref);
     }
 
     private void setPreferenceView(MyPreferences pref){

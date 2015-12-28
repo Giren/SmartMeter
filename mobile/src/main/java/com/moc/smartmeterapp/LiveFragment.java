@@ -23,12 +23,16 @@ import com.moc.smartmeterapp.model.EntryObject;
 import com.moc.smartmeterapp.model.Global;
 import com.moc.smartmeterapp.model.Hour;
 import com.moc.smartmeterapp.model.Limit;
+import com.moc.smartmeterapp.preferences.MyPreferences;
+import com.moc.smartmeterapp.preferences.PreferenceHelper;
 import com.moc.smartmeterapp.ui.Limiter;
 import com.moc.smartmeterapp.ui.MeterView;
 
 import java.util.List;
 
 public class LiveFragment extends Fragment implements LiveCommunication.ILiveDataEvent {
+
+    private PreferenceHelper prefHelper;
 
     private MeterView meterView;
     private Limiter limiter;
@@ -62,6 +66,8 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        prefHelper = new PreferenceHelper();
+
         liveCommunication = new LiveCommunication(getActivity());
         liveCommunication.create();
         liveCommunication.registerDataEventHandler(this);
@@ -92,8 +98,16 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
-        limitRed = new Limit(2000, 2500, Color.RED);
-        limitYellow = new Limit(1500, 2000, Color.YELLOW);
+        MyPreferences pref = PreferenceHelper.getPreferences(view.getContext());
+
+        if(pref != null){
+            limitRed = new Limit(
+                    pref.
+            )
+        } else{
+            limitRed = new Limit(2000, 2500, Color.RED);
+            limitYellow = new Limit(1500, 2000, Color.YELLOW);
+        }
 
         limiter = new Limiter();
         limiter.addLimit(limitYellow);

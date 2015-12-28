@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.moc.smartmeterapp.model.Day;
-import com.moc.smartmeterapp.model.MyPreferences;
+import com.moc.smartmeterapp.preferences.MyPreferences;
 
 import java.util.Date;
 import java.util.List;

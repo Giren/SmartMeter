@@ -1,10 +1,12 @@
-package com.moc.smartmeterapp.model;
+package com.moc.smartmeterapp.preferences;
+
+import java.io.Serializable;
 
 /**
  * Created by michael on 22.12.15.
  */
 
-public class MyPreferences {
+public class MyPreferences implements Serializable{
     private Integer weekLimit;
     private String weekLimitColor;
     private Integer monthLimit;
