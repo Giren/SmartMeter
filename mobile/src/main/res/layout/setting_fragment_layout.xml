@@ -17,14 +17,13 @@
             android:id="@+id/weekLimit"
             android:layout_alignParentStart="true"
             android:textSize="30sp"
-            android:text="Wochenlimit" />
+            android:text="Limit 1" />
 
         <EditText
             android:layout_width="132dp"
             android:layout_height="wrap_content"
-            android:inputType="number"
             android:ems="10"
-            android:id="@+id/edit_week"
+            android:id="@+id/edit_limit_1"
             android:layout_gravity="right"
             android:textAlignment="center"
             android:textSize="20dp" />
@@ -41,13 +40,13 @@
             android:id="@+id/weekLimitColor"
             android:layout_alignParentStart="true"
             android:textSize="30sp"
-            android:text="Wochen-Farbe" />
+            android:text="Limit 1 Farbe" />
 
         <EditText
             android:layout_width="132dp"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:id="@+id/edit_week_color"
+            android:id="@+id/edit_limit_1_color"
             android:layout_gravity="right"
             android:textAlignment="center"
             android:textSize="20dp"
@@ -64,16 +63,15 @@
             android:layout_height="50dp"
             android:id="@+id/monthLimit"
             android:textSize="30sp"
-            android:text="Monatslimit"
+            android:text="Limit 2"
             android:layout_below="@+id/editText2"
             android:layout_alignParentStart="true" />
 
         <EditText
             android:layout_width="132dp"
             android:layout_height="wrap_content"
-            android:inputType="number"
             android:ems="10"
-            android:id="@+id/edit_month"
+            android:id="@+id/edit_limit_2"
             android:layout_gravity="right"
             android:textAlignment="center"
             android:textSize="20dp" />
@@ -89,7 +87,7 @@
             android:layout_height="50dp"
             android:id="@+id/monthLimitColor"
             android:textSize="30sp"
-            android:text="Monats-Farbe"
+            android:text="Limit 2 Farbe"
             android:layout_below="@+id/editText2"
             android:layout_alignParentStart="true" />
 
@@ -97,7 +95,7 @@
             android:layout_width="132dp"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:id="@+id/edit_month_color"
+            android:id="@+id/edit_limit_2_color"
             android:layout_gravity="right"
             android:textAlignment="center"
             android:textSize="20dp" />
@@ -113,16 +111,15 @@
             android:layout_height="50dp"
             android:id="@+id/yearLimit"
             android:textSize="30sp"
-            android:text="Jahreslimit"
+            android:text="Limit 3"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true" />
 
         <EditText
             android:layout_width="132dp"
             android:layout_height="wrap_content"
-            android:inputType="number"
             android:ems="10"
-            android:id="@+id/edit_year"
+            android:id="@+id/edit_limit_3"
             android:layout_gravity="right"
             android:textAlignment="center"
             android:textSize="20dp"
@@ -139,7 +136,7 @@
             android:layout_height="50dp"
             android:id="@+id/yearLimitColor"
             android:textSize="30sp"
-            android:text="Jahres-Farbe"
+            android:text="Limit 3 Farbe"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true" />
 
@@ -147,7 +144,7 @@
             android:layout_width="132dp"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:id="@+id/edit_year_color"
+            android:id="@+id/edit_limit_3_color"
             android:layout_gravity="right"
             android:textAlignment="center"
             android:textSize="20dp"

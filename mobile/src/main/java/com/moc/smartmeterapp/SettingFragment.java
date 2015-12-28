@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Switch;
 
 import com.moc.smartmeterapp.database.MeterDbHelper;
+import com.moc.smartmeterapp.model.Limit;
 import com.moc.smartmeterapp.preferences.MyPreferences;
 
 
@@ -26,12 +27,12 @@ public class SettingFragment extends Fragment {
     private MeterDbHelper meterDbHelper;
     private Intent intent;
 
-    private EditText editWeek;
-    private EditText editWeekColor;
-    private EditText editMonth;
-    private EditText editMonthColor;
-    private EditText editYear;
-    private EditText editYearColor;
+    private EditText editLimit1;
+    private EditText editLimit1Color;
+    private EditText editLimit2;
+    private EditText editLimit2Color;
+    private EditText editLimit3;
+    private EditText editLimit3Color;
     private EditText editIP;
 
     private Switch syncSwitch;
@@ -53,12 +54,12 @@ public class SettingFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        editWeek = (EditText)view.findViewById(R.id.edit_week);
-        editWeekColor = (EditText)view.findViewById(R.id.edit_week_color);
-        editMonth = (EditText)view.findViewById(R.id.edit_month);
-        editMonthColor = (EditText)view.findViewById(R.id.edit_month_color);
-        editYear =  (EditText)view.findViewById(R.id.edit_year);
-        editYearColor = (EditText)view.findViewById(R.id.edit_year_color);
+        editLimit1 = (EditText)view.findViewById(R.id.edit_limit_1);
+        editLimit1Color = (EditText)view.findViewById(R.id.edit_limit_1_color);
+        editLimit2 = (EditText)view.findViewById(R.id.edit_limit_2);
+        editLimit2Color = (EditText)view.findViewById(R.id.edit_limit_2_color);
+        editLimit3 =  (EditText)view.findViewById(R.id.edit_limit_3);
+        editLimit3Color = (EditText)view.findViewById(R.id.edit_limit_3_color);
         editIP = (EditText)view.findViewById(R.id.edit_ip);
         syncSwitch = (Switch)view.findViewById(R.id.sync_switch);
 
@@ -73,13 +74,14 @@ public class SettingFragment extends Fragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Limit limit1 = new Limit(100,200,1);
+                Limit limit2 = new Limit(250,350,2);
+                Limit limit3 = new Limit(1000,2000,3);
+
                 MyPreferences preferences = new MyPreferences(
-                        Integer.parseInt(editWeek.getText().toString()),
-                        editWeekColor.getText().toString(),
-                        Integer.parseInt(editMonth.getText().toString()),
-                        editMonthColor.getText().toString(),
-                        Integer.parseInt(editYear.getText().toString()),
-                        editYearColor.getText().toString(),
+                        limit1,
+                        limit2,
+                        limit3,
                         editIP.getText().toString(),
                         syncSwitch.isChecked()
                 );
@@ -97,12 +99,12 @@ public class SettingFragment extends Fragment {
     }
 
     private void setPreferenceView(MyPreferences pref){
-        editWeek.setText(String.valueOf(pref.getWeekLimit()));
-        editWeekColor.setText(pref.getWeekLimitColor());
-        editMonth.setText(String.valueOf(pref.getMonthLimit()));
-        editMonthColor.setText(pref.getMonthLimitColor());
-        editYear.setText(String.valueOf(pref.getYearLimit()));
-        editYearColor.setText(pref.getYearLimitColor());
+        editLimit1.setText(String.valueOf(pref.getLimit1().getMin())+"-"+String.valueOf(pref.getLimit1().getMax()));
+        editLimit1Color.setText(String.valueOf(pref.getLimit1().getColor()));
+        editLimit2.setText(String.valueOf(pref.getLimit2().getMin())+"-"+String.valueOf(pref.getLimit2().getMax()));
+        editLimit2Color.setText(String.valueOf(pref.getLimit2().getColor()));
+        editLimit3.setText(String.valueOf(pref.getLimit3().getMin())+"-"+String.valueOf(pref.getLimit3().getMax()));
+        editLimit3Color.setText(String.valueOf(pref.getLimit3().getColor()));
         editIP.setText(pref.getIpAddress());
         syncSwitch.setChecked(pref.getSync());
     }

@@ -1,5 +1,7 @@
 package com.moc.smartmeterapp.preferences;
 
+import com.moc.smartmeterapp.model.Limit;
+
 import java.io.Serializable;
 
 /**
@@ -7,25 +9,19 @@ import java.io.Serializable;
  */
 
 public class MyPreferences implements Serializable{
-    private Integer weekLimit;
-    private String weekLimitColor;
-    private Integer monthLimit;
-    private String monthLimitColor;
-    private Integer yearLimit;
-    private String yearLimitColor;
+    private Limit limit1;
+    private Limit limit2;
+    private Limit limit3;
+    private String limit3Color;
 
     private String ipAddress;
     private Boolean sync;
 
-    public MyPreferences(Integer weekLimit, String weekLimitColor, Integer monthLimit,
-                         String monthLimitColor, Integer yearLimit, String yearLimitColor,
+    public MyPreferences(Limit limit1, Limit limit2, Limit limit3,
                          String ipAddress, Boolean sync){
-        this.weekLimit = weekLimit;
-        this.weekLimitColor = weekLimitColor;
-        this.monthLimit = monthLimit;
-        this.monthLimitColor = monthLimitColor;
-        this.yearLimit = yearLimit;
-        this.yearLimitColor = yearLimitColor;
+        this.limit1 = limit1;
+        this.limit2 = limit2;
+        this.limit3 = limit3;
         this.ipAddress = ipAddress;
         this.sync = sync;
     }
@@ -33,40 +29,16 @@ public class MyPreferences implements Serializable{
     public MyPreferences(){
     }
 
-    public String getWeekLimitColor() {
-        return weekLimitColor;
+    public Limit getLimit1() {
+        return limit1;
     }
 
-    public String getMonthLimitColor() {
-        return monthLimitColor;
+    public Limit getLimit2() {
+        return limit2;
     }
 
-    public String getYearLimitColor() {
-        return yearLimitColor;
-    }
-
-    public void setWeekLimitColor(String weekLimitColor) {
-        this.weekLimitColor = weekLimitColor;
-    }
-
-    public void setMonthLimitColor(String monthLimitColor) {
-        this.monthLimitColor = monthLimitColor;
-    }
-
-    public void setYearLimitColor(String yearLimitColor) {
-        this.yearLimitColor = yearLimitColor;
-    }
-
-    public Integer getWeekLimit() {
-        return weekLimit;
-    }
-
-    public Integer getMonthLimit() {
-        return monthLimit;
-    }
-
-    public Integer getYearLimit() {
-        return yearLimit;
+    public Limit getLimit3() {
+        return limit3;
     }
 
     public String getIpAddress() {
@@ -77,16 +49,16 @@ public class MyPreferences implements Serializable{
         return sync;
     }
 
-    public void setWeekLimit(Integer weekLimit) {
-        this.weekLimit = weekLimit;
+    public void setLimit1(Limit limit1) {
+        this.limit1 = limit1;
     }
 
-    public void setMonthLimit(Integer monthLimit) {
-        this.monthLimit = monthLimit;
+    public void setLimit2(Limit limit2) {
+        this.limit2 = limit2;
     }
 
-    public void setYearLimit(Integer yearLimit) {
-        this.yearLimit = yearLimit;
+    public void setLimit3(Limit limit3) {
+        this.limit3 = limit3;
     }
 
     public void setIpAddress(String ipAddress) {

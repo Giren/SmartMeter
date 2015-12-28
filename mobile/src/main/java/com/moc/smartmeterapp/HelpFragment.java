@@ -60,12 +60,12 @@ public class HelpFragment extends Fragment{
                 //listView.setAdapter(listToArrayadapter(meterDbHelper.loadMonth(day1.getDate())));
                 //listView.setAdapter(showAllDBEntries());
                 MyPreferences prefs = meterDbHelper.loadPreferences();
-                text.setText("WeekLimit: " + prefs.getWeekLimit() + "\n" +
-                        "WeekLimitColor: " + prefs.getWeekLimitColor() + "\n" +
-                        "MonthLimit: " + prefs.getMonthLimit() + "\n" +
-                        "MonthLimitColor: " + prefs.getMonthLimitColor() + "\n" +
-                        "YearLimit: " + prefs.getYearLimit() + "\n" +
-                        "YearLimitColor: " + prefs.getYearLimitColor() + "\n" +
+                text.setText("Limit1: " + prefs.getLimit1().getMin()+"-"+ prefs.getLimit1().getMax() + "\n" +
+                        "Limit1Color: " + prefs.getLimit1().getColor() + "\n" +
+                        "Limit2: " + prefs.getLimit2().getMin()+"-"+ prefs.getLimit2().getMax() + "\n" +
+                        "Limit2Color: " + prefs.getLimit2().getColor() + "\n" +
+                        "Limit3: " + prefs.getLimit3().getMin()+"-"+ prefs.getLimit3().getMax() + "\n" +
+                        "Limit3Color: " + prefs.getLimit3().getColor() + "\n" +
                         "IP Address: " + prefs.getIpAddress() + "\n" +
                         "Notification: " + prefs.getSync() + "\n");
                 //meterDbHelper.loadLatestDay();
