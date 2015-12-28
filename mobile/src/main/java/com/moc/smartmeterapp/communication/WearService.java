@@ -15,6 +15,8 @@ import com.moc.smartmeterapp.model.DataObject;
 import com.moc.smartmeterapp.model.EntryObject;
 import com.moc.smartmeterapp.model.Global;
 import com.moc.smartmeterapp.model.Limit;
+import com.moc.smartmeterapp.preferences.MyPreferences;
+import com.moc.smartmeterapp.preferences.PreferenceHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,7 +28,8 @@ import java.util.List;
 public class WearService extends WearableListenerService implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LiveCommunication.ILiveDataEvent {
+        LiveCommunication.ILiveDataEvent,
+        PreferenceHelper.PrefReceive {
 
     private static final String WEARABLE_DATA_PATH = "/SmartMeterToWearable";
     private static final String HANDHELD_DATA_PATH = "/SmartMeterToHandheld";
@@ -34,15 +37,28 @@ public class WearService extends WearableListenerService implements
     private LiveCommunication liveCommunication;
     private GoogleApiClient googleClient;
 
+    private MyPreferences myPreferences;
+
+    private String limitWeek;
+    private String limitMonth;
+    private String limitYear;
+
     @Override
     public void onCreate() {
-<<<<<<< HEAD
-        liveCommunication = new LiveCommunication( getApplicationContext());
-=======
+        Log.d("DEBUG", "WEAR SERVICE ON CREATE");
         liveCommunication = new LiveCommunication(getApplicationContext());
         liveCommunication.create();
         liveCommunication.registerDataEventHandler(this);
->>>>>>> 21bcc31a4d329de626cfdddf74f7091b9f28cf23
+
+        myPreferences = PreferenceHelper.getPreferences( getApplicationContext());
+
+        limitWeek = String.valueOf(myPreferences.getLimit1().getMax() / 4);
+        limitMonth = String.valueOf( myPreferences.getLimit1().getMax());
+        limitYear = String.valueOf( myPreferences.getLimit1().getMax() * 12);
+
+        Log.d("DEBUG", "limitWeek: " + limitWeek);
+        Log.d("DEBUG", "limitMonth: " + limitMonth);
+        Log.d("DEBUG", "limitYear: " + limitYear);
 
         Log.d("DEBUG", "WEAR SERVICE ON CREATE");
 
@@ -87,6 +103,8 @@ public class WearService extends WearableListenerService implements
     public void onDestroy() {
         Log.d("DEBUG", "ON DESTROY");
 
+        liveCommunication.destroy();
+
         if (null != googleClient)
         {
             if (googleClient.isConnected())
@@ -94,9 +112,6 @@ public class WearService extends WearableListenerService implements
                 googleClient.disconnect();
             }
         }
-
-        liveCommunication.destroy();
-
         super.onDestroy();
     }
 
@@ -206,6 +221,11 @@ public class WearService extends WearableListenerService implements
         }
         // send Data on messagePath
         new SendToDataLayerThread( path, text + seperator + dataMessage).start();
+    }
+
+    @Override
+    public void onPrefReceive(MyPreferences pref) {
+        // TODO MyPreferences updaten
     }
 
     public class SendToDataLayerThread extends Thread {

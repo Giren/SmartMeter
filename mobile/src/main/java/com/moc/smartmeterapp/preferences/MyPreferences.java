@@ -18,7 +18,7 @@ public class MyPreferences implements Serializable{
     private Boolean sync;
 
     public MyPreferences(Limit limit1, Limit limit2, Limit limit3,
-                         String ipAddress, Boolean sync){
+                         String ipAddress, Boolean sync) {
         this.limit1 = limit1;
         this.limit2 = limit2;
         this.limit3 = limit3;

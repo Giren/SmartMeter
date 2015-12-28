@@ -36,6 +36,8 @@ public class MainActivity extends FragmentActivity implements
     LimitFragment limitMonth;
     LimitFragment limitYear;
 
+    FragmentData fragmentData;
+
     ViewPager pager;
     GoogleApiClient googleClient;
 
@@ -45,8 +47,10 @@ public class MainActivity extends FragmentActivity implements
      */
     @Override
     protected void onCreate( Bundle savedInstanceState) {
-        super.onCreate( savedInstanceState);
-        setContentView( R.layout.main_activity);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main_activity);
+
+        fragmentData = new FragmentData();
 
         pager = ( ViewPager) findViewById( R.id.viewPager);
         pager.setAdapter( new MyPagerAdapter( getSupportFragmentManager()));
@@ -165,6 +169,9 @@ public class MainActivity extends FragmentActivity implements
         } // if close
     } // handleReceivedMessage close
 
+    public FragmentData getFragmentData() {
+        return this.fragmentData;
+    }
 
     private class MyPagerAdapter extends FragmentPagerAdapter {
 

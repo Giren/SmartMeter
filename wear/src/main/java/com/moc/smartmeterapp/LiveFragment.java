@@ -69,7 +69,7 @@ public class LiveFragment extends CustomFragment {
         meterView.setTicks(45, 10);
         meterView.setAverage(450);
         meterView.setLimiter(limiter);
-        meterView.enableValueText( false);
+        meterView.enableValueText(false);
         meterView.setTicks(45);
 
         return view;
