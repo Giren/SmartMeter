@@ -25,7 +25,7 @@ import rx.schedulers.Schedulers;
  */
 public class RestCommunication {
 
-    public final static String SERVICE_ENDPOINT = "http://192.168.1.65:8080";
+    public final static String SERVICE_ENDPOINT = "http://10.0.0.20:8080";
 
     public final static String GET_GLOBBAL_PATH = "";
     public final static String GET_LIMITS_PATH = "";

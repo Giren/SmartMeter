@@ -3,20 +3,9 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.moc.smartmeterapp.PercentView
+    <com.moc.smartmeterapp.ui.MeterView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/percentView"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:textSize="30sp"
-        android:gravity="center"
-        android:id="@+id/textView"
-        android:layout_centerHorizontal="true"
-        android:textColor="@android:color/holo_blue_dark"
-        android:text="Home\nWeek-Fragment"/>
+        android:id="@+id/week_meterview"/>
 
 </RelativeLayout>

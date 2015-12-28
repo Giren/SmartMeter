@@ -48,7 +48,6 @@ public class HelpFragment extends Fragment{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         return inflater.inflate(R.layout.help_fragment_layout,null);
     }
 
@@ -64,24 +63,24 @@ public class HelpFragment extends Fragment{
             public void onClick(View v) {
                 meterDbHelper.openDatabase();
                 //Day newDay = meterDbHelper.loadDay(nDate);
-                meterDbHelper.getAllEntries();
-                meterDbHelper.loadMonth(day2.getDate());
-                meterDbHelper.loadYear(day1.getDate());
+                //meterDbHelper.getAllEntries();
+                //meterDbHelper.loadMonth(day2.getDate());
+                //meterDbHelper.loadYear(day1.getDate());
                 //meterDbHelper.deleteMonth(day1.getDate());
                 //meterDbHelper.deleteYear(day.getDate());
                 //meterDbHelper.deleteDay(day.getDate());
                 //listView.setAdapter(listToArrayadapter(meterDbHelper.loadMonth(day1.getDate())));
                 //listView.setAdapter(showAllDBEntries());
-//                MyPreferences prefs = meterDbHelper.loadPreferences();
-//                text.setText("WeekLimit: "+prefs.getWeekLimit()+"\n"+
-//                        "WeekLimitColor: "+prefs.getWeekLimitColor()+"\n"+
-//                        "MonthLimit: "+ prefs.getMonthLimit()+"\n"+
-//                        "MonthLimitColor: "+prefs.getMonthLimitColor()+"\n"+
-//                        "YearLimit: "+ prefs.getYearLimit()+"\n"+
-//                        "YearLimitColor: "+ prefs.getYearLimitColor()+"\n"+
-//                        "IP Address: "+ prefs.getIpAddress()+"\n"+
-//                        "Notification: "+ prefs.getNotification()+"\n");
-                meterDbHelper.loadLatestDay();
+                MyPreferences prefs = meterDbHelper.loadPreferences();
+                text.setText("WeekLimit: "+prefs.getWeekLimit()+"\n"+
+                        "WeekLimitColor: "+prefs.getWeekLimitColor()+"\n"+
+                        "MonthLimit: "+ prefs.getMonthLimit()+"\n"+
+                        "MonthLimitColor: "+prefs.getMonthLimitColor()+"\n"+
+                        "YearLimit: "+ prefs.getYearLimit()+"\n"+
+                        "YearLimitColor: "+ prefs.getYearLimitColor()+"\n"+
+                        "IP Address: "+ prefs.getIpAddress()+"\n"+
+                        "Notification: "+ prefs.getSync()+"\n");
+                //meterDbHelper.loadLatestDay();
                 meterDbHelper.closeDatabase();
             }
         });

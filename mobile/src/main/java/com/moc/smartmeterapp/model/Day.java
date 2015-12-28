@@ -1,5 +1,7 @@
 package com.moc.smartmeterapp.model;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -54,6 +56,16 @@ public class Day {
 
         mean /= hours.size();
 
+        Log.d("CALC MMMM", "day size: " + hours.size() + " first object: " + hours.get(0).getMmm().getMean());
+        Log.d("CALC MMMM", 0 + " " + mean + " " + max);
         return new MinMeanMax(totalSum, 0, mean, max);
+    }
+
+    public List<Hour> getHours() {
+        return hours;
+    }
+
+    public void setHours(List<Hour> hours) {
+        this.hours = hours;
     }
 }
