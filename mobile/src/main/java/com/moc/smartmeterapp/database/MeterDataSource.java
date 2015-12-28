@@ -26,7 +26,9 @@ public class MeterDataSource {
     private SQLiteDatabase database;
     private MeterDbHelper meterDbHelper;
 
-    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM-dd-yyyy");
+    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    public static final DateFormat MONTH_FORMAT = new SimpleDateFormat("yyyy-MM");
+    public static final DateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy");
 
     private String[] columns = {
                 MeterDbHelper.COLUMN_ID,
@@ -68,10 +70,15 @@ public class MeterDataSource {
     }
 
     private String dateToString(Date date){
-        //return ( date.getYear()+"-"+date.getMonth()+"-"+date.getDay());
         return DATE_FORMAT.format(date);
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
-//        return( dateFormat.format(date) );
+    }
+
+    private String monthToString(Date date){
+        return MONTH_FORMAT.format(date);
+    }
+
+    private String yearToString(Date date){
+        return YEAR_FORMAT.format(date);
     }
 
     private Day cursorToMeterData(Cursor cursor){
@@ -118,7 +125,7 @@ public class MeterDataSource {
 
         if(cursor.moveToFirst()){
             Day day = cursorToMeterData(cursor);
-            System.out.println("found Date: " + day.getDate().getYear());
+            System.out.println("found Date: " + dateToString(day.getDate()));
             cursor.close();
             return day;
         }
@@ -131,19 +138,17 @@ public class MeterDataSource {
         Cursor cursor = database.query(MeterDbHelper.TABLE_METER_LIST,
                 columns,
                 MeterDbHelper.COLUMN_DATE + " like ?",
-                new String[] { String.valueOf(date.getYear())+"-"+String.valueOf(date.getMonth())+"%" },
+                new String[] { monthToString(date) +"%" },
                 null, null, null, null);
 
         return cursorToMeterList(cursor);
     }
 
     public List<Day> getYearFromDataBase(Date date){
-        final DateFormat df = new SimpleDateFormat("yyyy");
-        String d = df.format(date);
         Cursor cursor = database.query(MeterDbHelper.TABLE_METER_LIST,
                 columns,
                 MeterDbHelper.COLUMN_DATE + " like ?",
-                new String[]{d + "%"},
+                new String[]{ yearToString(date) + "%"},
                 null, null, null, null);
 
         return cursorToMeterList(cursor);
@@ -165,13 +170,13 @@ public class MeterDataSource {
     public void deleteMonthFromDataBase(Date date){
         database.delete(MeterDbHelper.TABLE_METER_LIST,
                 MeterDbHelper.COLUMN_DATE + " like ?",
-                new String[]{String.valueOf(date.getYear()) + "-" + String.valueOf(date.getMonth()) + "%"});
+                new String[]{ monthToString(date)+"%"} );
     }
 
     public void deleteYearFromDataBase(Date date){
         database.delete(MeterDbHelper.TABLE_METER_LIST,
                 MeterDbHelper.COLUMN_DATE + " like ?",
-                new String[]{String.valueOf(date.getYear())+"%"} );
+                new String[]{ yearToString(date)+"%"} );
     }
 
     public Day getLatestDayFromDB() {
