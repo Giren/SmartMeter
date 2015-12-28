@@ -45,7 +45,7 @@ public class MeterDataSource {
             MeterDbHelper.COLUMN_PREF_YEAR_LIMIT,
             MeterDbHelper.COLUMN_PREF_YEAR_LIMIT_COLOR,
             MeterDbHelper.COLUMN_PREF_IP,
-            MeterDbHelper.COLUMN_PREF_NOTIFICATION
+            MeterDbHelper.COLUMN_PREF_SYNC
     };
 
     public MeterDataSource(Context context){
@@ -209,7 +209,7 @@ public class MeterDataSource {
         int dbYearLimitColor = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_YEAR_LIMIT_COLOR);
 
         int dbIp = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_IP);
-        int dbNotification = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_NOTIFICATION);
+        int dbSync = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_SYNC);
 
         Long id = cursor.getLong(dbIndex);
         int weekLimit = cursor.getInt(dbWeekLimit);
@@ -220,7 +220,7 @@ public class MeterDataSource {
         String yearLimitColor = cursor.getString(dbYearLimitColor);
 
         String ip = cursor.getString(dbIp);
-        Boolean notification = Boolean.parseBoolean(cursor.getString(dbNotification));
+        Boolean sync = Boolean.parseBoolean(cursor.getString(dbSync));
 
         MyPreferences preferences = new MyPreferences(weekLimit,
                 weekLimitColor,
@@ -229,7 +229,7 @@ public class MeterDataSource {
                 yearLimit,
                 yearLimitColor,
                 ip,
-                notification);
+                sync);
 
         return preferences;
     }
@@ -239,14 +239,15 @@ public class MeterDataSource {
 
         contentValues.put(MeterDbHelper.COLUMN_PREF_WEEK_LIMIT, myPreferences.getWeekLimit());
         contentValues.put(MeterDbHelper.COLUMN_PREF_WEEK_LIMIT_COLOR, myPreferences.getWeekLimitColor());
-        contentValues.put(MeterDbHelper.COLUMN_PREF_MONTH_LIMIT, myPreferences.getWeekLimit());
-        contentValues.put(MeterDbHelper.COLUMN_PREF_MONTH_LIMIT_COLOR, myPreferences.getWeekLimitColor());
-        contentValues.put(MeterDbHelper.COLUMN_PREF_YEAR_LIMIT, myPreferences.getWeekLimit());
-        contentValues.put(MeterDbHelper.COLUMN_PREF_YEAR_LIMIT_COLOR, myPreferences.getWeekLimitColor());
+        contentValues.put(MeterDbHelper.COLUMN_PREF_MONTH_LIMIT, myPreferences.getMonthLimit());
+        contentValues.put(MeterDbHelper.COLUMN_PREF_MONTH_LIMIT_COLOR, myPreferences.getMonthLimitColor());
+        contentValues.put(MeterDbHelper.COLUMN_PREF_YEAR_LIMIT, myPreferences.getYearLimit());
+        contentValues.put(MeterDbHelper.COLUMN_PREF_YEAR_LIMIT_COLOR, myPreferences.getYearLimitColor());
 
         contentValues.put(MeterDbHelper.COLUMN_PREF_IP, myPreferences.getIpAddress());
-        contentValues.put(MeterDbHelper.COLUMN_PREF_NOTIFICATION, String.valueOf(myPreferences.getNotification()));
+        contentValues.put(MeterDbHelper.COLUMN_PREF_SYNC, String.valueOf(myPreferences.getSync()));
 
+        deleteMeterPref();
         long insertID = database.insert(MeterDbHelper.TABLE_PREFS, null, contentValues);
     }
 

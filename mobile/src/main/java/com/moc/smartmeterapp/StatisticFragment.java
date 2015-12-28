@@ -274,7 +274,7 @@ public class StatisticFragment extends Fragment{
                 datePicker.getMonth(),
                 datePicker.getDayOfMonth());
 
-        System.out.println("Day to insert in Chart: " + dateToString(date));
+        //System.out.println("Day to insert in Chart: " + dateToString(date));
 
         meterDbHelper.openDatabase();
         switch (userChoice){
