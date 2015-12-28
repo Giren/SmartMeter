@@ -36,7 +36,7 @@ public class WearService extends WearableListenerService implements
 
     @Override
     public void onCreate() {
-        liveCommunication = new LiveCommunication(getApplicationContext());
+        liveCommunication = new LiveCommunication( getApplicationContext());
 
         Log.d("DEBUG", "WEAR SERVICE ON CREATE");
 
