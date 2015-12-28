@@ -1,7 +1,6 @@
 package com.moc.smartmeterapp;
 
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,13 +15,10 @@ import android.widget.TextView;
 public class StatisticFragment extends CustomFragment {
 
     String fragmentName;
-    String currentValue;
-    String limitValue;
-    String limitPercent;
     TextView tvCurrentValue;
     TextView tvLimitValue;
     TextView tvLimitPercent;
-    TextView tv;
+    TextView tvLimitView;
     ProgressBar pbLimit;
     boolean userVisible;
 
@@ -36,68 +32,52 @@ public class StatisticFragment extends CustomFragment {
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate( R.layout.statistic_frag, container, false);
 
-        tv = ( TextView) v.findViewById( R.id.tvLimitView);
-        String localLabel;
-        switch ( getArguments().getString( "msg")) {
-            case "limitWeek": {
-                localLabel = "Wochenlimit";
-                break;
-            }
-            case "limitMonth": {
-                localLabel = "Monatslimit";
-                break;
-            }
-            case "limitYear": {
-                localLabel = "Jahreslimit";
-                break;
-            }
-            default: {
-                localLabel = "Default";
-                break;
-            }
-        }
-        tv.setText( localLabel);
-
+        // get elements
+        tvLimitView = ( TextView) v.findViewById( R.id.tvLimitView);
         tvCurrentValue = ( TextView) v.findViewById( R.id.tvCurrentValue);
         tvLimitValue = ( TextView) v.findViewById( R.id.tvLimitValue);
         tvLimitPercent = ( TextView) v.findViewById( R.id.tvLimitPercent);
-
-        tvLimitValue.setText( "100");
-
         pbLimit = ( ProgressBar) v.findViewById( R.id.pbLimit);
-        pbLimit.setMax(100);
-        pbLimit.setProgress(0);
-        pbLimit.setScaleY(3f);
-        pbLimit.setDrawingCacheBackgroundColor(Color.GREEN);
 
+        // set fragment name an name in view
+        fragmentName = getArguments().getString( "msg");
+        tvLimitView.setText( getLimitViewName( fragmentName));
+
+        // configure progressbar
+        pbLimit.setMax( 100);
+        pbLimit.setProgress( 0);
+        pbLimit.setScaleY( 3f);
+        //pbLimit.setDrawingCacheBackgroundColor( Color.GREEN);
+
+        // confige current value, limit value, percent value in view
         tvCurrentValue.setText( "0");
         tvLimitValue.setText( "0");
         tvLimitPercent.setText( "0 %");
 
-
-//        getActivity().runOnUiThread( new Runnable() {
-//            @Override
-//            public void run() {
-//                int progressStatus = 0;
-//                while( progressStatus < 100) {
-//                    progressBar.setProgress( progressStatus);
-//                    tvActualValue.setText( String.valueOf( progressStatus));
-//                    tvPercent.setText( String.valueOf( progressStatus));
-//                    progressStatus++;
-//
-//                    try {
-//                        Thread.sleep( 300);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        });
-
-        fragmentName = getArguments().getString("msg");
-
         Log.d("DEBUG", "StatisticFragment - onCreateView() - " + fragmentName);
         return v;
+    }
+
+    public String getLimitViewName( String fragmentName) {
+        Log.d("DEBUG", "StatisticFragment - getLimitViewName() for:" + fragmentName);
+        switch ( fragmentName) {
+            case "limitWeek": {
+                Log.d("DEBUG", "StatisticFragment - getLimitViewName() - return: Wochenlimit");
+                return "Wochenlimit";
+            }
+            case "limitMonth": {
+                Log.d("DEBUG", "StatisticFragment - getLimitViewName() - return: Monatslimit");
+                return "Monatslimit";
+            }
+            case "limitYear": {
+                Log.d("DEBUG", "StatisticFragment - getLimitViewName() - return: Jahreslimit");
+                return "Jahreslimit";
+            }
+            default: {
+                Log.d("DEBUG", "StatisticFragment - getLimitViewName() - return: Default");
+                return "Default";
+            }
+        }
     }
 
     /**
@@ -107,19 +87,18 @@ public class StatisticFragment extends CustomFragment {
     public void UpdateFragmentContent( String update) {
         Log.d("DEBUG", "StatisticFragment - UpdateFragmentContent() - " + update);
         /*
-            Format des empfangenen Strings:
-            <fragmentKürzel>;<LimitValue>;<CurrentValue>
+            Format of received string:
+            <fragmentName>;<LimitValue>;<CurrentValue>
          */
         String[] msgSplit = update.split(";");
 
         tvLimitValue.setText( msgSplit[1]);
         tvCurrentValue.setText( msgSplit[2]);
 
-        int percenthelp = ( Integer.valueOf( msgSplit[2]) * 100) / Integer.valueOf(msgSplit[1]);
-        tvLimitPercent.setText( String.valueOf( percenthelp) + " %");
-        pbLimit.setProgress( percenthelp);
-
-        //tv.setText(update);
+        int percentValue = ( Integer.valueOf( msgSplit[2]) * 100) / Integer.valueOf(msgSplit[1]);
+        String limitPercentHelper = String.valueOf( percentValue) + " %";
+        tvLimitPercent.setText( limitPercentHelper);
+        pbLimit.setProgress( percentValue);
     }
 
     @Override
@@ -134,6 +113,7 @@ public class StatisticFragment extends CustomFragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
 
+        // set this fragment visible or invisible
         this.setUserVisible( isVisibleToUser);
 
         if ( this.getUserVisible()) {

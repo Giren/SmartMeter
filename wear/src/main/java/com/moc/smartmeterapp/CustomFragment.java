@@ -7,14 +7,13 @@ import android.support.v4.app.Fragment;
  */
 public class CustomFragment extends Fragment {
 
-    private boolean userVisible;
-
     public void UpdateFragmentContent( String update) {
-        // Do something
+        //TODO Override method
     }
 
     public String getFragmentName() {
-        return "String";
+        //TODO Override method
+        return "";
     }
 
 
