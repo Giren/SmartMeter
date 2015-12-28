@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.moc.smartmeterapp.MainActivity;
 import com.moc.smartmeterapp.R;
@@ -76,7 +77,6 @@ public class SyncService extends IntentService implements RestCommunication.IDat
             db.deleteAll();
             db.saveYear(dataObject.getDays());
 
-            total = db.getAllEntries().size();
             db.closeDatabase();
         }
     }

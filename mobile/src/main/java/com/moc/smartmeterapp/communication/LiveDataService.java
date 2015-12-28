@@ -79,7 +79,7 @@ public class LiveDataService extends Service {
 
                 Log.d("DEBUG", "Connectiong to socket...");
                 try {
-                    clientSocket = new Socket("192.168.1.65", 9999);
+                    clientSocket = new Socket("10.0.0.20", 9999);
 
                     while (clientSocket.isConnected()) {
                         inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -98,6 +98,12 @@ public class LiveDataService extends Service {
                     Log.d("DEBUG", "UnknownHostException");
                 } catch(IOException e1) {
                     Log.d("DEBUG", "IOException");
+                } finally {
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        Log.e("EXEPTION:", e.getMessage());
+                    }
                 }
             }
             Log.d("DEBUG", "Thread stopped...");

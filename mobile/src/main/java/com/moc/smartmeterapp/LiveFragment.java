@@ -97,6 +97,7 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         MyPreferences pref = PreferenceHelper.getPreferences(view.getContext());
 
@@ -137,7 +138,5 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
                 meterView.setMax(seekBar.getProgress() + 2500);
             }
         });
-
-        super.onViewCreated(view, savedInstanceState);
     }
 }
