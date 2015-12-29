@@ -102,15 +102,24 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
         MyPreferences pref = PreferenceHelper.getPreferences(view.getContext());
 
         if(pref != null){
-//            limitRed = new Limit(
-//                    pref.getLimit1(),
-//                    pref.getLimit2(),
-//
-//            )
+            limitRed = new Limit(
+                    pref.getLimit1().getMin(),
+                    pref.getLimit1().getMax(),
+                    pref.getLimit1().getColor()
+            );
+            limitYellow = new Limit(
+                    pref.getLimit2().getMin(),
+                    pref.getLimit2().getMax(),
+                    pref.getLimit2().getColor()
+            );
+
         } else{
             limitRed = new Limit(2000, 2500, Color.RED);
             limitYellow = new Limit(1500, 2000, Color.YELLOW);
         }
+
+  //      limitRed = new Limit(2000, 2500, Color.RED);
+   //     limitYellow = new Limit(1500, 2000, Color.YELLOW);
 
         limiter = new Limiter();
         limiter.addLimit(limitYellow);
