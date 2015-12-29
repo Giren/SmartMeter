@@ -1,6 +1,7 @@
 package com.moc.smartmeterapp;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,11 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Created by David on 23.11.2015.
  */
 public class LimitFragment extends CustomFragment {
+
+    final String ERR_NO_DATA_IN_DB = "ERRO01";
 
     String fragmentName;
     TextView tvCurrentValue;
@@ -92,13 +96,25 @@ public class LimitFragment extends CustomFragment {
          */
         String[] msgSplit = update.split(";");
 
-        tvLimitValue.setText( msgSplit[1]);
-        tvCurrentValue.setText( msgSplit[2]);
+        tvCurrentValue.setText( msgSplit[1]);
+        tvLimitValue.setText(msgSplit[2]);
 
-        int percentValue = ( Integer.valueOf( msgSplit[2]) * 100) / Integer.valueOf(msgSplit[1]);
-        String limitPercentHelper = String.valueOf( percentValue) + " %";
-        tvLimitPercent.setText( limitPercentHelper);
-        pbLimit.setProgress( percentValue);
+        if( msgSplit[1].equals( ERR_NO_DATA_IN_DB)) {
+
+            Context context = getActivity().getApplicationContext();
+            CharSequence text = "No Datasource in DB";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+
+            tvLimitPercent.setText(ERR_NO_DATA_IN_DB);
+            pbLimit.setProgress( 0);
+        } else {
+            int percentValue = ( Integer.valueOf( msgSplit[1]) * 100) / Integer.valueOf(msgSplit[2]);
+            String limitPercentHelper = String.valueOf( percentValue) + " %";
+            tvLimitPercent.setText( limitPercentHelper);
+            pbLimit.setProgress( percentValue);
+        }
     }
 
     @Override

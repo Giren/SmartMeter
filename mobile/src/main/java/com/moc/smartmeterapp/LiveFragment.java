@@ -118,9 +118,6 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
             limitYellow = new Limit(1500, 2000, Color.YELLOW);
         }
 
-  //      limitRed = new Limit(2000, 2500, Color.RED);
-   //     limitYellow = new Limit(1500, 2000, Color.YELLOW);
-
         limiter = new Limiter();
         limiter.addLimit(limitYellow);
         limiter.addLimit(limitRed);

@@ -1,12 +1,15 @@
 package com.moc.smartmeterapp;
 
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 /**
  * Created by David on 23.11.2015.
@@ -20,6 +23,9 @@ public class LiveFragment extends CustomFragment {
     private Limiter limiter;
     private Limit limitRed;
     private Limit limitYellow;
+    private Limit limit1;
+    private Limit limit2;
+    private Limit limit3;
 
     private Vibrator vibrator;
     private long[] vibrationPattern = {0, 500, 50, 300};
@@ -41,7 +47,6 @@ public class LiveFragment extends CustomFragment {
             public void onLimitReached(Limit limit, float value) {
                 vibrator.vibrate(vibrationPattern, indexInPatternToRepeat);
             }
-
             @Override
             public void onLimitLeave(Limit limit, float value) {
             }
@@ -69,7 +74,7 @@ public class LiveFragment extends CustomFragment {
         meterView.setTicks(45, 10);
         meterView.setAverage(450);
         meterView.setLimiter(limiter);
-        meterView.enableValueText( false);
+        meterView.enableValueText(false);
         meterView.setTicks(45);
 
         return view;
@@ -87,8 +92,14 @@ public class LiveFragment extends CustomFragment {
     @Override
     public void UpdateFragmentContent( String update) {
         System.out.println("Live UpdateFragmentContent" + update);
-        String[] splitted = update.split(";");
-        meterView.setValue( Float.valueOf( splitted[1]));
+        String[] splitted = update.split( ";");
+
+        if( splitted[1].equals( "keepAlive")) {
+            Log.d("DEBUG", "UpdateFragmentContent() - keepAlive");
+
+        } else {
+            meterView.setValue( Float.valueOf( splitted[1]));
+        }
     }
 
     @Override

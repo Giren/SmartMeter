@@ -36,6 +36,8 @@ public class MainActivity extends FragmentActivity implements
     LimitFragment limitMonth;
     LimitFragment limitYear;
 
+    FragmentData fragmentData;
+
     ViewPager pager;
     GoogleApiClient googleClient;
 
@@ -45,8 +47,10 @@ public class MainActivity extends FragmentActivity implements
      */
     @Override
     protected void onCreate( Bundle savedInstanceState) {
-        super.onCreate( savedInstanceState);
-        setContentView( R.layout.main_activity);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main_activity);
+
+        fragmentData = new FragmentData();
 
         pager = ( ViewPager) findViewById( R.id.viewPager);
         pager.setAdapter( new MyPagerAdapter( getSupportFragmentManager()));
@@ -59,7 +63,7 @@ public class MainActivity extends FragmentActivity implements
                 .build();
 
         // Set flag keep screen on
-        getWindow().addFlags( WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override
@@ -134,6 +138,8 @@ public class MainActivity extends FragmentActivity implements
         Log.d("DEBUG", "MainActivity - handleReceivedMessage(): " + message);
         List<Fragment> allFragments = getSupportFragmentManager().getFragments();
 
+        fragmentData.addData( message);
+
         if (allFragments != null) {
             for (Fragment fragment : allFragments) {
                 CustomFragment myFragment = (CustomFragment) fragment;
@@ -147,24 +153,41 @@ public class MainActivity extends FragmentActivity implements
                         myFragment.UpdateFragmentContent( message);
                         // send message to get new data
                         final CustomFragment finalFragment = myFragment;
-                        Runnable getNewData = new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Thread.sleep( 1000);
-                                } catch (Exception e) {
-                                    System.out.println( e.getMessage());
-                                }
-                                new SendToDataLayerThread( HANDHELD_DATA_PATH, finalFragment.getFragmentName()).start();
+
+                        final int threadTimeout;
+
+                        if( message.contains( "liveData") && !message.contains( "keepAlive")) {
+                            // TODO update limits and redraw tacho
+
+                            break;
+                        } else {
+                            if( message.contains( "liveData")) {
+                                threadTimeout = 500;
+                            } else {
+                                threadTimeout = 10000;
                             }
-                        };
-                        new Thread( getNewData).start();
+                            Runnable getNewData = new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        Thread.sleep( threadTimeout);
+                                    } catch (Exception e) {
+                                        System.out.println( e.getMessage());
+                                    }
+                                    new SendToDataLayerThread( HANDHELD_DATA_PATH, finalFragment.getFragmentName()).start();
+                                }
+                            };
+                            new Thread( getNewData).start();
+                        }
                     } // if close
                 } // if close
             } // iteration for close
         } // if close
     } // handleReceivedMessage close
 
+    public FragmentData getFragmentData() {
+        return this.fragmentData;
+    }
 
     private class MyPagerAdapter extends FragmentPagerAdapter {
 
