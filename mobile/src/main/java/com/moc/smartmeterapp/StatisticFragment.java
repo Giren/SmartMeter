@@ -97,7 +97,7 @@ public class StatisticFragment extends Fragment{
         previewChart.setLineChartData(previewData);
         previewChart.setViewportChangeListener(new ViewportListener());
 
-        Button selectButton = (Button)view.findViewById(R.id.button_left);
+        final Button selectButton = (Button)view.findViewById(R.id.button_left);
         selectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -118,6 +118,7 @@ public class StatisticFragment extends Fragment{
                     @Override
                     public void onClick(View v) {
                         userChoice = numberPicker.getValue();
+                        selectButton.setText(selectString[userChoice]);
                         dialogSelect.dismiss();
                         dateButton.callOnClick();
                     }
@@ -142,6 +143,11 @@ public class StatisticFragment extends Fragment{
                     @Override
                     public void onClick(View v) {
                         handleUserChoice();
+                        dateButton.setText(dateToString(new Date(
+                                datePicker.getYear()-1900,
+                                datePicker.getMonth(),
+                                datePicker.getDayOfMonth()
+                        )));
                         updateChartView();
                         dialog.dismiss();
                     }
@@ -150,25 +156,6 @@ public class StatisticFragment extends Fragment{
                 dialog.show();
             }
         });
-//
-//        //TODO:
-//        Date d = null;
-//        try {
-//            d = MeterDataSource.DATE_FORMAT.parse("01-01-2015");
-//            IDatabase db = new MeterDbHelper(getActivity());
-//            db.openDatabase();
-//            List<String> data = new ArrayList<String>();
-//            List<Day> days = db.getAllEntries();
-//            if(days != null && days.size() > 0) {
-//                for(Day day : days) {
-//                    data.add(String.valueOf(day.getMmm().getMean()));
-//                }
-//            }
-//            addDataToChart(data);
-//            db.closeDatabase();
-//        } catch (ParseException e) {
-//
-//        }
         updateChartView();
     }
 

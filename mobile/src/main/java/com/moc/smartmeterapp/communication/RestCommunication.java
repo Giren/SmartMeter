@@ -1,9 +1,13 @@
 package com.moc.smartmeterapp.communication;
 
+import android.content.Context;
+
 import com.google.gson.GsonBuilder;
 import com.moc.smartmeterapp.model.DataObject;
 import com.moc.smartmeterapp.model.Global;
 import com.moc.smartmeterapp.model.Limit;
+import com.moc.smartmeterapp.preferences.MyPreferences;
+import com.moc.smartmeterapp.preferences.PreferenceHelper;
 import com.moc.smartmeterapp.utils.DateConverter;
 
 import java.util.Date;
@@ -25,12 +29,14 @@ import rx.schedulers.Schedulers;
  */
 public class RestCommunication {
 
-    public final static String SERVICE_ENDPOINT = "http://10.0.0.20:8080";
+    public final static String PORT = "8080";
 
     public final static String GET_GLOBBAL_PATH = "";
     public final static String GET_LIMITS_PATH = "";
     public final static String GET_YEAR_DATA_PATH = "year";
     public final static String GET_MONTH_DATA_PATH = "month";
+
+    private Context context;
 
     private Map<String, String> PARAMS;
 
@@ -63,11 +69,25 @@ public class RestCommunication {
         rx.Observable<Global> getGlobalObservable(@Path("path") String path, @QueryMap Map<String, String> params);
     }
 
-    private IRestService restService = createRetrofitService(IRestService.class);
+    private IRestService restService;
 
-    public RestCommunication() {
+    public RestCommunication(Context context) {
+        this.context = context;
+        restService = createRetrofitService(IRestService.class);
         PARAMS = new HashMap<String, String>();
         PARAMS.put("accessToken", "123456");
+    }
+
+    private String getServiceEndpoint() {
+        //TODO: Sicherheitsabfragen
+        if(context != null) {
+            MyPreferences prefs = PreferenceHelper.getPreferences(context);
+
+            if(prefs != null && prefs.getIpAddress() != null)
+                return "http://" + prefs.getIpAddress() + ":" + PORT;
+        }
+
+        return "http://127.0.0.1:" + PORT;
     }
 
     public void fetchGlobalData(final IGlobalDataReceiver globalDataReceiver) {
@@ -151,12 +171,12 @@ public class RestCommunication {
                 });
     }
 
-    public static <T> T createRetrofitService(final Class<T> c) {
+    public <T> T createRetrofitService(final Class<T> c) {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Date.class, new DateConverter());
 
         final RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint(SERVICE_ENDPOINT)
+                .setEndpoint(getServiceEndpoint())
                 .setConverter(new GsonConverter(gsonBuilder.create()))
                 .build();
         T service = restAdapter.create(c);

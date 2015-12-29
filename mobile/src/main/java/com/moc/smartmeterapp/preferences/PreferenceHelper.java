@@ -53,6 +53,17 @@ public class PreferenceHelper {
         return pref;
     }
 
+    public static void setPreferences(Context context, MyPreferences prefs){
+        if( prefs!= null) {
+            IDatabase helper = new MeterDbHelper(context);
+            helper.openDatabase();
+
+            helper.savePreferences(prefs);
+
+            helper.closeDatabase();
+        }
+    }
+
     public static interface PrefReceive{
         void onPrefReceive(MyPreferences pref);
     }

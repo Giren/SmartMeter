@@ -60,15 +60,17 @@ public class LiveCommunication {
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            for(ILiveDataEvent e : dataEventHandlers) {
-                if(e != null) {
-                    String temp = intent.getStringExtra(String.valueOf(LIVE_DATA));
+            String temp = intent.getStringExtra(String.valueOf(LIVE_DATA));
 
-                    if(temp != null && !temp.isEmpty()) {
-                       e.onLiveDataReceived(Integer.valueOf(temp));
+            if(temp != null && !temp.isEmpty()) {
+                for(ILiveDataEvent e : dataEventHandlers) {
+                    if(e != null) {
+                        e.onLiveDataReceived(Integer.valueOf(temp));
                     }
                 }
             }
+
+
         }
     };
 

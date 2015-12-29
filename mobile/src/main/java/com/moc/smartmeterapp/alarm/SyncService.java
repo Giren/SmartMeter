@@ -16,13 +16,15 @@ import com.moc.smartmeterapp.database.IDatabase;
 import com.moc.smartmeterapp.database.MeterDbHelper;
 import com.moc.smartmeterapp.model.DataObject;
 import com.moc.smartmeterapp.model.Day;
+import com.moc.smartmeterapp.preferences.MyPreferences;
+import com.moc.smartmeterapp.preferences.PreferenceHelper;
 
 import java.util.List;
 
 /**
  * Created by philipp on 23.12.2015.
  */
-public class SyncService extends IntentService implements RestCommunication.IDataReceiver {
+public class SyncService extends IntentService implements RestCommunication.IDataReceiver, PreferenceHelper.PrefReceive {
 
     private NotificationManager mNotificationManager;
     private NotificationCompat.Builder builder;
@@ -31,6 +33,9 @@ public class SyncService extends IntentService implements RestCommunication.IDat
     private int count = 0;
     private int total = 0;
 
+    private MyPreferences prefs;
+    private PreferenceHelper preferenceHelper;
+
     public SyncService() {
         super("SyncService");
     }
@@ -38,7 +43,18 @@ public class SyncService extends IntentService implements RestCommunication.IDat
     @Override
     public void onCreate() {
         super.onCreate();
-        restCommunication = new RestCommunication();
+        restCommunication = new RestCommunication(getApplicationContext());
+
+        preferenceHelper = new PreferenceHelper();
+
+        MyPreferences tempPref = PreferenceHelper.getPreferences(getApplicationContext());
+        if(tempPref != null) {
+            prefs = tempPref;
+        } else {
+            prefs.setIpAddress("127.0.0.1");
+        }
+
+        preferenceHelper.register(this);
     }
 
     @Override
@@ -92,5 +108,10 @@ public class SyncService extends IntentService implements RestCommunication.IDat
         if(total > 0)
             s += " Total: " + String.valueOf(total);
         sendNotification(s);
+    }
+
+    @Override
+    public void onPrefReceive(MyPreferences pref) {
+        this.prefs = pref;
     }
 }
