@@ -1,6 +1,7 @@
 package com.moc.smartmeterapp;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -74,9 +75,9 @@ public class SettingFragment extends Fragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Limit limit1 = new Limit(100,200,1);
-                Limit limit2 = new Limit(250,350,2);
-                Limit limit3 = new Limit(1000,2000,3);
+                Limit limit1 = new Limit(100,200, Color.BLUE);
+                Limit limit2 = new Limit(250,350, Color.RED);
+                Limit limit3 = new Limit(1000,2000, Color.GREEN);
 
                 MyPreferences preferences = new MyPreferences(
                         limit1,

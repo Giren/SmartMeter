@@ -63,7 +63,7 @@ public class MainActivity extends FragmentActivity implements
                 .build();
 
         // Set flag keep screen on
-        getWindow().addFlags( WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override
@@ -153,18 +153,32 @@ public class MainActivity extends FragmentActivity implements
                         myFragment.UpdateFragmentContent( message);
                         // send message to get new data
                         final CustomFragment finalFragment = myFragment;
-                        Runnable getNewData = new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Thread.sleep( 500);
-                                } catch (Exception e) {
-                                    System.out.println( e.getMessage());
-                                }
-                                new SendToDataLayerThread( HANDHELD_DATA_PATH, finalFragment.getFragmentName()).start();
+
+                        final int threadTimeout;
+
+                        if( message.contains( "liveData") && !message.contains( "keepAlive")) {
+                            // TODO update limits and redraw tacho
+
+                            break;
+                        } else {
+                            if( message.contains( "liveData")) {
+                                threadTimeout = 500;
+                            } else {
+                                threadTimeout = 10000;
                             }
-                        };
-                        new Thread( getNewData).start();
+                            Runnable getNewData = new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        Thread.sleep( threadTimeout);
+                                    } catch (Exception e) {
+                                        System.out.println( e.getMessage());
+                                    }
+                                    new SendToDataLayerThread( HANDHELD_DATA_PATH, finalFragment.getFragmentName()).start();
+                                }
+                            };
+                            new Thread( getNewData).start();
+                        }
                     } // if close
                 } // if close
             } // iteration for close

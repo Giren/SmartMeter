@@ -107,7 +107,7 @@ public class LimitFragment extends CustomFragment {
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
 
-            tvLimitPercent.setText( ERR_NO_DATA_IN_DB);
+            tvLimitPercent.setText(ERR_NO_DATA_IN_DB);
             pbLimit.setProgress( 0);
         } else {
             int percentValue = ( Integer.valueOf( msgSplit[1]) * 100) / Integer.valueOf(msgSplit[2]);

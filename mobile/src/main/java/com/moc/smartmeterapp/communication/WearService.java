@@ -1,5 +1,6 @@
 package com.moc.smartmeterapp.communication;
 
+import android.app.PendingIntent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -58,18 +59,18 @@ public class WearService extends WearableListenerService implements
     private String limitMonth;
     private String limitYear;
 
+    private Limit limit1, limit2, limit3;
+
+
     @Override
     public void onCreate() {
         Log.d("DEBUG", "WEAR SERVICE ON CREATE");
-        liveCommunication = new LiveCommunication(getApplicationContext());
-        liveCommunication.create();
-        liveCommunication.registerDataEventHandler(this);
 
         dayFormat = new SimpleDateFormat( "dd");
         monthFormat = new SimpleDateFormat( "MM");
         yearFormat = new SimpleDateFormat( "yyyy");
 
-        myPreferences = PreferenceHelper.getPreferences( getApplicationContext());
+        myPreferences = PreferenceHelper.getPreferences(getApplicationContext());
         if(meterDbHelper == null){
             meterDbHelper = new MeterDbHelper( getBaseContext());
         }
@@ -80,12 +81,13 @@ public class WearService extends WearableListenerService implements
         limitWeek = String.valueOf(myPreferences.getLimit1().getMax() / 4);
         limitMonth = String.valueOf( myPreferences.getLimit1().getMax());
         limitYear = String.valueOf( myPreferences.getLimit1().getMax() * 12);
+        limit1 = myPreferences.getLimit1();
+        limit2 = myPreferences.getLimit2();
+        limit3 = myPreferences.getLimit3();
 
         Log.d("DEBUG", "limitWeek: " + limitWeek);
         Log.d("DEBUG", "limitMonth: " + limitMonth);
         Log.d("DEBUG", "limitYear: " + limitYear);
-
-        Log.d("DEBUG", "WEAR SERVICE ON CREATE");
 
         if ( googleClient == null) {
             // Build a new GoogleApiClient for the Wearable API
@@ -127,9 +129,10 @@ public class WearService extends WearableListenerService implements
     @Override
     public void onDestroy() {
         Log.d("DEBUG", "ON DESTROY");
-
-        liveCommunication.destroy();
-
+        if( liveCommunication != null) {
+            liveCommunication.destroy();
+            liveCommunication = null;
+        }
         if (null != googleClient)
         {
             if (googleClient.isConnected())
@@ -145,7 +148,6 @@ public class WearService extends WearableListenerService implements
         Log.d("DEBUG", "ON MESSAGE RECEIVED + message: " + new String(messageEvent.getData()));
         if( messageEvent.getPath().equals( HANDHELD_DATA_PATH)) {
             final String message = new String( messageEvent.getData());
-
             Runnable reactOnMessageRunnable = new Runnable() {
                 @Override
                 public void run() {
@@ -153,7 +155,6 @@ public class WearService extends WearableListenerService implements
                 }
             };
             new Thread(reactOnMessageRunnable).start();
-
         } else {
             super.onMessageReceived( messageEvent);
         }
@@ -166,25 +167,39 @@ public class WearService extends WearableListenerService implements
         switch ( receivedMessage) {
             case "liveData": {
                 Log.d("DEBUG", "liveData case");
-                //dataMessageToWearable( WEARABLE_DATA_PATH, "liveData");
+                if( liveCommunication == null) {
+                    liveCommunication = new LiveCommunication(getApplicationContext());
+                    liveCommunication.create();
+                    liveCommunication.registerDataEventHandler(this);
+                }
+                liveDataKeepAlive(WEARABLE_DATA_PATH);
                 break;
             }
             case "limitWeek": {
                 Log.d("DEBUG", "limitWeekCase");
+                if( liveCommunication != null) {
+                    liveCommunication.destroy();
+                    liveCommunication = null;
+                }
                 dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitWeek", limitWeek);
-                //dataMessageToWearable(WEARABLE_DATA_PATH, "limitWeek");
                 break;
             }
             case "limitMonth": {
                 Log.d("DEBUG", "limitMonth case");
+                if( liveCommunication != null) {
+                    liveCommunication.destroy();
+                    liveCommunication = null;
+                }
                 dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitMonth", limitMonth);
-                //dataMessageToWearable(WEARABLE_DATA_PATH, "limitMonth");
                 break;
             }
             case "limitYear": {
                 Log.d("DEBUG", "limitYear case");
+                if( liveCommunication != null) {
+                    liveCommunication.destroy();
+                    liveCommunication = null;
+                }
                 dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitYear", limitYear);
-                //dataMessageToWearable(WEARABLE_DATA_PATH, "limitYear");
                 break;
             }
             case "goodbye": {
@@ -219,7 +234,6 @@ public class WearService extends WearableListenerService implements
         dataMessage = fragmentName + seperator + currentValue + seperator + limitValue;
         new SendToDataLayerThread( path, dataMessage).start();
     }
-
 
     public String getCurrentValueOfThisWeek() {
 
@@ -333,8 +347,6 @@ public class WearService extends WearableListenerService implements
         }
     }
 
-
-
     public String getCurrentLimitValue( String fragmentName) {
 
         switch ( fragmentName) {
@@ -367,27 +379,33 @@ public class WearService extends WearableListenerService implements
         return ERR_NO_DATA_IN_DB;
     }
 
-    public void dataMessageToWearable(String path, String text) {
+    public void liveDataKeepAlive( String path) {
 
-        String seperator = ";";
-        String dataMessage = "";
-        SimpleDateFormat sdf = new SimpleDateFormat( "dd.MM.yyyy HH:mm:ss");
-        String myTime = sdf.format( new Date());
-
-        // Datenvorbereitung
-        // dataMessage += "\n";
-        dataMessage = String.valueOf( 0 + ( (int)( Math.random() * 2500)));
-
-        // TODO Datenbeschaffung innerhalb des Threads und anschließend senden
-
+        String dataMessage = "liveData;keepAlive;";
+        dataMessage += "limit1;";
+        dataMessage += limit1.getMin() + ";";
+        dataMessage += limit1.getMax() + ";";
+        dataMessage += limit1.getColor();
+        if( limit2 != null) {
+            dataMessage += ";limit2;";
+            dataMessage += limit2.getMin() + ";";
+            dataMessage += limit2.getMax() + ";";
+            dataMessage += limit2.getColor();
+            if( limit3 != null) {
+                dataMessage += ";limit3;";
+                dataMessage += limit3.getMin() + ";";
+                dataMessage += limit3.getMax() + ";";
+                dataMessage += limit3.getColor();
+            }
+        }
         // vor dem senden nochmal warten
         try {
-            Thread.sleep( 1000);
+            Thread.sleep( 500);
         } catch (Exception e) {
             System.out.println( e.getMessage());
         }
         // send Data on messagePath
-        new SendToDataLayerThread( path, text + seperator + dataMessage).start();
+        new SendToDataLayerThread( path, dataMessage).start();
     }
 
     @Override
@@ -396,6 +414,10 @@ public class WearService extends WearableListenerService implements
         limitWeek = String.valueOf( pref.getLimit1().getMax() / 4);
         limitMonth = String.valueOf( pref.getLimit1().getMax());
         limitYear = String.valueOf( pref.getLimit1().getMax() * 12);
+
+        limit1 = pref.getLimit1();
+        limit2 = pref.getLimit2();
+        limit3 = pref.getLimit3();
     }
 
     public class SendToDataLayerThread extends Thread {
