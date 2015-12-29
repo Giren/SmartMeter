@@ -109,7 +109,7 @@ public class StatisticFragment extends Fragment{
 
                 numberPicker = (NumberPicker) dialogSelect.findViewById(R.id.number_picker);
                 numberPicker.setMinValue(0);
-                numberPicker.setMaxValue(selectString.length-1);
+                numberPicker.setMaxValue(selectString.length - 1);
                 numberPicker.setDisplayedValues(selectString);
                 numberPicker.setWrapSelectorWheel(true);
 
@@ -144,7 +144,7 @@ public class StatisticFragment extends Fragment{
                     public void onClick(View v) {
                         handleUserChoice();
                         dateButton.setText(dateToString(new Date(
-                                datePicker.getYear()-1900,
+                                datePicker.getYear() - 1900,
                                 datePicker.getMonth(),
                                 datePicker.getDayOfMonth()
                         )));
@@ -159,26 +159,28 @@ public class StatisticFragment extends Fragment{
         updateChartView();
     }
 
-    public void addValueToChart(Day day) {
-        if(liveList.size() >= maxNumberToShow){
-            liveList.remove(0);
-        }
-        liveList.add(day);
-        addListToChart(liveList);
-    }
-
     public void addListToChart(List<Day> days){
-        int maxValue = 0;
         int currentValue;
         int size = days.size();
+        maxValueOfLineChartData = 0;
         List<PointValue> valuePoints = new ArrayList<PointValue>();
 
-        for(int i=0; i<size; i++){
-            currentValue = days.get(i).getMmm().getMean();
-            if(currentValue > maxValue){
-                maxValueOfLineChartData = currentValue;
+        if(size == 1){
+            for(int i=0; i<24; i++){
+                currentValue = days.get(0).getHours().get(i).getMmm().getMean();
+                if(currentValue > maxValueOfLineChartData){
+                    maxValueOfLineChartData = currentValue;
+                }
+                valuePoints.add(new PointValue(i, currentValue));
             }
-            valuePoints.add(new PointValue(i, currentValue));
+        } else {
+            for(int i=0; i<size; i++){
+                currentValue = days.get(i).getMmm().getMean();
+                if(currentValue > maxValueOfLineChartData){
+                    maxValueOfLineChartData = currentValue;
+                }
+                valuePoints.add(new PointValue(i, currentValue));
+            }
         }
 
         dataLine = new Line(valuePoints);
@@ -261,15 +263,13 @@ public class StatisticFragment extends Fragment{
                 datePicker.getMonth(),
                 datePicker.getDayOfMonth());
 
-        //System.out.println("Day to insert in Chart: " + dateToString(date));
-
         meterDbHelper.openDatabase();
         switch (userChoice){
             case DAY:
-                maxNumberToShow = 1;
+                maxNumberToShow = 24;
                 d = meterDbHelper.loadDay(date);
                 if(d != null){
-                    addValueToChart(d);
+                    datalist.add(d);
                 }
                 break;
             case WEEK:
@@ -285,18 +285,17 @@ public class StatisticFragment extends Fragment{
             case MONTH:
                 maxNumberToShow = 31;
                 datalist = meterDbHelper.loadMonth(date);
-                if(datalist != null){
-                    addListToChart(datalist);
-                }
                 break;
             case YEAR:
                 maxNumberToShow = 365;
                 datalist = meterDbHelper.loadYear(date);
-                if(datalist != null){
-                    addListToChart(datalist);
-                }
                 break;
         }
+
+        if(datalist != null){
+            addListToChart(datalist);
+        }
+
         meterDbHelper.closeDatabase();
     }
 
