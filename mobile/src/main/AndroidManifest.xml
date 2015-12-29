@@ -3,8 +3,8 @@
     package="com.moc.smartmeterapp" >
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"></uses-permission>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -33,23 +33,24 @@
             android:name=".communication.LiveDataService"
             android:exported="true" />
 
-
         <activity
             android:name=".wdaeFSGGSRGSrg"
             android:label="@string/title_activity_wdae_fsggsrgsrg" >
         </activity>
 
-        <receiver android:name=".alarm.AlarmReceiver"></receiver>
-
-        <receiver android:name=".alarm.BootReceiver"
-            android:enabled="false">
+        <receiver android:name=".alarm.AlarmReceiver" />
+        <receiver
+            android:name=".alarm.BootReceiver"
+            android:enabled="false" >
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
         <service android:name=".alarm.SyncService" />
 
-
+        <activity android:name=".Preferences" >
+        </activity>
     </application>
 
 </manifest>

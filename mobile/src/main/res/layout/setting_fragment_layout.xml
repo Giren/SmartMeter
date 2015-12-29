@@ -6,212 +6,293 @@
     android:layout_height="match_parent"
     android:weightSum="1">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="220dp"
-            android:layout_height="50dp"
-            android:id="@+id/weekLimit"
-            android:layout_alignParentStart="true"
-            android:textSize="30sp"
-            android:text="Wochenlimit" />
-
-        <EditText
-            android:layout_width="132dp"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/edit_week"
-            android:layout_gravity="right"
-            android:textAlignment="center"
-            android:textSize="20dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="220dp"
-            android:layout_height="50dp"
-            android:id="@+id/weekLimitColor"
-            android:layout_alignParentStart="true"
-            android:textSize="30sp"
-            android:text="Wochen-Farbe" />
-
-        <EditText
-            android:layout_width="132dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:id="@+id/edit_week_color"
-            android:layout_gravity="right"
-            android:textAlignment="center"
-            android:textSize="20dp"
-            android:editable="true" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="220dp"
-            android:layout_height="50dp"
-            android:id="@+id/monthLimit"
-            android:textSize="30sp"
-            android:text="Monatslimit"
-            android:layout_below="@+id/editText2"
-            android:layout_alignParentStart="true" />
-
-        <EditText
-            android:layout_width="132dp"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/edit_month"
-            android:layout_gravity="right"
-            android:textAlignment="center"
-            android:textSize="20dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="220dp"
-            android:layout_height="50dp"
-            android:id="@+id/monthLimitColor"
-            android:textSize="30sp"
-            android:text="Monats-Farbe"
-            android:layout_below="@+id/editText2"
-            android:layout_alignParentStart="true" />
-
-        <EditText
-            android:layout_width="132dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:id="@+id/edit_month_color"
-            android:layout_gravity="right"
-            android:textAlignment="center"
-            android:textSize="20dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="220dp"
-            android:layout_height="50dp"
-            android:id="@+id/yearLimit"
-            android:textSize="30sp"
-            android:text="Jahreslimit"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true" />
-
-        <EditText
-            android:layout_width="132dp"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/edit_year"
-            android:layout_gravity="right"
-            android:textAlignment="center"
-            android:textSize="20dp"
-            style="@android:style/Widget.Holo.EditText"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="220dp"
-            android:layout_height="50dp"
-            android:id="@+id/yearLimitColor"
-            android:textSize="30sp"
-            android:text="Jahres-Farbe"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true" />
-
-        <EditText
-            android:layout_width="132dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:id="@+id/edit_year_color"
-            android:layout_gravity="right"
-            android:textAlignment="center"
-            android:textSize="20dp"
-            style="@android:style/Widget.Holo.EditText"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="220dp"
-            android:layout_height="50dp"
-            android:id="@+id/ip"
-            android:textSize="30sp"
-            android:text="IP-Adresse"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true" />
-
-        <EditText
-            android:layout_width="132dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:id="@+id/edit_ip"
-            android:layout_gravity="right"
-            android:textAlignment="center"
-            android:textSize="20dp"
-            style="@android:style/Widget.Holo.EditText"/>
-    </LinearLayout>
-
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="1">
+        android:layout_height="match_parent"
+        android:layout_weight="0.98">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/sync"
-            android:textSize="30sp"
-            android:text="Synchronisation"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true" />
-
-        <Switch
-            android:layout_width="wrap_content"
+        <GridLayout
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/sync_switch"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="0.84"
-            android:switchMinWidth="100dp"
-            android:checked="true"
-            android:textOn="On"
-            android:textOff="Off"/>
-    </LinearLayout>
+            android:weightSum="1"
+            android:columnCount="5"
+            android:rowCount="31"
+            android:padding="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_gravity="fill_horizontal"
+                android:id="@+id/weekLimit"
+                android:textSize="23dp"
+                android:text="Monatslimit"
+                android:layout_row="0"
+                android:layout_column="0"
+                android:minHeight="14dp" />
+
+            <TextView
+                android:textSize="16dp"
+                android:text="Farbe"
+                android:layout_row="1"
+                android:layout_column="0"
+                android:minHeight="9dp" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/main_limit_color_button"
+                android:layout_row="1"
+                android:layout_column="2"
+                android:minHeight="20pt"
+                android:text="WÄHLEN" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:textSize="16dp"
+                android:text="Limit (kWh)"
+                android:layout_row="2"
+                android:layout_column="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="9dp" />
+
+            <EditText
+                android:layout_width="89dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/prime_limit_start"
+                android:layout_row="2"
+                android:layout_column="2"
+                android:textIsSelectable="false"
+                android:text="2000" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:textSize="20sp"
+                android:text="-"
+                android:layout_row="2"
+                android:layout_column="3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="20pt" />
+
+            <EditText
+                android:layout_width="89dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/prime_limit_stop"
+                android:layout_row="2"
+                android:layout_column="4"
+                android:text="10000" />
+
+            <TextView
+                android:layout_gravity="fill_horizontal"
+                android:textSize="23dp"
+                android:text="Opt. Limit"
+                android:layout_row="3"
+                android:layout_column="0"
+                android:minHeight="14dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:textSize="16dp"
+                android:text="Farbe"
+                android:layout_row="4"
+                android:layout_column="0"
+                android:minHeight="9dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView3"
+                android:textIsSelectable="false" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/opt1_limit_color_button"
+                android:layout_row="4"
+                android:layout_column="2"
+                android:minHeight="20pt"
+                android:text="Wählen" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:textSize="16dp"
+                android:text="Limit (kWh)"
+                android:layout_row="6"
+                android:layout_column="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="12pt" />
+
+            <EditText
+                android:layout_width="89dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText3"
+                android:layout_row="6"
+                android:layout_column="2"
+                android:text="0" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:textSize="20sp"
+                android:text="-"
+                android:layout_row="6"
+                android:layout_column="3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="20pt" />
+
+            <EditText
+                android:layout_width="89dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText4"
+                android:layout_row="6"
+                android:layout_column="4"
+                android:text="0" />
+
+            <TextView
+                android:layout_gravity="fill_horizontal"
+                android:textSize="23dp"
+                android:text="Opt. Limit 2"
+                android:layout_row="8"
+                android:layout_column="0"
+                android:minHeight="16pt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView6" />
+
+            <TextView
+                android:textSize="16dp"
+                android:text="Farbe"
+                android:layout_row="10"
+                android:layout_column="0"
+                android:minHeight="12pt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView7" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/opt2_limit_color_button"
+                android:layout_row="10"
+                android:layout_column="2"
+                android:minHeight="20pt"
+                android:text="Wählen" />
+
+            <TextView
+                android:id="@+id/textView8"
+                android:textSize="16dp"
+                android:text="Limit (kWh)"
+                android:layout_row="13"
+                android:layout_column="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="12pt" />
+
+            <EditText
+                android:layout_width="89dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText5"
+                android:layout_row="13"
+                android:layout_column="2"
+                android:text="0" />
+
+            <TextView
+                android:id="@+id/textView9"
+                android:textSize="20sp"
+                android:text="-"
+                android:layout_row="13"
+                android:layout_column="3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="20pt" />
+
+            <EditText
+                android:layout_width="89dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText6"
+                android:layout_row="13"
+                android:layout_column="4"
+                android:text="0" />
+
+            <TextView
+                android:layout_gravity="fill_horizontal"
+                android:textSize="23dp"
+                android:text="Netzwerk"
+                android:layout_row="14"
+                android:layout_column="0"
+                android:minHeight="16pt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView10" />
+
+            <TextView
+                android:textSize="16dp"
+                android:text="IP-Adresse"
+                android:layout_row="15"
+                android:layout_column="0"
+                android:minHeight="12pt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView11" />
+
+            <EditText
+                android:layout_width="189dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText7"
+                android:layout_row="15"
+                android:layout_column="2"
+                android:layout_columnSpan="3"
+                android:text="0.0.0.0" />
+
+            <TextView
+                android:layout_gravity="fill_horizontal"
+                android:textSize="23dp"
+                android:text="Sync"
+                android:layout_row="18"
+                android:layout_column="0"
+                android:minHeight="16pt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView12" />
+
+            <TextView
+                android:textSize="16dp"
+                android:text="Auto. Sync"
+                android:layout_row="19"
+                android:layout_column="0"
+                android:minHeight="12pt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView13" />
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="30 min"
+                android:id="@+id/checkBox"
+                android:layout_row="19"
+                android:layout_column="2"
+                android:checked="false" />
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/button2"
+                android:layout_row="19"
+                android:layout_column="4"
+                android:text="Manuell" />
+
+        </GridLayout>
+
+    </ScrollView >
 
     <Button
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Speichern"
-        android:id="@+id/button_save"
+        android:id="@+id/button_right"
+        android:layout_gravity="right"
         android:background="@color/orange"
-        android:layout_marginTop="80dp" />
+        android:text="Speichern" />
 
 </LinearLayout>

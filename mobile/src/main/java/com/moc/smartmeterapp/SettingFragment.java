@@ -1,7 +1,7 @@
 package com.moc.smartmeterapp;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,6 +13,7 @@ import android.widget.Switch;
 
 import com.moc.smartmeterapp.database.MeterDbHelper;
 import com.moc.smartmeterapp.model.MyPreferences;
+import com.moc.smartmeterapp.utils.HSVColorPickerDialog;
 
 
 /**
@@ -32,6 +33,7 @@ public class SettingFragment extends Fragment {
 
     private Switch syncSwitch;
 
+    private Button button;
 
     @Nullable
     @Override
@@ -46,24 +48,24 @@ public class SettingFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        editWeek = (EditText)view.findViewById(R.id.edit_week);
-        editWeekColor = (EditText)view.findViewById(R.id.edit_week_color);
+        button = (Button)view.findViewById(R.id.main_limit_color_button);
+        /*editWeekColor = (EditText)view.findViewById(R.id.edit_week_color);
         editMonth = (EditText)view.findViewById(R.id.edit_month);
         editMonthColor = (EditText)view.findViewById(R.id.edit_month_color);
         editYear =  (EditText)view.findViewById(R.id.edit_year);
         editYearColor = (EditText)view.findViewById(R.id.edit_year_color);
         editIP = (EditText)view.findViewById(R.id.edit_ip);
         syncSwitch = (Switch)view.findViewById(R.id.sync_switch);
+        */
 
-        meterDbHelper.openDatabase();
-        MyPreferences pref = meterDbHelper.loadPreferences();
-        meterDbHelper.closeDatabase();
+       // meterDbHelper.openDatabase();
+        //MyPreferences pref = meterDbHelper.loadPreferences();
+        //meterDbHelper.closeDatabase();
 
-        if(pref != null)
-            setPreferenceView(pref);
+        //if(pref != null)
+            //setPreferenceView(pref);
 
-        Button saveButton = (Button) view.findViewById(R.id.button_save);
+        /*Button saveButton = (Button) view.findViewById(R.id.button_save);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,10 +83,25 @@ public class SettingFragment extends Fragment {
                 meterDbHelper.savePreferences(preferences);
                 meterDbHelper.closeDatabase();
             }
+        });*/
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                /*HSVColorPickerDialog cpd = new HSVColorPickerDialog( getActivity(), 0xFF4488CC, new HSVColorPickerDialog.OnColorSelectedListener() {
+                    @Override
+                    public void colorSelected(Integer color) {
+                        // Do something with the selected color
+                    }
+                });
+                cpd.setTitle( "Pick a color" );
+                cpd.show();*/
+            }
         });
     }
 
-    private void setPreferenceView(MyPreferences pref){
+    private void setPreferenceView(MyPreferences pref) {
         editWeek.setText(String.valueOf(pref.getWeekLimit()));
         editWeekColor.setText(pref.getWeekLimitColor());
         editMonth.setText(String.valueOf(pref.getMonthLimit()));
@@ -94,5 +111,7 @@ public class SettingFragment extends Fragment {
         editIP.setText(pref.getIpAddress());
         syncSwitch.setChecked(pref.getSync());
     }
+
+
 
 }
