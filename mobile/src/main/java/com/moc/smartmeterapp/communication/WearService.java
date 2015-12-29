@@ -11,16 +11,23 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
+import com.moc.smartmeterapp.database.MeterDbHelper;
 import com.moc.smartmeterapp.model.DataObject;
+import com.moc.smartmeterapp.model.Day;
 import com.moc.smartmeterapp.model.EntryObject;
 import com.moc.smartmeterapp.model.Global;
 import com.moc.smartmeterapp.model.Limit;
 import com.moc.smartmeterapp.preferences.MyPreferences;
 import com.moc.smartmeterapp.preferences.PreferenceHelper;
 
+import java.sql.Time;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Created by philipp on 26.11.2015.
@@ -31,6 +38,8 @@ public class WearService extends WearableListenerService implements
         LiveCommunication.ILiveDataEvent,
         PreferenceHelper.PrefReceive {
 
+    final String ERR_NO_DATA_IN_DB = "ERRO01";
+
     private static final String WEARABLE_DATA_PATH = "/SmartMeterToWearable";
     private static final String HANDHELD_DATA_PATH = "/SmartMeterToHandheld";
 
@@ -38,6 +47,12 @@ public class WearService extends WearableListenerService implements
     private GoogleApiClient googleClient;
 
     private MyPreferences myPreferences;
+
+    private Calendar calendar;
+    private TimeZone timeZone;
+    private MeterDbHelper meterDbHelper;
+
+    private DateFormat dayFormat, monthFormat, yearFormat;
 
     private String limitWeek;
     private String limitMonth;
@@ -50,7 +65,17 @@ public class WearService extends WearableListenerService implements
         liveCommunication.create();
         liveCommunication.registerDataEventHandler(this);
 
+        dayFormat = new SimpleDateFormat( "dd");
+        monthFormat = new SimpleDateFormat( "MM");
+        yearFormat = new SimpleDateFormat( "yyyy");
+
         myPreferences = PreferenceHelper.getPreferences( getApplicationContext());
+        if(meterDbHelper == null){
+            meterDbHelper = new MeterDbHelper( getBaseContext());
+        }
+
+        timeZone = TimeZone.getDefault();
+        calendar = new GregorianCalendar( timeZone);
 
         limitWeek = String.valueOf(myPreferences.getLimit1().getMax() / 4);
         limitMonth = String.valueOf( myPreferences.getLimit1().getMax());
@@ -117,7 +142,7 @@ public class WearService extends WearableListenerService implements
 
     @Override
      public void onMessageReceived( MessageEvent messageEvent) {
-        Log.d("DEBUG", "ON MESSAGE RECEIVED + message: " + new String( messageEvent.getData()));
+        Log.d("DEBUG", "ON MESSAGE RECEIVED + message: " + new String(messageEvent.getData()));
         if( messageEvent.getPath().equals( HANDHELD_DATA_PATH)) {
             final String message = new String( messageEvent.getData());
 
@@ -136,6 +161,8 @@ public class WearService extends WearableListenerService implements
 
     public void reactOnMessage( String receivedMessage) {
         Log.d("DEBUG", "REACT ON MESSAGE + message: " + receivedMessage);
+        meterDbHelper.openDatabase();
+        Log.d("DEBUG", "REACT ON MESSAGE - openDatabase()");
         switch ( receivedMessage) {
             case "liveData": {
                 Log.d("DEBUG", "liveData case");
@@ -143,52 +170,42 @@ public class WearService extends WearableListenerService implements
                 break;
             }
             case "limitWeek": {
-                System.out.println("limitWeek case");
                 Log.d("DEBUG", "limitWeekCase");
-                dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitWeek", "2500");
+                dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitWeek", limitWeek);
                 //dataMessageToWearable(WEARABLE_DATA_PATH, "limitWeek");
                 break;
             }
             case "limitMonth": {
                 Log.d("DEBUG", "limitMonth case");
-                System.out.println("limitMonth case");
-                dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitMonth", "10000");
+                dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitMonth", limitMonth);
                 //dataMessageToWearable(WEARABLE_DATA_PATH, "limitMonth");
                 break;
             }
             case "limitYear": {
                 Log.d("DEBUG", "limitYear case");
-                System.out.println("limitYear case");
-                dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitYear", "120000");
+                dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitYear", limitYear);
                 //dataMessageToWearable(WEARABLE_DATA_PATH, "limitYear");
                 break;
             }
             case "goodbye": {
                 Log.d("DEBUG", "goodbye case");
-                System.out.println( "goodbye case");
                 break;
             }
             default:
                 Log.d("DEBUG", "default case");
-                System.out.println("default case");
                 break;
         }
+        meterDbHelper.closeDatabase();
+        Log.d("DEBUG", "REACT ON MESSAGE - closeDatabase()");
     }
 
-    public void dataMessageToWearableLimit(String path, String text, String limit) {
-
+    public void dataMessageToWearableLimit(String path, String fragmentName, String limitValue) {
         String seperator = ";";
-        String dataMessage = limit + seperator;
-
-        SimpleDateFormat sdf = new SimpleDateFormat( "dd.MM.yyyy HH:mm:ss");
-        String myTime = sdf.format( new Date());
+        String dataMessage;
 
         // Datenvorbereitung
-        // dataMessage += "\n";
-        dataMessage += String.valueOf( 0 + ( (int)( Math.random() * Integer.valueOf( limit))));
-
-
-        // TODO Datenbeschaffung innerhalb des Threads und anschließend senden
+        String currentValue = getCurrentLimitValue( fragmentName);
+        // TODO Datenbeschaffung der einzelnen limits, anschließend senden
 
         // vor dem senden nochmal warten
         try {
@@ -196,8 +213,158 @@ public class WearService extends WearableListenerService implements
         } catch (Exception e) {
             System.out.println( e.getMessage());
         }
-        // send Data on messagePath
-        new SendToDataLayerThread( path, text + seperator + dataMessage).start();
+
+        // send Data to wearable on messagePath
+        // <fragmentName>;<currentValue>;<limitValue>
+        dataMessage = fragmentName + seperator + currentValue + seperator + limitValue;
+        new SendToDataLayerThread( path, dataMessage).start();
+    }
+
+
+    public String getCurrentValueOfThisWeek() {
+
+        Date dateCurrent, dateBefore;
+        Calendar weekCalendar = new GregorianCalendar();
+
+        if( weekCalendar.get( Calendar.DAY_OF_WEEK) == 1)
+        {
+            Day dayCurrent = meterDbHelper.loadDay( weekCalendar.getTime());
+            if( dayCurrent == null) {
+                return ERR_NO_DATA_IN_DB;
+            } else {
+                return String.valueOf( dayCurrent.getMmm().getTotalSum());
+            }
+            //return String.valueOf((int) (Math.random() * Integer.valueOf(limitWeek)));
+
+        } else {
+            dateCurrent = weekCalendar.getTime();
+            weekCalendar.add( Calendar.DAY_OF_MONTH, 1 - (weekCalendar.get( Calendar.DAY_OF_WEEK)));
+            dateBefore = weekCalendar.getTime();
+
+            DateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd hh-mm-ss");
+            Log.d("DEBUG", "getCurrentValueOfThisWeek - DateFormat: " + sdf.format( dateCurrent));
+            Log.d("DEBUG", "getCurrentValueOfThisWeek - DateFormat: " + sdf.format( dateBefore));
+
+            Day dayCurrent = meterDbHelper.loadDay( dateCurrent);
+            Day dayBefore = meterDbHelper.loadDay( dateBefore);
+
+            if( dayCurrent == null || dayBefore == null) {
+                return ERR_NO_DATA_IN_DB;
+            } else {
+                int currentValue = dayCurrent.getMmm().getTotalSum() - dayBefore.getMmm().getTotalSum();
+                return String.valueOf( currentValue);
+            }
+            //return String.valueOf((int) (Math.random() * Integer.valueOf(limitWeek)));
+        }
+    }
+
+    public String getCurrentValueOfThisMonth() {
+
+        Date dateCurrent, dateBefore;
+        Calendar monthCalendar = new GregorianCalendar();
+
+        if( monthCalendar.get( Calendar.DAY_OF_MONTH) == 1)
+        {
+            Day dayCurrent = meterDbHelper.loadDay( monthCalendar.getTime());
+            if( dayCurrent == null) {
+                return ERR_NO_DATA_IN_DB;
+            } else {
+                return String.valueOf( dayCurrent.getMmm().getTotalSum());
+            }
+            //return String.valueOf((int) (Math.random() * Integer.valueOf(limitMonth)));
+
+        } else {
+            dateCurrent = monthCalendar.getTime();
+            monthCalendar.add( Calendar.DAY_OF_MONTH, 1 - (monthCalendar.get( Calendar.DAY_OF_MONTH)));
+            dateBefore = monthCalendar.getTime();
+
+            DateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd hh-mm-ss");
+            Log.d("DEBUG", "getCurrentValueOfThisWeek - DateFormat: " + sdf.format( dateCurrent));
+            Log.d("DEBUG", "getCurrentValueOfThisWeek - DateFormat: " + sdf.format( dateBefore));
+
+            Day dayCurrent = meterDbHelper.loadDay( dateCurrent);
+            Day dayBefore = meterDbHelper.loadDay( dateBefore);
+
+            if( dayCurrent == null || dayBefore == null) {
+                return ERR_NO_DATA_IN_DB;
+            } else {
+                int currentValue = dayCurrent.getMmm().getTotalSum() - dayBefore.getMmm().getTotalSum();
+                return String.valueOf( currentValue);
+            }
+            //return String.valueOf((int) (Math.random() * Integer.valueOf(limitMonth)));
+        }
+    }
+
+    public String getCurrentValueOfThisYear() {
+
+        Date dateCurrent, dateBefore;
+        Calendar yearCalendar = new GregorianCalendar();
+
+        if( yearCalendar.get( Calendar.DAY_OF_MONTH) == 1 && yearCalendar.get( Calendar.MONTH) == 0)
+        {
+            Day dayCurrent = meterDbHelper.loadDay( yearCalendar.getTime());
+
+            if( dayCurrent == null) {
+                return ERR_NO_DATA_IN_DB;
+            } else {
+                return String.valueOf( dayCurrent.getMmm().getTotalSum());
+            }
+           // return String.valueOf((int) (Math.random() * Integer.valueOf(limitYear)));
+
+        } else {
+            dateCurrent = yearCalendar.getTime();
+            yearCalendar.add( Calendar.DAY_OF_YEAR, 1 - (yearCalendar.get( Calendar.DAY_OF_YEAR)));
+            dateBefore = yearCalendar.getTime();
+
+            DateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd hh-mm-ss");
+            Log.d("DEBUG", "getCurrentValueOfThisWeek - DateFormat: " + sdf.format( dateCurrent));
+            Log.d("DEBUG", "getCurrentValueOfThisWeek - DateFormat: " + sdf.format( dateBefore));
+
+            Day dayCurrent = meterDbHelper.loadDay( dateCurrent);
+            Day dayBefore = meterDbHelper.loadDay( dateBefore);
+
+            if( dayCurrent == null || dayBefore == null) {
+                return ERR_NO_DATA_IN_DB;
+            } else {
+                int currentValue = dayCurrent.getMmm().getTotalSum() - dayBefore.getMmm().getTotalSum();
+                return String.valueOf( currentValue);
+            }
+            //return String.valueOf((int) (Math.random() * Integer.valueOf(limitYear)));
+        }
+    }
+
+
+
+    public String getCurrentLimitValue( String fragmentName) {
+
+        switch ( fragmentName) {
+            case "liveData": {
+                Log.d("DEBUG", "getCurrentLimitValue - liveData case");
+                break;
+            }
+            case "limitWeek": {
+                Log.d("DEBUG", "getCurrentLimitValue - limitWeek case");
+                return getCurrentValueOfThisWeek();
+                //return String.valueOf((int) (Math.random() * Integer.valueOf(limitWeek)));
+            }
+            case "limitMonth": {
+                Log.d("DEBUG", "getCurrentLimitValue - limitMonth case");
+                return getCurrentValueOfThisMonth();
+                // TODO get Data from DB
+                //return String.valueOf( ( int)( Math.random() * Integer.valueOf( limitMonth)));
+            }
+            case "limitYear": {
+                Log.d("DEBUG", "getCurrentLimitValue - limitYear case");
+                return getCurrentValueOfThisYear();
+                // TODO get Data from DB
+                //return String.valueOf( ( int)( Math.random() * Integer.valueOf( limitYear)));
+            }
+            default: {
+                Log.d("DEBUG", "getCurrentLimitValue - default case");
+                break;
+            }
+        }
+        return ERR_NO_DATA_IN_DB;
     }
 
     public void dataMessageToWearable(String path, String text) {
@@ -225,7 +392,10 @@ public class WearService extends WearableListenerService implements
 
     @Override
     public void onPrefReceive(MyPreferences pref) {
-        // TODO MyPreferences updaten
+        // TODO benötigte updaten
+        limitWeek = String.valueOf( pref.getLimit1().getMax() / 4);
+        limitMonth = String.valueOf( pref.getLimit1().getMax());
+        limitYear = String.valueOf( pref.getLimit1().getMax() * 12);
     }
 
     public class SendToDataLayerThread extends Thread {

@@ -138,6 +138,8 @@ public class MainActivity extends FragmentActivity implements
         Log.d("DEBUG", "MainActivity - handleReceivedMessage(): " + message);
         List<Fragment> allFragments = getSupportFragmentManager().getFragments();
 
+        fragmentData.addData( message);
+
         if (allFragments != null) {
             for (Fragment fragment : allFragments) {
                 CustomFragment myFragment = (CustomFragment) fragment;
@@ -155,7 +157,7 @@ public class MainActivity extends FragmentActivity implements
                             @Override
                             public void run() {
                                 try {
-                                    Thread.sleep( 1000);
+                                    Thread.sleep( 500);
                                 } catch (Exception e) {
                                     System.out.println( e.getMessage());
                                 }
