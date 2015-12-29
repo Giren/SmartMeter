@@ -1,19 +1,31 @@
 package com.moc.smartmeterapp;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.Switch;
+import android.widget.Toast;
 
+import com.moc.smartmeterapp.database.IDatabase;
 import com.moc.smartmeterapp.database.MeterDbHelper;
-import com.moc.smartmeterapp.model.MyPreferences;
+import com.moc.smartmeterapp.model.Limit;
+import com.moc.smartmeterapp.preferences.MyPreferences;
+import com.moc.smartmeterapp.preferences.PreferenceHelper;
 import com.moc.smartmeterapp.utils.HSVColorPickerDialog;
+
+import java.util.regex.Pattern;
 
 
 /**
@@ -21,26 +33,44 @@ import com.moc.smartmeterapp.utils.HSVColorPickerDialog;
  */
 public class SettingFragment extends Fragment {
 
-    private MeterDbHelper meterDbHelper;
+    private static final String INTENT_IDENTIFIER = "PREFERENCES_BROADCAST";
+    public static final String MESSAGE_IDENTIFIER = "PREFS";
 
-    private EditText editWeek;
-    private EditText editWeekColor;
-    private EditText editMonth;
-    private EditText editMonthColor;
-    private EditText editYear;
-    private EditText editYearColor;
+    private MeterDbHelper meterDbHelper;
+    private Intent intent;
+
+    private EditText primeLimitStart;
+    private EditText primeLimitStop;
+    private Button primeLimitColorBtn;
+
+    private EditText opt1LimitStart;
+    private EditText opt1LimitStop;
+    private Button opt1LimitColorBtn;
+
+    private EditText opt2LimitStart;
+    private EditText opt2LimitStop;
+    private Button opt2LimitColorBtn;
+
     private EditText editIP;
 
-    private Switch syncSwitch;
+    private CheckBox syncCheck;
+    private Button manualSync;
 
-    private Button button;
+    private Button saveButton;
+
+    private static final Pattern PARTIAl_IP_ADDRESS =
+            Pattern.compile("^((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])\\.){0,3}" +
+                    "((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])){0,1}$");
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         if(meterDbHelper == null){
             meterDbHelper = new MeterDbHelper(getActivity().getBaseContext());
         }
+
+        intent = new Intent(INTENT_IDENTIFIER);
 
         return inflater.inflate(R.layout.setting_fragment_layout,null,false);
     }
@@ -48,70 +78,143 @@ public class SettingFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        button = (Button)view.findViewById(R.id.main_limit_color_button);
-        /*editWeekColor = (EditText)view.findViewById(R.id.edit_week_color);
-        editMonth = (EditText)view.findViewById(R.id.edit_month);
-        editMonthColor = (EditText)view.findViewById(R.id.edit_month_color);
-        editYear =  (EditText)view.findViewById(R.id.edit_year);
-        editYearColor = (EditText)view.findViewById(R.id.edit_year_color);
-        editIP = (EditText)view.findViewById(R.id.edit_ip);
-        syncSwitch = (Switch)view.findViewById(R.id.sync_switch);
-        */
 
-       // meterDbHelper.openDatabase();
-        //MyPreferences pref = meterDbHelper.loadPreferences();
-        //meterDbHelper.closeDatabase();
+        primeLimitStart = (EditText)view.findViewById(R.id.prime_limit_start);
+        primeLimitStop = (EditText)view.findViewById(R.id.prime_limit_stop);
+        primeLimitColorBtn = (Button)view.findViewById(R.id.prime_limit_color);
+        primeLimitColorBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                HSVColorPickerDialog dialog = new HSVColorPickerDialog(getActivity(), primeLimitColorBtn.getSolidColor(), new HSVColorPickerDialog.OnColorSelectedListener() {
+                    @Override
+                    public void colorSelected(Integer color) {
+                        primeLimitColorBtn.setBackgroundColor(color);
+                    }
+                });
 
-        //if(pref != null)
-            //setPreferenceView(pref);
+                dialog.setTitle("Wählen Sie eine Farbe");
+                dialog.show();
+            }
+        });
 
-        /*Button saveButton = (Button) view.findViewById(R.id.button_save);
+        opt1LimitStart = (EditText)view.findViewById(R.id.opt1_limit_start);
+        opt1LimitStop = (EditText)view.findViewById(R.id.opt1_limit_stop);
+        opt1LimitColorBtn = (Button)view.findViewById(R.id.opt1_limit_color_button);
+        opt1LimitColorBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                HSVColorPickerDialog dialog = new HSVColorPickerDialog(getActivity(), opt1LimitColorBtn.getSolidColor(), new HSVColorPickerDialog.OnColorSelectedListener() {
+                    @Override
+                    public void colorSelected(Integer color) {
+                        opt1LimitColorBtn.setBackgroundColor(color);
+                    }
+                });
+
+                dialog.setTitle("Wählen Sie eine Farbe");
+                dialog.show();
+            }
+        });
+
+        opt2LimitStart = (EditText)view.findViewById(R.id.opt2_limit_start);
+        opt2LimitStop = (EditText)view.findViewById(R.id.opt2_limit_stop);
+        opt2LimitColorBtn = (Button)view.findViewById(R.id.opt2_limit_color_button);
+        opt2LimitColorBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                HSVColorPickerDialog dialog = new HSVColorPickerDialog(getActivity(), opt2LimitColorBtn.getSolidColor(), new HSVColorPickerDialog.OnColorSelectedListener() {
+                    @Override
+                    public void colorSelected(Integer color) {
+                        opt2LimitColorBtn.setBackgroundColor(color);
+                    }
+                });
+
+                dialog.setTitle("Wählen Sie eine Farbe");
+                dialog.show();
+            }
+        });
+
+        editIP = (EditText)view.findViewById(R.id.network_ip);
+        editIP.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    }
+
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    }
+
+                    private String mPreviousText = "";
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        if (PARTIAl_IP_ADDRESS.matcher(s).matches()) {
+                            mPreviousText = s.toString();
+                        } else {
+                            s.replace(0, s.length(), mPreviousText);
+                        }
+                    }
+                });
+        syncCheck = (CheckBox)view.findViewById(R.id.sync_check);
+
+        saveButton = (Button)view.findViewById(R.id.save_prefs);
+
+        final MyPreferences pref = PreferenceHelper.getPreferences(getActivity());
+
+        if(pref != null)
+            setPreferenceView(pref);
+
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Limit limit1 = new Limit(
+                        Integer.valueOf(primeLimitStart.getText().toString()),
+                        Integer.valueOf(primeLimitStop.getText().toString()),
+                        ((ColorDrawable) primeLimitColorBtn.getBackground()).getColor());
+                Limit limit2 = new Limit(
+                        Integer.valueOf(opt1LimitStart.getText().toString()),
+                        Integer.valueOf(opt1LimitStop.getText().toString()),
+                        ((ColorDrawable) opt1LimitColorBtn.getBackground()).getColor());
+                Limit limit3 = new Limit(
+                        Integer.valueOf(opt2LimitStart.getText().toString()),
+                        Integer.valueOf(opt2LimitStop.getText().toString()),
+                        ((ColorDrawable) opt2LimitColorBtn.getBackground()).getColor());
+
                 MyPreferences preferences = new MyPreferences(
-                        Integer.parseInt(editWeek.getText().toString()),
-                        editWeekColor.getText().toString(),
-                        Integer.parseInt(editMonth.getText().toString()),
-                        editMonthColor.getText().toString(),
-                        Integer.parseInt(editYear.getText().toString()),
-                        editYearColor.getText().toString(),
+                        limit1,
+                        limit2,
+                        limit3,
                         editIP.getText().toString(),
-                        syncSwitch.isChecked()
+                        syncCheck.isChecked()
                 );
-                meterDbHelper.openDatabase();
-                meterDbHelper.savePreferences(preferences);
-                meterDbHelper.closeDatabase();
-            }
-        });*/
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+                PreferenceHelper.setPreferences(getActivity(), preferences);
+                sendBroadcast(preferences);
 
-                /*HSVColorPickerDialog cpd = new HSVColorPickerDialog( getActivity(), 0xFF4488CC, new HSVColorPickerDialog.OnColorSelectedListener() {
-                    @Override
-                    public void colorSelected(Integer color) {
-                        // Do something with the selected color
-                    }
-                });
-                cpd.setTitle( "Pick a color" );
-                cpd.show();*/
+                Toast.makeText(getActivity(), "Gespeichert", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void setPreferenceView(MyPreferences pref) {
-        editWeek.setText(String.valueOf(pref.getWeekLimit()));
-        editWeekColor.setText(pref.getWeekLimitColor());
-        editMonth.setText(String.valueOf(pref.getMonthLimit()));
-        editMonthColor.setText(pref.getMonthLimitColor());
-        editYear.setText(String.valueOf(pref.getYearLimit()));
-        editYearColor.setText(pref.getYearLimitColor());
-        editIP.setText(pref.getIpAddress());
-        syncSwitch.setChecked(pref.getSync());
+    private void sendBroadcast(MyPreferences pref){
+        intent.putExtra(MESSAGE_IDENTIFIER, pref);
     }
 
+    private void setPreferenceView(MyPreferences pref){
+        primeLimitStart.setText(String.valueOf(pref.getLimit1().getMin()));
+        primeLimitStop.setText(String.valueOf(pref.getLimit1().getMax()));
+        primeLimitColorBtn.setBackgroundColor(pref.getLimit1().getColor());
 
+        opt1LimitStart.setText(String.valueOf(pref.getLimit2().getMin()));
+        opt1LimitStop.setText(String.valueOf(pref.getLimit2().getMax()));
+        opt1LimitColorBtn.setBackgroundColor(pref.getLimit2().getColor());
+
+        opt2LimitStart.setText(String.valueOf(pref.getLimit3().getMin()));
+        opt2LimitStop.setText(String.valueOf(pref.getLimit3().getMax()));
+        opt2LimitColorBtn.setBackgroundColor(pref.getLimit3().getColor());
+
+        editIP.setText(pref.getIpAddress());
+
+        syncCheck.setChecked(pref.getSync());
+    }
 
 }

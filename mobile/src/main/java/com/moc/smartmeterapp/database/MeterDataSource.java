@@ -8,15 +8,14 @@ import android.database.sqlite.SQLiteDatabase;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.moc.smartmeterapp.model.Day;
-import com.moc.smartmeterapp.model.MyPreferences;
+import com.moc.smartmeterapp.model.Limit;
+import com.moc.smartmeterapp.preferences.MyPreferences;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by michael on 13.12.15.
@@ -38,12 +37,9 @@ public class MeterDataSource {
 
     private String[] prefColumns = {
             MeterDbHelper.COLUMN_PREF_ID,
-            MeterDbHelper.COLUMN_PREF_WEEK_LIMIT,
-            MeterDbHelper.COLUMN_PREF_WEEK_LIMIT_COLOR,
-            MeterDbHelper.COLUMN_PREF_MONTH_LIMIT,
-            MeterDbHelper.COLUMN_PREF_MONTH_LIMIT_COLOR,
-            MeterDbHelper.COLUMN_PREF_YEAR_LIMIT,
-            MeterDbHelper.COLUMN_PREF_YEAR_LIMIT_COLOR,
+            MeterDbHelper.COLUMN_PREF_LIMIT_1,
+            MeterDbHelper.COLUMN_PREF_LIMIT_2,
+            MeterDbHelper.COLUMN_PREF_LIMIT_3,
             MeterDbHelper.COLUMN_PREF_IP,
             MeterDbHelper.COLUMN_PREF_SYNC
     };
@@ -200,49 +196,48 @@ public class MeterDataSource {
 
 
     private MyPreferences cursorToPreferences(Cursor cursor){
-        int dbIndex = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_ID);
-        int dbWeekLimit = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_WEEK_LIMIT);
-        int dbWeekLimitColor = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_WEEK_LIMIT_COLOR);
-        int dbMonthLimit = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_MONTH_LIMIT);
-        int dbMonthLimitColor = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_MONTH_LIMIT_COLOR);
-        int dbYearLimit = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_YEAR_LIMIT);
-        int dbYearLimitColor = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_YEAR_LIMIT_COLOR);
+        byte[] blob;
+        String json;
+        Gson gson = new Gson();
 
+        int dbIndex = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_ID);
         int dbIp = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_IP);
         int dbSync = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_SYNC);
 
         Long id = cursor.getLong(dbIndex);
-        int weekLimit = cursor.getInt(dbWeekLimit);
-        String weekLimitColor = cursor.getString(dbWeekLimitColor);
-        int monthLimit = cursor.getInt(dbMonthLimit);
-        String monthLimitColor = cursor.getString(dbMonthLimitColor);
-        int yearLimit = cursor.getInt(dbYearLimit);
-        String yearLimitColor = cursor.getString(dbYearLimitColor);
-
         String ip = cursor.getString(dbIp);
         Boolean sync = Boolean.parseBoolean(cursor.getString(dbSync));
 
-        MyPreferences preferences = new MyPreferences(weekLimit,
-                weekLimitColor,
-                monthLimit,
-                monthLimitColor,
-                yearLimit,
-                yearLimitColor,
+        blob = cursor.getBlob(cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_LIMIT_1));
+        json = new String(blob);
+        Limit limit1 = gson.fromJson(json, new TypeToken<Limit>(){}.getType());
+
+        blob = cursor.getBlob(cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_LIMIT_2));
+        json = new String(blob);
+        Limit limit2 = gson.fromJson(json, new TypeToken<Limit>(){}.getType());
+
+        blob = cursor.getBlob(cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_LIMIT_3));
+        json = new String(blob);
+        Limit limit3 = gson.fromJson(json, new TypeToken<Limit>(){}.getType());
+
+        MyPreferences preferences = new MyPreferences(
+                limit1,
+                limit2,
+                limit3,
                 ip,
-                sync);
+                sync
+        );
 
         return preferences;
     }
 
     public void savePreferences(MyPreferences myPreferences){
+        Gson gson = new Gson();
         ContentValues contentValues = new ContentValues();
 
-        contentValues.put(MeterDbHelper.COLUMN_PREF_WEEK_LIMIT, myPreferences.getWeekLimit());
-        contentValues.put(MeterDbHelper.COLUMN_PREF_WEEK_LIMIT_COLOR, myPreferences.getWeekLimitColor());
-        contentValues.put(MeterDbHelper.COLUMN_PREF_MONTH_LIMIT, myPreferences.getMonthLimit());
-        contentValues.put(MeterDbHelper.COLUMN_PREF_MONTH_LIMIT_COLOR, myPreferences.getMonthLimitColor());
-        contentValues.put(MeterDbHelper.COLUMN_PREF_YEAR_LIMIT, myPreferences.getYearLimit());
-        contentValues.put(MeterDbHelper.COLUMN_PREF_YEAR_LIMIT_COLOR, myPreferences.getYearLimitColor());
+        contentValues.put(MeterDbHelper.COLUMN_PREF_LIMIT_1, gson.toJson(myPreferences.getLimit1()).getBytes());
+        contentValues.put(MeterDbHelper.COLUMN_PREF_LIMIT_2, gson.toJson(myPreferences.getLimit2()).getBytes());
+        contentValues.put(MeterDbHelper.COLUMN_PREF_LIMIT_3, gson.toJson(myPreferences.getLimit3()).getBytes());
 
         contentValues.put(MeterDbHelper.COLUMN_PREF_IP, myPreferences.getIpAddress());
         contentValues.put(MeterDbHelper.COLUMN_PREF_SYNC, String.valueOf(myPreferences.getSync()));

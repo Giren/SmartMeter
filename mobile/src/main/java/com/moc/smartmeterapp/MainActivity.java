@@ -1,5 +1,6 @@
 package com.moc.smartmeterapp;
 
+import android.app.Activity;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -133,7 +134,7 @@ public class MainActivity extends AppCompatActivity{
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
 
-        restCommunication = new RestCommunication();
+        restCommunication = new RestCommunication(this);
         restCommunication.fetchMonthData(0, new RestCommunication.IDataReceiver() {
             @Override
             public void onDataReceived(DataObject dataObject) {

@@ -27,19 +27,21 @@
                 android:text="Monatslimit"
                 android:layout_row="0"
                 android:layout_column="0"
-                android:minHeight="14dp" />
+                android:minHeight="14dp"
+                android:inputType="number"/>
 
             <TextView
                 android:textSize="16dp"
                 android:text="Farbe"
                 android:layout_row="1"
                 android:layout_column="0"
-                android:minHeight="9dp" />
+                android:minHeight="9dp"
+                android:inputType="number" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/main_limit_color_button"
+                android:id="@+id/prime_limit_color"
                 android:layout_row="1"
                 android:layout_column="2"
                 android:minHeight="20pt"
@@ -53,7 +55,8 @@
                 android:layout_column="0"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="9dp" />
+                android:minHeight="9dp"
+                android:inputType="number" />
 
             <EditText
                 android:layout_width="89dp"
@@ -62,7 +65,8 @@
                 android:layout_row="2"
                 android:layout_column="2"
                 android:textIsSelectable="false"
-                android:text="2000" />
+                android:text="2000"
+                android:inputType="number" />
 
             <TextView
                 android:id="@+id/textView"
@@ -80,7 +84,8 @@
                 android:id="@+id/prime_limit_stop"
                 android:layout_row="2"
                 android:layout_column="4"
-                android:text="10000" />
+                android:text="10000"
+                android:inputType="number" />
 
             <TextView
                 android:layout_gravity="fill_horizontal"
@@ -125,10 +130,11 @@
             <EditText
                 android:layout_width="89dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/editText3"
+                android:id="@+id/opt1_limit_start"
                 android:layout_row="6"
                 android:layout_column="2"
-                android:text="0" />
+                android:text="0"
+                android:inputType="number" />
 
             <TextView
                 android:id="@+id/textView5"
@@ -143,10 +149,11 @@
             <EditText
                 android:layout_width="89dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/editText4"
+                android:id="@+id/opt1_limit_stop"
                 android:layout_row="6"
                 android:layout_column="4"
-                android:text="0" />
+                android:text="0"
+                android:inputType="number" />
 
             <TextView
                 android:layout_gravity="fill_horizontal"
@@ -191,10 +198,11 @@
             <EditText
                 android:layout_width="89dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/editText5"
+                android:id="@+id/opt2_limit_start"
                 android:layout_row="13"
                 android:layout_column="2"
-                android:text="0" />
+                android:text="0"
+                android:inputType="number" />
 
             <TextView
                 android:id="@+id/textView9"
@@ -209,10 +217,11 @@
             <EditText
                 android:layout_width="89dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/editText6"
+                android:id="@+id/opt2_limit_stop"
                 android:layout_row="13"
                 android:layout_column="4"
-                android:text="0" />
+                android:text="0"
+                android:inputType="number" />
 
             <TextView
                 android:layout_gravity="fill_horizontal"
@@ -238,7 +247,7 @@
             <EditText
                 android:layout_width="189dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/editText7"
+                android:id="@+id/network_ip"
                 android:layout_row="15"
                 android:layout_column="2"
                 android:layout_columnSpan="3"
@@ -269,16 +278,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="30 min"
-                android:id="@+id/checkBox"
+                android:id="@+id/sync_check"
                 android:layout_row="19"
                 android:layout_column="2"
-                android:checked="false" />
+                android:checked="true" />
 
             <Button
                 style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/button2"
+                android:id="@+id/manual_sync"
                 android:layout_row="19"
                 android:layout_column="4"
                 android:text="Manuell" />
@@ -290,7 +299,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/button_right"
+        android:id="@+id/save_prefs"
         android:layout_gravity="right"
         android:background="@color/orange"
         android:text="Speichern" />

@@ -6,7 +6,10 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.moc.smartmeterapp.MainActivity;
 import com.moc.smartmeterapp.model.EntryObject;
+import com.moc.smartmeterapp.preferences.MyPreferences;
+import com.moc.smartmeterapp.preferences.PreferenceHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,9 +29,10 @@ import rx.schedulers.Schedulers;
 /**
  * Created by philipp on 26.11.2015.
  */
-public class LiveDataService extends Service {
+public class LiveDataService extends Service implements PreferenceHelper.PrefReceive {
 
     private static final int TESTDELAY = 10;
+    private final int PORT = 9999;
 
     private final IBinder mBinder = new LocalBinder();
     private static final String TAG = "BroadcastService";
@@ -42,12 +46,27 @@ public class LiveDataService extends Service {
     public String message;
     private Intent intent;
 
+    private PreferenceHelper preferenceHelper;
+    private MyPreferences prefs;
+
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d("DEBUG", "Service created...");
 
         intent = new Intent(BROADCAST_ACTION);
+
+        prefs = new MyPreferences();
+
+        MyPreferences tempPref = PreferenceHelper.getPreferences(getApplicationContext());
+        if(tempPref != null) {
+            prefs = tempPref;
+        } else {
+            prefs.setIpAddress("127.0.0.1");
+        }
+
+        preferenceHelper = new PreferenceHelper();
+        preferenceHelper.register(this);
     }
 
     @Override
@@ -61,6 +80,11 @@ public class LiveDataService extends Service {
         stopReceiver();
         Log.d("DEBUG", "Service destroyed...");
         super.onDestroy();
+    }
+
+    @Override
+    public void onPrefReceive(MyPreferences pref) {
+        this.prefs = prefs;
     }
 
     public class LocalBinder extends Binder {
@@ -79,7 +103,7 @@ public class LiveDataService extends Service {
 
                 Log.d("DEBUG", "Connectiong to socket...");
                 try {
-                    clientSocket = new Socket("10.0.0.20", 9999);
+                    clientSocket = new Socket(prefs.getIpAddress(), PORT);
 
                     while (clientSocket.isConnected()) {
                         inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));

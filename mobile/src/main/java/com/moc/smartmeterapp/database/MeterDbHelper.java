@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.moc.smartmeterapp.model.Day;
-import com.moc.smartmeterapp.model.MyPreferences;
+import com.moc.smartmeterapp.preferences.MyPreferences;
 
 import java.util.Date;
 import java.util.List;
@@ -30,12 +30,9 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
     public static final String COLUMN_DAY_O = "day_o";
 
     public static final String COLUMN_PREF_ID = "id";
-    public static final String COLUMN_PREF_WEEK_LIMIT = "week_limit";
-    public static final String COLUMN_PREF_WEEK_LIMIT_COLOR = "week_limit_color";
-    public static final String COLUMN_PREF_MONTH_LIMIT = "month_limit";
-    public static final String COLUMN_PREF_MONTH_LIMIT_COLOR = "month_limit_color";
-    public static final String COLUMN_PREF_YEAR_LIMIT = "year_limit";
-    public static final String COLUMN_PREF_YEAR_LIMIT_COLOR = "year_limit_color";
+    public static final String COLUMN_PREF_LIMIT_1 = "limit1";
+    public static final String COLUMN_PREF_LIMIT_2 = "limit2";
+    public static final String COLUMN_PREF_LIMIT_3 = "limit3";
     public static final String COLUMN_PREF_IP = "ip_address";
     public static final String COLUMN_PREF_SYNC = "sync";
 
@@ -46,12 +43,9 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
 
     private static final String SQL_CREATE_PREF = "CREATE TABLE " + TABLE_PREFS + "(" +
             COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            COLUMN_PREF_WEEK_LIMIT + " INTEGER NOT NULL, " +
-            COLUMN_PREF_WEEK_LIMIT_COLOR + " TEXT NOT NULL, " +
-            COLUMN_PREF_MONTH_LIMIT + " INTEGER NOT NULL, " +
-            COLUMN_PREF_MONTH_LIMIT_COLOR + " TEXT NOT NULL, " +
-            COLUMN_PREF_YEAR_LIMIT + " INTEGER NOT NULL, " +
-            COLUMN_PREF_YEAR_LIMIT_COLOR + " TEXT NOT NULL, " +
+            COLUMN_PREF_LIMIT_1 + " BLOB, " +
+            COLUMN_PREF_LIMIT_2 + " BLOB, " +
+            COLUMN_PREF_LIMIT_3 + " BLOB, " +
             COLUMN_PREF_IP + " TEXT NOT NULL, " +
             COLUMN_PREF_SYNC + " TEXT NOT NULL);";
 

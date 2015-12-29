@@ -11,6 +11,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.FloatMath;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -44,6 +45,7 @@ public class HSVColorPickerDialog extends AlertDialog {
         this.selectedColor = initialColor;
         this.listener = listener;
 
+
         colorWheel = new HSVColorWheel( context );
         int padding = (int) (context.getResources().getDisplayMetrics().density * PADDING_DP);
         int borderSize = (int) (context.getResources().getDisplayMetrics().density * BORDER_DP);
@@ -51,21 +53,23 @@ public class HSVColorPickerDialog extends AlertDialog {
 
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams( LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT );
         lp.bottomMargin = (int) (context.getResources().getDisplayMetrics().density * CONTROL_SPACING_DP);
-        colorWheel.setListener( new OnColorSelectedListener() {
+        colorWheel.setColor(initialColor);
+        layout.addView(colorWheel, lp);
+        colorWheel.setListener(new OnColorSelectedListener() {
+            @Override
             public void colorSelected(Integer color) {
+                selectedColor = color;
             }
-        } );
-        colorWheel.setColor( initialColor );
-        layout.addView( colorWheel, lp );
+        });
 
         int selectedColorHeight = (int) (context.getResources().getDisplayMetrics().density * SELECTED_COLOR_HEIGHT_DP);
 
         lp = new RelativeLayout.LayoutParams( LayoutParams.MATCH_PARENT, selectedColorHeight + 2 * borderSize );
         lp.bottomMargin = (int) (context.getResources().getDisplayMetrics().density * CONTROL_SPACING_DP);
-        lp.addRule( RelativeLayout.BELOW, 1 );
+        lp.addRule(RelativeLayout.BELOW, 1);
 
         lp = new RelativeLayout.LayoutParams( LayoutParams.MATCH_PARENT, selectedColorHeight + 2 * borderSize );
-        lp.addRule( RelativeLayout.BELOW, 2 );
+        lp.addRule(RelativeLayout.BELOW, 2);
 
         setButton( BUTTON_NEGATIVE, context.getString( android.R.string.cancel ), clickListener );
         setButton( BUTTON_POSITIVE, context.getString( android.R.string.ok ), clickListener );
@@ -107,6 +111,7 @@ public class HSVColorPickerDialog extends AlertDialog {
         private final Context context;
 
         private OnColorSelectedListener listener;
+
         public HSVColorWheel(Context context, AttributeSet attrs, int defStyle) {
             super(context, attrs, defStyle);
             this.context = context;
@@ -141,7 +146,7 @@ public class HSVColorPickerDialog extends AlertDialog {
             this.listener = listener;
         }
 
-        float[] colorHsv = { 0f, 0f, 1f };
+        float[] colorHsv = { 1f, 1f, 1f };
         public void setColor( int color ) {
             Color.colorToHSV(color, colorHsv);
             invalidate();
@@ -224,7 +229,7 @@ public class HSVColorPickerDialog extends AlertDialog {
                     } else {
                         alpha = 255 - (int) ((centerDist - scaledInnerCircleRadius) / scaledFadeOutSize * 255);
                     }
-                    scaledPixels[ i ] = Color.HSVToColor( alpha, hsv );
+                    scaledPixels[ i ] = Color.HSVToColor(alpha, hsv);
                 } else {
                     scaledPixels[ i ] = 0x00000000;
                 }
@@ -266,7 +271,9 @@ public class HSVColorPickerDialog extends AlertDialog {
             double centerDist = Math.sqrt( x*x + y*y );
             hsv[ 0 ] = (float) (Math.atan2( y, x ) / Math.PI * 180f) + 180;
             hsv[ 1 ] = Math.max( 0f, Math.min( 1f, (float) (centerDist / innerCircleRadius) ) );
-            return Color.HSVToColor( hsv );
+            hsv[ 2 ] = 1;
+
+            return Color.HSVToColor(0xff, hsv );
         }
 
         @Override
@@ -276,7 +283,7 @@ public class HSVColorPickerDialog extends AlertDialog {
                 case MotionEvent.ACTION_DOWN:
                 case MotionEvent.ACTION_MOVE:
                     if ( listener != null ) {
-                        listener.colorSelected( getColorForPoint( (int)event.getX(), (int)event.getY(), colorHsv ) );
+                        listener.colorSelected(getColorForPoint((int) event.getX(), (int) event.getY(), colorHsv ) );
                     }
                     invalidate();
                     return true;
