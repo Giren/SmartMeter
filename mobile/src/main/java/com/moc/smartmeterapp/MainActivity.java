@@ -43,8 +43,6 @@ public class MainActivity extends AppCompatActivity{
 
     private AlarmReceiver alarm = new AlarmReceiver();
 
-    private RestCommunication restCommunication;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,33 +131,6 @@ public class MainActivity extends AppCompatActivity{
                 R.string.app_name);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
-
-        restCommunication = new RestCommunication(this);
-        restCommunication.fetchMonthData(0, new RestCommunication.IDataReceiver() {
-            @Override
-            public void onDataReceived(DataObject dataObject) {
-                for(Day d : dataObject.getDays()) {
-                    for(Hour h : d.getHours()) {
-                        Log.d("DEBUG:", String.valueOf(h.getMmm().getMean()));
-                    }
-                }
-                IDatabase helper = new MeterDbHelper(getApplicationContext());
-                helper.openDatabase();
-                helper.deleteAll();
-                helper.saveMonth(dataObject.getDays());
-                helper.closeDatabase();
-            }
-
-            @Override
-            public void onError(String message) {
-                Log.d("DEBUG:", message);
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        });
     }
 
 }

@@ -18,6 +18,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.moc.smartmeterapp.alarm.AlarmReceiver;
 import com.moc.smartmeterapp.database.IDatabase;
 import com.moc.smartmeterapp.database.MeterDbHelper;
 import com.moc.smartmeterapp.model.Limit;
@@ -135,28 +136,36 @@ public class SettingFragment extends Fragment {
 
         editIP = (EditText)view.findViewById(R.id.network_ip);
         editIP.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    }
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
-                    private String mPreviousText = "";
+            private String mPreviousText = "";
 
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                        if (PARTIAl_IP_ADDRESS.matcher(s).matches()) {
-                            mPreviousText = s.toString();
-                        } else {
-                            s.replace(0, s.length(), mPreviousText);
-                        }
-                    }
-                });
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (PARTIAl_IP_ADDRESS.matcher(s).matches()) {
+                    mPreviousText = s.toString();
+                } else {
+                    s.replace(0, s.length(), mPreviousText);
+                }
+            }
+        });
         syncCheck = (CheckBox)view.findViewById(R.id.sync_check);
 
         saveButton = (Button)view.findViewById(R.id.save_prefs);
+        manualSync = (Button)view.findViewById(R.id.manual_sync);
+        manualSync.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlarmReceiver alarmReceiver = new AlarmReceiver();
+                alarmReceiver.doAlarm(getActivity());
+            }
+        });
 
         final MyPreferences pref = PreferenceHelper.getPreferences(getActivity());
 

@@ -8,7 +8,12 @@ import android.util.Log;
 import com.moc.smartmeterapp.model.Day;
 import com.moc.smartmeterapp.preferences.MyPreferences;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -98,7 +103,15 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
 
     @Override
     public Day loadLatestDay() {
-        return meterDataSource.getLatestDayFromDB();
+        Day day = meterDataSource.getLatestDayFromDB();
+
+        if(day != null)
+            return day;
+
+        Calendar calendar = new GregorianCalendar(1900, 1, 1);
+        day = new Day(calendar.getTime());
+
+        return day;
     }
 
     @Override

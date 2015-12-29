@@ -35,6 +35,14 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
      * alarm fires, the app broadcasts an Intent to this WakefulBroadcastReceiver.
      * @param context
      */
+    public void doAlarm(Context context) {
+        alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, alarmIntent);
+    }
+
     public void setAlarm(Context context) {
         alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);

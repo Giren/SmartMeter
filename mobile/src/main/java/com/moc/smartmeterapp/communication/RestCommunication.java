@@ -3,6 +3,7 @@ package com.moc.smartmeterapp.communication;
 import android.content.Context;
 
 import com.google.gson.GsonBuilder;
+import com.moc.smartmeterapp.database.MeterDataSource;
 import com.moc.smartmeterapp.model.DataObject;
 import com.moc.smartmeterapp.model.Global;
 import com.moc.smartmeterapp.model.Limit;
@@ -10,6 +11,8 @@ import com.moc.smartmeterapp.preferences.MyPreferences;
 import com.moc.smartmeterapp.preferences.PreferenceHelper;
 import com.moc.smartmeterapp.utils.DateConverter;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -29,16 +32,21 @@ import rx.schedulers.Schedulers;
  */
 public class RestCommunication {
 
+
+
+    public static final DateFormat DAY_FORMAT = new SimpleDateFormat("dd");
+    public static final DateFormat MONTH_FORMAT = new SimpleDateFormat("MM");
+    public static final DateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy");
+
     public final static String PORT = "8080";
 
     public final static String GET_GLOBBAL_PATH = "";
     public final static String GET_LIMITS_PATH = "";
+    public final static String GET_SINCE_DATA_PATH = "since";
     public final static String GET_YEAR_DATA_PATH = "year";
     public final static String GET_MONTH_DATA_PATH = "month";
 
     private Context context;
-
-    private Map<String, String> PARAMS;
 
     public interface IGlobalDataReceiver {
         void onGlobalDataReceived(Global global);
@@ -64,9 +72,6 @@ public class RestCommunication {
 
         @GET("/{path}")
         rx.Observable<List<Limit>> getLimitsObservable(@Path("path") String path, @QueryMap Map<String, String> params);
-
-        @GET("/{path}")
-        rx.Observable<Global> getGlobalObservable(@Path("path") String path, @QueryMap Map<String, String> params);
     }
 
     private IRestService restService;
@@ -74,8 +79,6 @@ public class RestCommunication {
     public RestCommunication(Context context) {
         this.context = context;
         restService = createRetrofitService(IRestService.class);
-        PARAMS = new HashMap<String, String>();
-        PARAMS.put("accessToken", "123456");
     }
 
     private String getServiceEndpoint() {
@@ -90,30 +93,9 @@ public class RestCommunication {
         return "http://127.0.0.1:" + PORT;
     }
 
-    public void fetchGlobalData(final IGlobalDataReceiver globalDataReceiver) {
-
-        restService.getGlobalObservable(GET_GLOBBAL_PATH, PARAMS)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<Global>() {
-                    @Override
-                    public void onCompleted() {
-                        globalDataReceiver.onComplete();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        globalDataReceiver.onError(e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(Global global) {
-                        globalDataReceiver.onGlobalDataReceived(global);
-                    }
-                });
-    }
-
     public void fetchLimits(final ILimitsReceiver limitsReceiver) {
+        Map<String, String> PARAMS = new HashMap<String, String>();
+        PARAMS.put("accessToken", "123456");
 
         restService.getLimitsObservable(GET_LIMITS_PATH, PARAMS)
                 .subscribeOn(Schedulers.newThread())
@@ -139,17 +121,20 @@ public class RestCommunication {
     public void saveLimits(List<Limit> limits) {
     }
 
-    public void fetchMonthData(int month, final IDataReceiver dataReceiver) {
-        fetchData(GET_MONTH_DATA_PATH, month, dataReceiver);
+    public void fetchSinceData(Date date, final IDataReceiver dataReceiver) {
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("accessToken", "123456");
+        params.put("year", YEAR_FORMAT.format(date));
+        params.put("month", MONTH_FORMAT.format(date));
+        params.put("day", DAY_FORMAT.format(date));
+
+        fetchData(GET_SINCE_DATA_PATH, params, dataReceiver);
     }
 
-    public void fetchYearData(int year, final IDataReceiver dataReceiver) {
-        fetchData(GET_YEAR_DATA_PATH, year, dataReceiver);
-    }
+    private void fetchData(String path, Map<String, String> params, final IDataReceiver dataReceiver) {
 
-    private void fetchData(String param, int value, final IDataReceiver dataReceiver) {
-
-        restService.getDataObjectsObservable(param, PARAMS)
+        restService.getDataObjectsObservable("since", params)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<DataObject>() {

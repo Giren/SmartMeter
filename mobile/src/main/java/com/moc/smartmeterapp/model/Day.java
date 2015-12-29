@@ -28,6 +28,16 @@ public class Day {
         this.date = date;
     }
 
+    public Day(Date date) {
+        hours = new ArrayList<Hour>();
+
+        for(int i=0; i<24; i++) {
+            hours.add(new Hour());
+        }
+
+        this.date = date;
+    }
+
     public Date getDate() {
         return date;
     }

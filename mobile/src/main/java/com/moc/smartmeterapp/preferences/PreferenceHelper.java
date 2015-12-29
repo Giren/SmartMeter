@@ -3,10 +3,12 @@ package com.moc.smartmeterapp.preferences;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 
 import com.moc.smartmeterapp.SettingFragment;
 import com.moc.smartmeterapp.database.IDatabase;
 import com.moc.smartmeterapp.database.MeterDbHelper;
+import com.moc.smartmeterapp.model.Limit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,8 @@ import java.util.List;
  * Created by michael on 28.12.15.
  */
 public class PreferenceHelper {
+
+    private static final String STD_IP = "127.0.0.1";
 
     private List<PrefReceive> prefList;
 
@@ -33,6 +37,17 @@ public class PreferenceHelper {
         }
     };
 
+    private static MyPreferences createStdPrefs() {
+        MyPreferences myPreferences = new MyPreferences();
+        myPreferences.setIpAddress(STD_IP);
+        myPreferences.setLimit1(new Limit(2500, 3000, Color.RED));
+        myPreferences.setLimit2(new Limit(2000, 2500, Color.YELLOW));
+        myPreferences.setLimit3(new Limit(0, 2000, Color.GREEN));
+        myPreferences.setSync(true);
+
+        return myPreferences;
+    }
+
     public PreferenceHelper(){
         prefList = new ArrayList<PrefReceive>();
     }
@@ -50,7 +65,11 @@ public class PreferenceHelper {
         helper.openDatabase();
         MyPreferences pref = helper.loadPreferences();
         helper.closeDatabase();
-        return pref;
+
+        if(pref != null)
+            return pref;
+
+        return createStdPrefs();
     }
 
     public static void setPreferences(Context context, MyPreferences prefs){

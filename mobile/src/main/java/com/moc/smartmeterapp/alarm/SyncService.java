@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.moc.smartmeterapp.MainActivity;
 import com.moc.smartmeterapp.R;
 import com.moc.smartmeterapp.communication.RestCommunication;
@@ -19,6 +20,7 @@ import com.moc.smartmeterapp.model.Day;
 import com.moc.smartmeterapp.preferences.MyPreferences;
 import com.moc.smartmeterapp.preferences.PreferenceHelper;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -47,19 +49,22 @@ public class SyncService extends IntentService implements RestCommunication.IDat
 
         preferenceHelper = new PreferenceHelper();
 
-        MyPreferences tempPref = PreferenceHelper.getPreferences(getApplicationContext());
-        if(tempPref != null) {
-            prefs = tempPref;
-        } else {
-            prefs.setIpAddress("127.0.0.1");
-        }
+        prefs = PreferenceHelper.getPreferences(getApplicationContext());
+        Log.d("ALARM", "ALAAAAAARM");
 
         preferenceHelper.register(this);
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        restCommunication.fetchYearData(0, this);
+        IDatabase database = new MeterDbHelper(getApplicationContext());
+        database.openDatabase();
+        Day lastDay = database.loadLatestDay();
+        database.closeDatabase();
+
+        if(lastDay != null) {
+            restCommunication.fetchSinceData(lastDay.getDate(), this);
+        }
     }
 
     // Post a notification indicating whether a doodle was found.

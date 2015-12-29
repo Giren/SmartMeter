@@ -27,5 +27,7 @@ public class HomeWeekFragment extends Fragment {
 
         meterView = (MeterView) view.findViewById(R.id.week_meterview);
         meterView.setOffsetAngle(45);
+
+
     }
 }
