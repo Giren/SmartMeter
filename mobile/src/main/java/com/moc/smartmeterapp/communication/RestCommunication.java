@@ -1,6 +1,7 @@
 package com.moc.smartmeterapp.communication;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.gson.GsonBuilder;
 import com.moc.smartmeterapp.model.DataObject;
@@ -19,7 +20,9 @@ import java.util.Map;
 
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
+import retrofit.http.Body;
 import retrofit.http.GET;
+import retrofit.http.POST;
 import retrofit.http.Path;
 import retrofit.http.QueryMap;
 import rx.Observer;
@@ -29,7 +32,7 @@ import rx.schedulers.Schedulers;
 /**
  * Created by philipp on 23.12.2015.
  */
-public class RestCommunication {
+public class RestCommunication implements PreferenceHelper.PrefReceive{
     public static final DateFormat DAY_FORMAT = new SimpleDateFormat("dd");
     public static final DateFormat MONTH_FORMAT = new SimpleDateFormat("MM");
     public static final DateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy");
@@ -38,15 +41,22 @@ public class RestCommunication {
     public final static String PROTOCOL = "http://";
     public final static String DUMMY = "127.0.0.1";
 
-    public final static String GET_GLOBBAL_PATH = "";
-    public final static String GET_LIMITS_PATH = "";
+    public final static String SET_LIMITS_PATH = "setlimit";
+    public final static String GET_LIMITS_PATH = "getlimit";
     public final static String GET_SINCE_DATA_PATH = "since";
     public final static String GET_YEAR_DATA_PATH = "year";
     public final static String GET_MONTH_DATA_PATH = "month";
 
     private Context context;
+    private MyPreferences prefs;
+    private PreferenceHelper preferenceHelper;
 
     private Map<String, String> GLOBAL_PARAMS;
+
+    @Override
+    public void onPrefReceive(MyPreferences pref) {
+        this.prefs = pref;
+    }
 
     public interface IGlobalDataReceiver {
         void onGlobalDataReceived(Global global);
@@ -55,7 +65,7 @@ public class RestCommunication {
     }
 
     public interface ILimitsReceiver {
-        void onLimitsReceived(List<Limit> limits);
+        void onLimitsReceived(Limit limit, int slot);
         void onError(String message);
         void onComplete();
     }
@@ -71,38 +81,35 @@ public class RestCommunication {
         rx.Observable<DataObject> getDataObjectsObservable(@Path("path") String path, @QueryMap Map<String, String> params);
 
         @GET("/{path}")
-        rx.Observable<List<Limit>> getLimitsObservable(@Path("path") String path, @QueryMap Map<String, String> params);
-    }
+        rx.Observable<Limit> getLimitsObservable(@Path("path") String path, @QueryMap Map<String, String> params);
 
-    private IRestService restService;
+        @POST("/{path}")
+        rx.Observable<Void> setLimit(@Path("path") String path, @QueryMap Map<String, String> params, @Body Limit limit);
+    }
 
     public RestCommunication(Context context) {
         this.context = context;
-        restService = createRetrofitService(IRestService.class);
+
+        prefs = PreferenceHelper.getPreferences(context);
+        preferenceHelper = new PreferenceHelper();
+        preferenceHelper.register(this);
 
         GLOBAL_PARAMS = new HashMap<String, String>();
         GLOBAL_PARAMS.put("accessToken", "123456");
     }
 
     private String getServiceEndpoint() {
-        //TODO: Sicherheitsabfragen
-        if(context != null) {
-            MyPreferences prefs = PreferenceHelper.getPreferences(context);
-
-            if(prefs != null && prefs.getIpAddress() != null)
-                return PROTOCOL + prefs.getIpAddress() + ":" + PORT;
-        }
-
-        return PROTOCOL + DUMMY + ":" + PORT;
+        return PROTOCOL + prefs.getIpAddress() + ":" + PORT;
     }
 
-    public void fetchLimits(final ILimitsReceiver limitsReceiver) {
+    public void fetchLimit(final ILimitsReceiver limitsReceiver, final int slot) {
         Map<String, String> LOCAL_PARAMS = GLOBAL_PARAMS;
+        LOCAL_PARAMS.put("slot", String.valueOf(slot));
 
-        restService.getLimitsObservable(GET_LIMITS_PATH, LOCAL_PARAMS)
+        createRetrofitService(IRestService.class).getLimitsObservable(GET_LIMITS_PATH, LOCAL_PARAMS)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<Limit>>() {
+                .subscribe(new Observer<Limit>() {
                     @Override
                     public void onCompleted() {
                         limitsReceiver.onComplete();
@@ -114,13 +121,37 @@ public class RestCommunication {
                     }
 
                     @Override
-                    public void onNext(List<Limit> limits) {
-                        limitsReceiver.onLimitsReceived(limits);
+                    public void onNext(Limit limits) {
+                        limitsReceiver.onLimitsReceived(limits, slot);
                     }
                 });
     }
 
-    public void saveLimits(List<Limit> limits) {
+    public void saveLimit(Limit limit, final int slot) {
+        Map<String, String> LOCAL_PARAMS = GLOBAL_PARAMS;
+        LOCAL_PARAMS.put("slot", String.valueOf(slot));
+        LOCAL_PARAMS.put("color", String.valueOf(limit.getColor()));
+        LOCAL_PARAMS.put("min", String.valueOf(limit.getMin()));
+        LOCAL_PARAMS.put("max", String.valueOf(limit.getMax()));
+
+        createRetrofitService(IRestService.class).setLimit(SET_LIMITS_PATH, LOCAL_PARAMS, limit)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Void>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.i("SUCCESS", "SAVED LIMIT: SLOT " + String.valueOf(slot));
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("ERROR", "ERROR WHILE SETTING LIMITS: " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(Void v) {
+                    }
+                });
     }
 
     public void fetchSinceData(Date date, final IDataReceiver dataReceiver) {
@@ -135,7 +166,7 @@ public class RestCommunication {
 
     private void fetchData(String path, Map<String, String> params, final IDataReceiver dataReceiver) {
 
-        restService.getDataObjectsObservable("since", params)
+        createRetrofitService(IRestService.class).getDataObjectsObservable("since", params)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<DataObject>() {

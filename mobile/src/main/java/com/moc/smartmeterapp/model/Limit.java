@@ -1,6 +1,8 @@
 package com.moc.smartmeterapp.model;
 
-public class Limit {
+import java.io.Serializable;
+
+public class Limit implements Serializable {
 	
 	public interface ILimitEventHandler {
 		void onLimitReached(Limit limit,  float value);
