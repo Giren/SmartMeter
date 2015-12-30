@@ -212,7 +212,7 @@ public class SettingFragment extends Fragment {
                 PreferenceHelper.setPreferences(getActivity(), preferences);
                 sendBroadcast(preferences);
 
-                insertTestDatainDB();
+                //insertTestDatainDB();
 
                 Toast.makeText(getActivity(), "Gespeichert", Toast.LENGTH_SHORT).show();
             }

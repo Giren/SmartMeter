@@ -47,13 +47,12 @@ public class WearService extends WearableListenerService implements
     private LiveCommunication liveCommunication;
     private GoogleApiClient googleClient;
 
-    private MyPreferences myPreferences;
+    MyPreferences myPreferences;
 
-    private Calendar calendar;
-    private TimeZone timeZone;
+    TimeZone timeZone;
     private MeterDbHelper meterDbHelper;
 
-    private DateFormat dayFormat, monthFormat, yearFormat;
+    //private DateFormat dayFormat, monthFormat, yearFormat;
 
     private String limitWeek;
     private String limitMonth;
@@ -66,17 +65,21 @@ public class WearService extends WearableListenerService implements
     public void onCreate() {
         Log.d("DEBUG", "WEAR SERVICE ON CREATE");
 
-        dayFormat = new SimpleDateFormat( "dd");
-        monthFormat = new SimpleDateFormat( "MM");
-        yearFormat = new SimpleDateFormat( "yyyy");
+        //dayFormat = new SimpleDateFormat( "dd");
+        //monthFormat = new SimpleDateFormat( "MM");
+        //yearFormat = new SimpleDateFormat( "yyyy");
 
         myPreferences = PreferenceHelper.getPreferences(getApplicationContext());
         if(meterDbHelper == null){
             meterDbHelper = new MeterDbHelper( getBaseContext());
         }
 
+        liveCommunication = new LiveCommunication(getApplicationContext());
+
+        meterDbHelper.openDatabase();
+        Log.d("DEBUG", "REACT ON MESSAGE - openDatabase()");
         timeZone = TimeZone.getDefault();
-        calendar = new GregorianCalendar( timeZone);
+        //calendar = new GregorianCalendar( timeZone);
 
         limitWeek = String.valueOf(myPreferences.getLimit1().getMax() / 4);
         limitMonth = String.valueOf( myPreferences.getLimit1().getMax());
@@ -108,6 +111,8 @@ public class WearService extends WearableListenerService implements
     @Override
     public void onConnected(Bundle bundle) {
         Log.d("DEBUG", "WEAR SERVICE ON CONNECTED");
+        liveCommunication.registerDataEventHandler(this);
+        liveCommunication.create();
     }
 
     @Override
@@ -129,10 +134,12 @@ public class WearService extends WearableListenerService implements
     @Override
     public void onDestroy() {
         Log.d("DEBUG", "ON DESTROY");
-        if( liveCommunication != null) {
+//        if( liveCommunication != null) {
             liveCommunication.destroy();
-            liveCommunication = null;
-        }
+//            liveCommunication = null;
+//        }
+        meterDbHelper.closeDatabase();
+        Log.d("DEBUG", "REACT ON MESSAGE - closeDatabase()");
         if (null != googleClient)
         {
             if (googleClient.isConnected())
@@ -162,43 +169,41 @@ public class WearService extends WearableListenerService implements
 
     public void reactOnMessage( String receivedMessage) {
         Log.d("DEBUG", "REACT ON MESSAGE + message: " + receivedMessage);
-        meterDbHelper.openDatabase();
-        Log.d("DEBUG", "REACT ON MESSAGE - openDatabase()");
+// db open
+        //Log.d("DEBUG", "REACT ON MESSAGE - openDatabase()");
         switch ( receivedMessage) {
             case "liveData": {
                 Log.d("DEBUG", "liveData case");
-                if( liveCommunication == null) {
-                    liveCommunication = new LiveCommunication(getApplicationContext());
-                    liveCommunication.create();
-                    liveCommunication.registerDataEventHandler(this);
-                }
+//                if( liveCommunication == null) {
+//
+//                }
                 liveDataKeepAlive(WEARABLE_DATA_PATH);
                 break;
             }
             case "limitWeek": {
                 Log.d("DEBUG", "limitWeekCase");
-                if( liveCommunication != null) {
-                    liveCommunication.destroy();
-                    liveCommunication = null;
-                }
+//                if( liveCommunication != null) {
+//                    liveCommunication.destroy();
+//                    liveCommunication = null;
+//                }
                 dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitWeek", limitWeek);
                 break;
             }
             case "limitMonth": {
                 Log.d("DEBUG", "limitMonth case");
-                if( liveCommunication != null) {
-                    liveCommunication.destroy();
-                    liveCommunication = null;
-                }
+//                if( liveCommunication != null) {
+//                    liveCommunication.destroy();
+//                    liveCommunication = null;
+//                }
                 dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitMonth", limitMonth);
                 break;
             }
             case "limitYear": {
                 Log.d("DEBUG", "limitYear case");
-                if( liveCommunication != null) {
-                    liveCommunication.destroy();
-                    liveCommunication = null;
-                }
+//                if( liveCommunication != null) {
+//                    liveCommunication.destroy();
+//                    liveCommunication = null;
+//                }
                 dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitYear", limitYear);
                 break;
             }
@@ -210,8 +215,8 @@ public class WearService extends WearableListenerService implements
                 Log.d("DEBUG", "default case");
                 break;
         }
-        meterDbHelper.closeDatabase();
-        Log.d("DEBUG", "REACT ON MESSAGE - closeDatabase()");
+        // DB close
+        //Log.d("DEBUG", "REACT ON MESSAGE - closeDatabase()");
     }
 
     public void dataMessageToWearableLimit(String path, String fragmentName, String limitValue) {
@@ -259,14 +264,19 @@ public class WearService extends WearableListenerService implements
             Log.d("DEBUG", "getCurrentValueOfThisWeek - DateFormat: " + sdf.format( dateCurrent));
             Log.d("DEBUG", "getCurrentValueOfThisWeek - DateFormat: " + sdf.format( dateBefore));
 
-            Day dayCurrent = meterDbHelper.loadDay( dateCurrent);
+            //Day dayCurrent = meterDbHelper.loadDay( dateCurrent);
+            Day dayCurrent = meterDbHelper.loadLatestDay(); // load latest day from DB
             Day dayBefore = meterDbHelper.loadDay( dateBefore);
 
             if( dayCurrent == null || dayBefore == null) {
                 return ERR_NO_DATA_IN_DB;
             } else {
-                int currentValue = dayCurrent.getMmm().getTotalSum() - dayBefore.getMmm().getTotalSum();
-                return String.valueOf( currentValue);
+                if( dayCurrent.getDate().after( dayBefore.getDate())) {
+                    int currentValue = dayCurrent.getMmm().getTotalSum() - dayBefore.getMmm().getTotalSum();
+                    return String.valueOf( currentValue);
+                } else {
+                    return ERR_NO_DATA_IN_DB;
+                }
             }
             //return String.valueOf((int) (Math.random() * Integer.valueOf(limitWeek)));
         }
@@ -296,14 +306,19 @@ public class WearService extends WearableListenerService implements
             Log.d("DEBUG", "getCurrentValueOfThisWeek - DateFormat: " + sdf.format( dateCurrent));
             Log.d("DEBUG", "getCurrentValueOfThisWeek - DateFormat: " + sdf.format( dateBefore));
 
-            Day dayCurrent = meterDbHelper.loadDay( dateCurrent);
+            //Day dayCurrent = meterDbHelper.loadDay( dateCurrent);
+            Day dayCurrent = meterDbHelper.loadLatestDay(); // load latest day from DB
             Day dayBefore = meterDbHelper.loadDay( dateBefore);
 
             if( dayCurrent == null || dayBefore == null) {
                 return ERR_NO_DATA_IN_DB;
             } else {
-                int currentValue = dayCurrent.getMmm().getTotalSum() - dayBefore.getMmm().getTotalSum();
-                return String.valueOf( currentValue);
+                if( dayCurrent.getDate().after( dayBefore.getDate())) {
+                    int currentValue = dayCurrent.getMmm().getTotalSum() - dayBefore.getMmm().getTotalSum();
+                    return String.valueOf( currentValue);
+                } else {
+                    return ERR_NO_DATA_IN_DB;
+                }
             }
             //return String.valueOf((int) (Math.random() * Integer.valueOf(limitMonth)));
         }
@@ -333,14 +348,19 @@ public class WearService extends WearableListenerService implements
             Log.d("DEBUG", "getCurrentValueOfThisWeek - DateFormat: " + sdf.format( dateCurrent));
             Log.d("DEBUG", "getCurrentValueOfThisWeek - DateFormat: " + sdf.format( dateBefore));
 
-            Day dayCurrent = meterDbHelper.loadDay( dateCurrent);
+            //Day dayCurrent = meterDbHelper.loadDay( dateCurrent);
+            Day dayCurrent = meterDbHelper.loadLatestDay(); // load latest day from DB
             Day dayBefore = meterDbHelper.loadDay( dateBefore);
 
             if( dayCurrent == null || dayBefore == null) {
                 return ERR_NO_DATA_IN_DB;
             } else {
-                int currentValue = dayCurrent.getMmm().getTotalSum() - dayBefore.getMmm().getTotalSum();
-                return String.valueOf( currentValue);
+                if( dayCurrent.getDate().after( dayBefore.getDate())) {
+                    int currentValue = dayCurrent.getMmm().getTotalSum() - dayBefore.getMmm().getTotalSum();
+                    return String.valueOf( currentValue);
+                } else {
+                    return ERR_NO_DATA_IN_DB;
+                }
             }
             //return String.valueOf((int) (Math.random() * Integer.valueOf(limitYear)));
         }

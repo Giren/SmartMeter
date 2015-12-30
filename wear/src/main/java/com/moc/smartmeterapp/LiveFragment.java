@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -27,6 +28,8 @@ public class LiveFragment extends CustomFragment {
     private Limit limit2;
     private Limit limit3;
 
+    private TextView tvLiveValue;
+
     private Vibrator vibrator;
     private long[] vibrationPattern = {0, 500, 50, 300};
     private final int indexInPatternToRepeat = -1;
@@ -40,6 +43,9 @@ public class LiveFragment extends CustomFragment {
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.live_frag, container, false);
+
+        tvLiveValue = ( TextView) view.findViewById( R.id.tvLiveValue);
+        tvLiveValue.setText( "0");
 
         limitRed = new Limit(2000, 2500, Color.RED);
         limitRed.setEventHandler(new Limit.ILimitEventHandler() {
@@ -99,6 +105,7 @@ public class LiveFragment extends CustomFragment {
 
         } else {
             meterView.setValue( Float.valueOf( splitted[1]));
+            tvLiveValue.setText( splitted[1]);
         }
     }
 
