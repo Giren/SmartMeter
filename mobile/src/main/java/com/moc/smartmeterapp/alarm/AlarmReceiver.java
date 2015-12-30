@@ -1,6 +1,7 @@
 package com.moc.smartmeterapp.alarm;
 
 import android.app.AlarmManager;
+import android.app.Application;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
@@ -10,6 +11,9 @@ import android.net.ConnectivityManager;
 import android.os.SystemClock;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.moc.smartmeterapp.MainActivity;
 
 import java.util.Calendar;
 
@@ -44,16 +48,19 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
     }
 
     public void setAlarm(Context context) {
+        setAlarm(context, AlarmManager.INTERVAL_HALF_HOUR / 60);
+    }
+
+    public void setAlarm(Context context, long minutes) {
         alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
         alarmIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         final boolean hasNetwork = !intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
         if (hasNetwork) {
-            // schedule service for every 15 minutes
             alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_HALF_HOUR,
-                    AlarmManager.INTERVAL_HALF_HOUR, alarmIntent);
+                    SystemClock.elapsedRealtime() + minutes * 60,
+                    minutes * 60, alarmIntent);
         } else {
             alarmMgr.cancel(alarmIntent);
         }
@@ -66,6 +73,8 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         pm.setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
+
+        Toast.makeText(context, "Automatische Synchronisation aktiviert", Toast.LENGTH_SHORT).show();
     }
 
     public void cancelAlarm(Context context) {
@@ -82,5 +91,8 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         pm.setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP);
+
+
+        Toast.makeText(context, "Automatische Synchronisation deaktiviert", Toast.LENGTH_SHORT).show();
     }
 }

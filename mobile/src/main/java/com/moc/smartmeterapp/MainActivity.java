@@ -41,13 +41,9 @@ public class MainActivity extends AppCompatActivity{
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
 
-    private AlarmReceiver alarm = new AlarmReceiver();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        alarm.setAlarm(this);
 
         setContentView(R.layout.activity_main);
 

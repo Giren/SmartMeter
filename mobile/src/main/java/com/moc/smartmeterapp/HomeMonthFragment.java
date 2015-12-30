@@ -18,10 +18,20 @@ import com.moc.smartmeterapp.preferences.PreferenceHelper;
 import com.moc.smartmeterapp.ui.Limiter;
 import com.moc.smartmeterapp.ui.MeterView;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Observer;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class HomeMonthFragment extends Fragment implements PreferenceHelper.PrefReceive{
+
+    private final float OFFSET = 0.1f;
 
     private MyPreferences prefs;
     private PreferenceHelper preferenceHelper;
@@ -46,14 +56,36 @@ public class HomeMonthFragment extends Fragment implements PreferenceHelper.Pref
         meterView.setOffsetAngle(45);
         meterView.setLimiter(getLimiter());
 
-        IDatabase databaseHelpter = new MeterDbHelper(getActivity());
-        databaseHelpter.openDatabase();
-        Day day = databaseHelpter.loadLatestDay();
-        databaseHelpter.closeDatabase();
+        final IDatabase databaseHelper = new MeterDbHelper(getActivity());
+        databaseHelper.openDatabase();
+        final Day day = databaseHelper.loadLatestDay();
 
         if(day != null) {
-            meterView.setAverage(day.getMmm().getMean());
-            meterView.setMax(day.getMmm().getMax());
+            Observable.just(databaseHelper.loadMonth(day.getDate()))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new rx.Observer<List<Day>>() {
+                    @Override
+                    public void onCompleted() {
+                        databaseHelper.closeDatabase();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(List<Day> days) {
+                        if(days != null) {
+                            int diff = days.get(days.size()-1).getMmm().getTotalSum()-days.get(0).getMmm().getTotalSum();
+                            diff /= 10000;
+                            meterView.setMax((int) (diff + diff*OFFSET));
+                            meterView.setValue(diff);
+                            meterView.invalidate();
+                        }
+                    }
+                });
         }
     }
 

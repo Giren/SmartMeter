@@ -249,7 +249,9 @@ public class MeterView extends View {
 			}
 		}
 
-		this.max = max;
+		if ( max > 0){
+			this.max = max;
+		}
 	}
 
 	public void setAverage(int avg) {

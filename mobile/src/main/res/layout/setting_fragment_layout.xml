@@ -281,7 +281,7 @@
                 android:id="@+id/sync_check"
                 android:layout_row="19"
                 android:layout_column="2"
-                android:checked="true" />
+                android:checked="false" />
 
             <Button
                 style="?android:attr/buttonStyleSmall"
