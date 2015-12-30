@@ -63,11 +63,31 @@ public class PreferenceHelper {
     public static MyPreferences getPreferences(Context context){
         IDatabase helper = new MeterDbHelper(context);
         helper.openDatabase();
-        MyPreferences pref = helper.loadPreferences();
+        MyPreferences prefs = helper.loadPreferences();
         helper.closeDatabase();
 
-        if(pref != null)
-            return pref;
+        if(prefs != null) {
+
+            MyPreferences stdPrefs = createStdPrefs();
+
+            if(prefs.getLimit1() == null) {
+                prefs.setLimit1(stdPrefs.getLimit1());
+            }
+
+            if(prefs.getLimit2() == null) {
+                prefs.setLimit2(stdPrefs.getLimit2());
+            }
+
+            if(prefs.getLimit3() == null) {
+                prefs.setLimit3(stdPrefs.getLimit3());
+            }
+
+            if(prefs.getIpAddress() == null || prefs.getIpAddress() == "") {
+                prefs.setIpAddress("127.0.0.1");
+            }
+
+            return prefs;
+        }
 
         return createStdPrefs();
     }

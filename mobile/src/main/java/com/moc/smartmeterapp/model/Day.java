@@ -61,13 +61,12 @@ public class Day {
 
             mean += h.getMmm().getMean();
 
-            totalSum += h.getMmm().getTotalSum();
+            if((temp = h.getMmm().getTotalSum()) > totalSum)
+                totalSum = temp;
         }
 
         mean /= hours.size();
 
-        Log.d("CALC MMMM", "day size: " + hours.size() + " first object: " + hours.get(0).getMmm().getMean());
-        Log.d("CALC MMMM", 0 + " " + mean + " " + max);
         return new MinMeanMax(totalSum, 0, mean, max);
     }
 
@@ -78,4 +77,5 @@ public class Day {
     public void setHours(List<Hour> hours) {
         this.hours = hours;
     }
+
 }

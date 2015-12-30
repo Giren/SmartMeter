@@ -101,7 +101,7 @@ public class LiveDataService extends Service implements PreferenceHelper.PrefRec
             Log.d("DEBUG", "Thread startet...");
             while(receiverIsRunning){
 
-                Log.d("DEBUG", "Connectiong to socket...");
+                Log.d("DEBUG", "Connecting to socket at " + prefs.getIpAddress() + "...");
                 try {
                     clientSocket = new Socket(prefs.getIpAddress(), PORT);
 

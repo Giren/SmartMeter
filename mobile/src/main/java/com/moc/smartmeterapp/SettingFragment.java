@@ -1,25 +1,22 @@
 package com.moc.smartmeterapp;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.moc.smartmeterapp.alarm.AlarmReceiver;
-import com.moc.smartmeterapp.database.IDatabase;
 import com.moc.smartmeterapp.database.MeterDbHelper;
 import com.moc.smartmeterapp.model.Limit;
 import com.moc.smartmeterapp.preferences.MyPreferences;
@@ -59,6 +56,8 @@ public class SettingFragment extends Fragment {
 
     private Button saveButton;
 
+    private MyPreferences prefs;
+
     private static final Pattern PARTIAl_IP_ADDRESS =
             Pattern.compile("^((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])\\.){0,3}" +
                     "((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])){0,1}$");
@@ -70,6 +69,8 @@ public class SettingFragment extends Fragment {
         if(meterDbHelper == null){
             meterDbHelper = new MeterDbHelper(getActivity().getBaseContext());
         }
+
+        prefs = PreferenceHelper.getPreferences(getActivity());
 
         intent = new Intent(INTENT_IDENTIFIER);
 
@@ -156,6 +157,17 @@ public class SettingFragment extends Fragment {
             }
         });
         syncCheck = (CheckBox)view.findViewById(R.id.sync_check);
+        syncCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                AlarmReceiver alarmReceiver = new AlarmReceiver();
+                if(b) {
+                    alarmReceiver.setAlarm(getActivity());
+                } else {
+                    alarmReceiver.cancelAlarm(getActivity());
+                }
+            }
+        });
 
         saveButton = (Button)view.findViewById(R.id.save_prefs);
         manualSync = (Button)view.findViewById(R.id.manual_sync);
@@ -166,11 +178,6 @@ public class SettingFragment extends Fragment {
                 alarmReceiver.doAlarm(getActivity());
             }
         });
-
-        final MyPreferences pref = PreferenceHelper.getPreferences(getActivity());
-
-        if(pref != null)
-            setPreferenceView(pref);
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -202,6 +209,9 @@ public class SettingFragment extends Fragment {
                 Toast.makeText(getActivity(), "Gespeichert", Toast.LENGTH_SHORT).show();
             }
         });
+
+        if(prefs != null)
+            setPreferenceView(prefs);
     }
 
     private void sendBroadcast(MyPreferences pref){

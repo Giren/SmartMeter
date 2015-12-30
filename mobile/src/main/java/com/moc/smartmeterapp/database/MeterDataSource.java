@@ -14,6 +14,8 @@ import com.moc.smartmeterapp.preferences.MyPreferences;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +30,13 @@ public class MeterDataSource {
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     public static final DateFormat MONTH_FORMAT = new SimpleDateFormat("yyyy-MM");
     public static final DateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy");
+
+    public static final Comparator<Day> dayComparator = new Comparator<Day>() {
+        @Override
+        public int compare(Day day, Day t1) {
+            return day.getDate().compareTo(t1.getDate());
+        }
+    };
 
     private String[] columns = {
                 MeterDbHelper.COLUMN_ID,
@@ -112,10 +121,10 @@ public class MeterDataSource {
 
     public Day getDayFromDataBase(Date date){
         Cursor cursor = database.query(MeterDbHelper.TABLE_METER_LIST,
-                        columns,
-                        MeterDbHelper.COLUMN_DATE + "=?",
-                        new String[] { dateToString(date) },
-                        null,null,null,null);
+                columns,
+                MeterDbHelper.COLUMN_DATE + "=?",
+                new String[]{dateToString(date)},
+                null, null, null, null);
 
         if(cursor.moveToFirst()){
             Day day = cursorToMeterData(cursor);
@@ -135,7 +144,13 @@ public class MeterDataSource {
                 new String[] { monthToString(date) +"%" },
                 null, null, null, null);
 
-        return cursorToMeterList(cursor);
+        List<Day> days = cursorToMeterList(cursor);
+
+        if(days != null) {
+            Collections.sort(days, dayComparator);
+        }
+
+        return days;
     }
 
     public List<Day> getYearFromDataBase(Date date){
@@ -145,14 +160,26 @@ public class MeterDataSource {
                 new String[]{ yearToString(date) + "%"},
                 null, null, null, null);
 
-        return cursorToMeterList(cursor);
+        List<Day> days = cursorToMeterList(cursor);
+
+        if(days != null) {
+            Collections.sort(days, dayComparator);
+        }
+
+        return days;
     }
 
     public List<Day> getAllDBData(){
         Cursor cursor = database.query(MeterDbHelper.TABLE_METER_LIST, columns,
                 null, null, null, null, null);
 
-        return cursorToMeterList(cursor);
+        List<Day> days = cursorToMeterList(cursor);
+
+        if(days != null) {
+            Collections.sort(days, dayComparator);
+        }
+
+        return days;
     }
 
     public void deleteDayFromDataBase(Date date){
@@ -191,9 +218,6 @@ public class MeterDataSource {
         System.out.println("Nichts fefunden");
         return null;
     }
-
-
-
 
     private MyPreferences cursorToPreferences(Cursor cursor){
         byte[] blob;

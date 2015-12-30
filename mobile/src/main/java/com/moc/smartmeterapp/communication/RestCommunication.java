@@ -3,7 +3,6 @@ package com.moc.smartmeterapp.communication;
 import android.content.Context;
 
 import com.google.gson.GsonBuilder;
-import com.moc.smartmeterapp.database.MeterDataSource;
 import com.moc.smartmeterapp.model.DataObject;
 import com.moc.smartmeterapp.model.Global;
 import com.moc.smartmeterapp.model.Limit;
@@ -31,14 +30,13 @@ import rx.schedulers.Schedulers;
  * Created by philipp on 23.12.2015.
  */
 public class RestCommunication {
-
-
-
     public static final DateFormat DAY_FORMAT = new SimpleDateFormat("dd");
     public static final DateFormat MONTH_FORMAT = new SimpleDateFormat("MM");
     public static final DateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy");
 
     public final static String PORT = "8080";
+    public final static String PROTOCOL = "http://";
+    public final static String DUMMY = "127.0.0.1";
 
     public final static String GET_GLOBBAL_PATH = "";
     public final static String GET_LIMITS_PATH = "";
@@ -47,6 +45,8 @@ public class RestCommunication {
     public final static String GET_MONTH_DATA_PATH = "month";
 
     private Context context;
+
+    private Map<String, String> GLOBAL_PARAMS;
 
     public interface IGlobalDataReceiver {
         void onGlobalDataReceived(Global global);
@@ -79,6 +79,9 @@ public class RestCommunication {
     public RestCommunication(Context context) {
         this.context = context;
         restService = createRetrofitService(IRestService.class);
+
+        GLOBAL_PARAMS = new HashMap<String, String>();
+        GLOBAL_PARAMS.put("accessToken", "123456");
     }
 
     private String getServiceEndpoint() {
@@ -87,17 +90,16 @@ public class RestCommunication {
             MyPreferences prefs = PreferenceHelper.getPreferences(context);
 
             if(prefs != null && prefs.getIpAddress() != null)
-                return "http://" + prefs.getIpAddress() + ":" + PORT;
+                return PROTOCOL + prefs.getIpAddress() + ":" + PORT;
         }
 
-        return "http://127.0.0.1:" + PORT;
+        return PROTOCOL + DUMMY + ":" + PORT;
     }
 
     public void fetchLimits(final ILimitsReceiver limitsReceiver) {
-        Map<String, String> PARAMS = new HashMap<String, String>();
-        PARAMS.put("accessToken", "123456");
+        Map<String, String> LOCAL_PARAMS = GLOBAL_PARAMS;
 
-        restService.getLimitsObservable(GET_LIMITS_PATH, PARAMS)
+        restService.getLimitsObservable(GET_LIMITS_PATH, LOCAL_PARAMS)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<List<Limit>>() {
@@ -123,13 +125,12 @@ public class RestCommunication {
 
     public void fetchSinceData(Date date, final IDataReceiver dataReceiver) {
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("accessToken", "123456");
-        params.put("year", YEAR_FORMAT.format(date));
-        params.put("month", MONTH_FORMAT.format(date));
-        params.put("day", DAY_FORMAT.format(date));
+        Map<String, String> LOCAL_PARAMS = GLOBAL_PARAMS;
+        LOCAL_PARAMS.put("year", YEAR_FORMAT.format(date));
+        LOCAL_PARAMS.put("month", MONTH_FORMAT.format(date));
+        LOCAL_PARAMS.put("day", DAY_FORMAT.format(date));
 
-        fetchData(GET_SINCE_DATA_PATH, params, dataReceiver);
+        fetchData(GET_SINCE_DATA_PATH, LOCAL_PARAMS, dataReceiver);
     }
 
     private void fetchData(String path, Map<String, String> params, final IDataReceiver dataReceiver) {
