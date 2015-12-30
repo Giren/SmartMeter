@@ -36,12 +36,7 @@ import java.util.regex.Pattern;
  * Created by michael on 24.11.15.
  */
 public class SettingFragment extends Fragment {
-
-    private static final String INTENT_IDENTIFIER = "PREFERENCES_BROADCAST";
-    public static final String MESSAGE_IDENTIFIER = "PREFS";
-
     private MeterDbHelper meterDbHelper;
-    private Intent intent;
 
     private EditText primeLimitStart;
     private EditText primeLimitStop;
@@ -63,6 +58,9 @@ public class SettingFragment extends Fragment {
     private Button saveButton;
 
     private MyPreferences prefs;
+    private PreferenceHelper preferenceHelper;
+
+    private Intent intent;
 
     private static final Pattern PARTIAl_IP_ADDRESS =
             Pattern.compile("^((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])\\.){0,3}" +
@@ -76,9 +74,16 @@ public class SettingFragment extends Fragment {
             meterDbHelper = new MeterDbHelper(getActivity().getBaseContext());
         }
 
-        prefs = PreferenceHelper.getPreferences(getActivity());
+        intent = new Intent(PreferenceHelper.INTENT_IDENTIFIER);
 
-        intent = new Intent(INTENT_IDENTIFIER);
+        prefs = PreferenceHelper.getPreferences(getActivity());
+        preferenceHelper = new PreferenceHelper();
+        preferenceHelper.register(new PreferenceHelper.PrefReceive() {
+            @Override
+            public void onPrefReceive(MyPreferences pref) {
+                setPreferenceView(prefs);
+            }
+        });
 
         return inflater.inflate(R.layout.setting_fragment_layout,null,false);
     }
@@ -210,7 +215,8 @@ public class SettingFragment extends Fragment {
                 );
 
                 PreferenceHelper.setPreferences(getActivity(), preferences);
-                sendBroadcast(preferences);
+                PreferenceHelper.limitsToServer(getActivity());
+                PreferenceHelper.sendBroadcast(getActivity());
 
                 //insertTestDatainDB();
 
@@ -220,10 +226,6 @@ public class SettingFragment extends Fragment {
 
         if(prefs != null)
             setPreferenceView(prefs);
-    }
-
-    private void sendBroadcast(MyPreferences pref){
-        intent.putExtra(MESSAGE_IDENTIFIER, pref);
     }
 
     private void setPreferenceView(MyPreferences pref){

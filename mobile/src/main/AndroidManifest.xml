@@ -46,11 +46,13 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".preferences.PreferenceHelper">
+            <intent-filter>
+                <action android:name="com.moc.smartmeterapp.preferences.PreferenceHelper" />
+            </intent-filter>
+        </receiver>
 
         <service android:name=".alarm.SyncService" />
-
-        <activity android:name=".Preferences" >
-        </activity>
     </application>
 
 </manifest>
