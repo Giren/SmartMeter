@@ -158,7 +158,6 @@ public class MainActivity extends FragmentActivity implements
 
                         if( message.contains( "liveData") && !message.contains( "keepAlive")) {
                             // TODO update limits and redraw tacho
-
                             break;
                         } else {
                             if( message.contains( "liveData")) {
@@ -248,6 +247,7 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
+    // use to send messages to handheld
     public class SendToDataLayerThread extends Thread {
 
         String path;

@@ -324,7 +324,6 @@ public class WearService extends WearableListenerService implements
                 return String.valueOf( dayCurrent.getMmm().getTotalSum());
             }
            // return String.valueOf((int) (Math.random() * Integer.valueOf(limitYear)));
-
         } else {
             dateCurrent = yearCalendar.getTime();
             yearCalendar.add( Calendar.DAY_OF_YEAR, 1 - (yearCalendar.get( Calendar.DAY_OF_YEAR)));
