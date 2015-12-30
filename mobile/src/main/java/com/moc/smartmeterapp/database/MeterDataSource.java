@@ -74,15 +74,15 @@ public class MeterDataSource {
         long insertID = database.insert(MeterDbHelper.TABLE_METER_LIST, null, contentValues);
     }
 
-    private String dateToString(Date date){
+    public static String dateToString(Date date){
         return DATE_FORMAT.format(date);
     }
 
-    private String monthToString(Date date){
+    public static String monthToString(Date date){
         return MONTH_FORMAT.format(date);
     }
 
-    private String yearToString(Date date){
+    public static String yearToString(Date date){
         return YEAR_FORMAT.format(date);
     }
 

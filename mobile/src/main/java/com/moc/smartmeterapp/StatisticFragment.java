@@ -149,7 +149,6 @@ public class StatisticFragment extends Fragment{
                     @Override
                     public void onClick(View v) {
                         handleUserChoice();
-                        dateButton.setText(dateToString(getPickedDate().getTime()));
                         updateChartView();
                         dialog.dismiss();
                     }
@@ -253,6 +252,7 @@ public class StatisticFragment extends Fragment{
                 if(day != null){
                     datalist.add(day);
                 }
+                dateButton.setText(MeterDataSource.dateToString(ca.getTime()));
                 break;
             case WEEK:
                 maxNumberToShow = 7;
@@ -263,20 +263,28 @@ public class StatisticFragment extends Fragment{
                     }
                     ca.set(Calendar.DAY_OF_MONTH,ca.get(Calendar.DAY_OF_MONTH)+1);
                 }
+                dateButton.setText(MeterDataSource.dateToString(ca.getTime()));
                 break;
             case MONTH:
                 maxNumberToShow = 31;
                 datalist = meterDbHelper.loadMonth(ca.getTime());
+                dateButton.setText(MeterDataSource.monthToString(ca.getTime()));
                 break;
             case YEAR:
                 maxNumberToShow = 365;
                 datalist = meterDbHelper.loadYear(ca.getTime());
+                dateButton.setText(MeterDataSource.yearToString(ca.getTime()));
                 break;
         }
 
-        if(datalist.size() != 0){
-            addListToChart(datalist);
-        } else {
+        if(datalist != null){
+            if(datalist.size() != 0){
+                addListToChart(datalist);
+            } else {
+                cleanChart();
+                Toast.makeText(getActivity(),"Keine Daten für gewähltes Datum gefunden", Toast.LENGTH_SHORT).show();
+            }
+        }else{
             cleanChart();
             Toast.makeText(getActivity(),"Keine Daten für gewähltes Datum gefunden", Toast.LENGTH_SHORT).show();
         }
@@ -286,6 +294,7 @@ public class StatisticFragment extends Fragment{
 
     private void cleanChart(){
         chart.setLineChartData(null);
+        previewChart.setLineChartData(null);
     }
 
     private Calendar getPickedDate(){
