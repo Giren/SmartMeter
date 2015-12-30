@@ -61,14 +61,13 @@ public class StatisticFragment extends Fragment{
 
     private String dialogSelectTilte = "Welcher Zeitraum ?";
     private String[] selectString = { "Tag", "Woche", "Monat", "Jahr" };
-    private int DEFAULT_NUMBER_TO_SHOW = 31;
     private int maxNumberToShow;
+    private int userChoice = 0;
 
     private final int DAY = 0;
     private final int WEEK = 1;
     private final int MONTH = 2;
     private final int YEAR = 3;
-    private int userChoice = 0;
 
     private MeterDbHelper meterDbHelper;
 
@@ -242,7 +241,7 @@ public class StatisticFragment extends Fragment{
     }
 
     private void handleUserChoice(){
-        Day d;
+        Day day;
         List<Day> datalist = new ArrayList<Day>();
         Calendar ca = getPickedDate();
 
@@ -250,17 +249,17 @@ public class StatisticFragment extends Fragment{
         switch (userChoice){
             case DAY:
                 maxNumberToShow = 24;
-                d = meterDbHelper.loadDay(ca.getTime());
-                if(d != null){
-                    datalist.add(d);
+                day = meterDbHelper.loadDay(ca.getTime());
+                if(day != null){
+                    datalist.add(day);
                 }
                 break;
             case WEEK:
                 maxNumberToShow = 7;
                 for(int i=0; i<maxNumberToShow; i++){
-                    d = meterDbHelper.loadDay(ca.getTime());
-                    if(d != null){
-                        datalist.add(d);
+                    day = meterDbHelper.loadDay(ca.getTime());
+                    if(day != null){
+                        datalist.add(day);
                     }
                     ca.set(Calendar.DAY_OF_MONTH,ca.get(Calendar.DAY_OF_MONTH)+1);
                 }

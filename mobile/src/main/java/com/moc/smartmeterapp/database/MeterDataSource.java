@@ -215,7 +215,7 @@ public class MeterDataSource {
             cursor.close();
             return day;
         }
-        System.out.println("Nichts fefunden");
+        System.out.println("No Date found in DataBase");
         return null;
     }
 
