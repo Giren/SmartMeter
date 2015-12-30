@@ -17,6 +17,7 @@ import com.moc.smartmeterapp.database.IDatabase;
 import com.moc.smartmeterapp.database.MeterDbHelper;
 import com.moc.smartmeterapp.model.DataObject;
 import com.moc.smartmeterapp.model.Day;
+import com.moc.smartmeterapp.model.Limit;
 import com.moc.smartmeterapp.preferences.MyPreferences;
 import com.moc.smartmeterapp.preferences.PreferenceHelper;
 
@@ -26,17 +27,12 @@ import java.util.List;
 /**
  * Created by philipp on 23.12.2015.
  */
-public class SyncService extends IntentService implements RestCommunication.IDataReceiver, PreferenceHelper.PrefReceive {
+public class SyncService extends IntentService implements RestCommunication.IDataReceiver {
 
     private NotificationManager mNotificationManager;
     private NotificationCompat.Builder builder;
-
-    private RestCommunication restCommunication;
     private int count = 0;
     private int total = 0;
-
-    private MyPreferences prefs;
-    private PreferenceHelper preferenceHelper;
 
     public SyncService() {
         super("SyncService");
@@ -45,26 +41,88 @@ public class SyncService extends IntentService implements RestCommunication.IDat
     @Override
     public void onCreate() {
         super.onCreate();
-        restCommunication = new RestCommunication(getApplicationContext());
-
-        preferenceHelper = new PreferenceHelper();
-
-        prefs = PreferenceHelper.getPreferences(getApplicationContext());
         Log.d("ALARM", "ALAAAAAARM");
-
-        preferenceHelper.register(this);
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
+
         IDatabase database = new MeterDbHelper(getApplicationContext());
         database.openDatabase();
         Day lastDay = database.loadLatestDay();
         database.closeDatabase();
 
         if(lastDay != null) {
-            restCommunication.fetchSinceData(lastDay.getDate(), this);
+            new RestCommunication(getApplicationContext()).fetchSinceData(lastDay.getDate(), this);
         }
+
+        new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
+            @Override
+            public void onLimitsReceived(Limit limit, int slot) {
+                Log.i("GOT LIMIT", "slot=" + String.valueOf(slot) + " max=" + String.valueOf(limit.getMax()));
+                MyPreferences preferences = PreferenceHelper.getPreferences(getApplicationContext());
+                if (preferences != null) {
+                    preferences.setLimit1(limit);
+                    PreferenceHelper.setPreferences(getApplicationContext(), preferences);
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                Log.e("ERROR LIMIT", message);
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        }, 0);
+
+        new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
+            @Override
+            public void onLimitsReceived(Limit limit, int slot) {
+                Log.i("GOT LIMIT", "slot=" + String.valueOf(slot) + " max=" + String.valueOf(limit.getMax()));
+                MyPreferences preferences = PreferenceHelper.getPreferences(getApplicationContext());
+                if (preferences != null) {
+                    preferences.setLimit2(limit);
+                    PreferenceHelper.setPreferences(getApplicationContext(), preferences);
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                Log.e("ERROR LIMIT", message);
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        }, 1);
+
+        new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
+            @Override
+            public void onLimitsReceived(Limit limit, int slot) {
+                Log.i("GOT LIMIT", "slot=" + String.valueOf(slot) + " max=" + String.valueOf(limit.getMax()));
+                MyPreferences preferences = PreferenceHelper.getPreferences(getApplicationContext());
+                if(preferences != null) {
+                    preferences.setLimit3(limit);
+                    PreferenceHelper.setPreferences(getApplicationContext(), preferences);
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                Log.e("ERROR LIMIT", message);
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        }, 2);
+
+        PreferenceHelper.sendBroadcast(getApplicationContext());
     }
 
     // Post a notification indicating whether a doodle was found.
@@ -95,7 +153,6 @@ public class SyncService extends IntentService implements RestCommunication.IDat
 
             IDatabase db = new MeterDbHelper(getApplicationContext());
             db.openDatabase();
-            db.deleteAll();
             db.saveYear(dataObject.getDays());
 
             db.closeDatabase();
@@ -113,10 +170,5 @@ public class SyncService extends IntentService implements RestCommunication.IDat
         if(total > 0)
             s += " Total: " + String.valueOf(total);
         sendNotification(s);
-    }
-
-    @Override
-    public void onPrefReceive(MyPreferences pref) {
-        this.prefs = pref;
     }
 }

@@ -4,8 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.util.Log;
 
 import com.moc.smartmeterapp.SettingFragment;
+import com.moc.smartmeterapp.communication.RestCommunication;
 import com.moc.smartmeterapp.database.IDatabase;
 import com.moc.smartmeterapp.database.MeterDbHelper;
 import com.moc.smartmeterapp.model.Limit;
@@ -16,26 +18,13 @@ import java.util.List;
 /**
  * Created by michael on 28.12.15.
  */
-public class PreferenceHelper {
+public class PreferenceHelper extends BroadcastReceiver{
 
     private static final String STD_IP = "127.0.0.1";
+    public static final String MESSAGE_IDENTIFIER = "PREFS";
+    public static final String INTENT_IDENTIFIER = "com.moc.smartmeterapp.preferences.PreferenceHelper";
 
     private List<PrefReceive> prefList;
-
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            MyPreferences pref = (MyPreferences)intent.getSerializableExtra(SettingFragment.MESSAGE_IDENTIFIER);
-
-            if(pref != null){
-                for(PrefReceive p: prefList){
-                    if(p != null){
-                        p.onPrefReceive(pref);
-                    }
-                }
-            }
-        }
-    };
 
     private static MyPreferences createStdPrefs() {
         MyPreferences myPreferences = new MyPreferences();
@@ -52,6 +41,18 @@ public class PreferenceHelper {
         prefList = new ArrayList<PrefReceive>();
     }
 
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        MyPreferences pref = (MyPreferences)intent.getSerializableExtra(MESSAGE_IDENTIFIER);
+        if(pref != null){
+            for(PrefReceive p: prefList){
+                if(p != null){
+                    p.onPrefReceive(pref);
+                }
+            }
+        }
+    }
+
     public void register(PrefReceive prefReceive){
         prefList.add(prefReceive);
     }
@@ -65,9 +66,7 @@ public class PreferenceHelper {
         helper.openDatabase();
         MyPreferences prefs = helper.loadPreferences();
         helper.closeDatabase();
-
         if(prefs != null) {
-
             MyPreferences stdPrefs = createStdPrefs();
 
             if(prefs.getLimit1() == null) {
@@ -80,10 +79,6 @@ public class PreferenceHelper {
 
             if(prefs.getLimit3() == null) {
                 prefs.setLimit3(stdPrefs.getLimit3());
-            }
-
-            if(prefs.getIpAddress() == null || prefs.getIpAddress() == "") {
-                prefs.setIpAddress("127.0.0.1");
             }
 
             return prefs;
@@ -100,6 +95,19 @@ public class PreferenceHelper {
             helper.savePreferences(prefs);
 
             helper.closeDatabase();
+        }
+    }
+
+    public static void sendBroadcast(Context context) {
+        context.sendBroadcast(new Intent(INTENT_IDENTIFIER).putExtra(MESSAGE_IDENTIFIER, getPreferences(context)));
+    }
+
+    public static void limitsToServer(Context context) {
+        MyPreferences myPreferences = getPreferences(context);
+        if(myPreferences != null) {
+            new RestCommunication(context).saveLimit(myPreferences.getLimit1(), 2);
+            new RestCommunication(context).saveLimit(myPreferences.getLimit2(), 1);
+            new RestCommunication(context).saveLimit(myPreferences.getLimit3(), 0);
         }
     }
 

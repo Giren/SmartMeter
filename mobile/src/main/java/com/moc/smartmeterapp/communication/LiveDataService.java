@@ -36,7 +36,7 @@ public class LiveDataService extends Service implements PreferenceHelper.PrefRec
 
     private final IBinder mBinder = new LocalBinder();
     private static final String TAG = "BroadcastService";
-    public static final String BROADCAST_ACTION = "com.mov.smartmeterapp.LiveDataService";
+    public static final String BROADCAST_ACTION = "com.moc.smartmeterapp.LiveDataService";
 
     private boolean receiverIsRunning = false;
     private boolean testIsRunning = false;
