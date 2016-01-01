@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.NumberPicker;
+import android.widget.Toast;
 
 import com.moc.smartmeterapp.database.MeterDbHelper;
 import com.moc.smartmeterapp.model.Day;
@@ -23,7 +24,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import lecho.lib.hellocharts.gesture.ZoomType;
@@ -58,14 +61,13 @@ public class StatisticFragment extends Fragment{
 
     private String dialogSelectTilte = "Welcher Zeitraum ?";
     private String[] selectString = { "Tag", "Woche", "Monat", "Jahr" };
-    private int DEFAULT_NUMBER_TO_SHOW = 31;
     private int maxNumberToShow;
+    private int userChoice = 0;
 
     private final int DAY = 0;
     private final int WEEK = 1;
     private final int MONTH = 2;
     private final int YEAR = 3;
-    private int userChoice;
 
     private MeterDbHelper meterDbHelper;
 
@@ -78,6 +80,7 @@ public class StatisticFragment extends Fragment{
         if(meterDbHelper == null){
             meterDbHelper = new MeterDbHelper(getActivity().getBaseContext());
         }
+
         return inflater.inflate(R.layout.statistic_fragment_layout,null);
     }
 
@@ -85,12 +88,9 @@ public class StatisticFragment extends Fragment{
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        maxNumberToShow = DEFAULT_NUMBER_TO_SHOW;
-        userChoice = 0;
-
         chart = (LineChartView) view.findViewById(R.id.chart);
         chart.setLineChartData(data);
-        chart.setZoomEnabled(false);
+        chart.setZoomEnabled(true);
         chart.setScrollEnabled(true);
 
         previewChart = (PreviewLineChartView) view.findViewById(R.id.chart_preview);
@@ -98,6 +98,7 @@ public class StatisticFragment extends Fragment{
         previewChart.setViewportChangeListener(new ViewportListener());
 
         final Button selectButton = (Button)view.findViewById(R.id.button_left);
+        selectButton.setText(selectString[userChoice]);
         selectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,6 +130,11 @@ public class StatisticFragment extends Fragment{
         });
 
         dateButton = (Button)view.findViewById(R.id.button_right);
+        if(datePicker == null){
+            dateButton.setText("Datum");
+        } else{
+            dateButton.setText(dateToString(getPickedDate().getTime()));
+        }
         dateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -143,11 +149,6 @@ public class StatisticFragment extends Fragment{
                     @Override
                     public void onClick(View v) {
                         handleUserChoice();
-                        dateButton.setText(dateToString(new Date(
-                                datePicker.getYear() - 1900,
-                                datePicker.getMonth(),
-                                datePicker.getDayOfMonth()
-                        )));
                         updateChartView();
                         dialog.dismiss();
                     }
@@ -203,14 +204,6 @@ public class StatisticFragment extends Fragment{
         updateChartView();
     }
 
-    private void previewY() {
-        Viewport tempViewport = new Viewport(chart.getMaximumViewport());
-        float dy = tempViewport.height() / 4;
-        tempViewport.inset(0, dy);
-        previewChart.setCurrentViewportWithAnimation(tempViewport);
-        previewChart.setZoomType(ZoomType.VERTICAL);
-    }
-
     private void previewX(boolean animate) {
         Viewport tempViewport = new Viewport(chart.getMaximumViewport());
         float dx = tempViewport.width() / 4;
@@ -221,16 +214,6 @@ public class StatisticFragment extends Fragment{
             previewChart.setCurrentViewport(tempViewport);
         }
         previewChart.setZoomType(ZoomType.HORIZONTAL);
-    }
-
-    private void previewXY() {
-        // Better to not modify viewport of any chart directly so create a copy.
-        Viewport tempViewport = new Viewport(chart.getMaximumViewport());
-        // Make temp viewport smaller.
-        float dx = tempViewport.width() / 4;
-        float dy = tempViewport.height() / 4;
-        tempViewport.inset(dx, dy);
-        previewChart.setCurrentViewportWithAnimation(tempViewport);
     }
 
     private class ViewportListener implements ViewportChangeListener {
@@ -257,46 +240,69 @@ public class StatisticFragment extends Fragment{
     }
 
     private void handleUserChoice(){
-        Day d;
+        Day day;
         List<Day> datalist = new ArrayList<Day>();
-        Date date = new Date(datePicker.getYear()-1900,
-                datePicker.getMonth(),
-                datePicker.getDayOfMonth());
+        Calendar ca = getPickedDate();
 
         meterDbHelper.openDatabase();
         switch (userChoice){
             case DAY:
                 maxNumberToShow = 24;
-                d = meterDbHelper.loadDay(date);
-                if(d != null){
-                    datalist.add(d);
+                day = meterDbHelper.loadDay(ca.getTime());
+                if(day != null){
+                    datalist.add(day);
                 }
+                dateButton.setText(MeterDataSource.dateToString(ca.getTime()));
                 break;
             case WEEK:
                 maxNumberToShow = 7;
                 for(int i=0; i<maxNumberToShow; i++){
-                    d = meterDbHelper.loadDay(date);
-                    if(d != null){
-                        datalist.add(d);
+                    day = meterDbHelper.loadDay(ca.getTime());
+                    if(day != null){
+                        datalist.add(day);
                     }
-                    date.setDate(date.getDay()+1);
+                    ca.set(Calendar.DAY_OF_MONTH,ca.get(Calendar.DAY_OF_MONTH)+1);
                 }
+                dateButton.setText(MeterDataSource.dateToString(ca.getTime()));
                 break;
             case MONTH:
                 maxNumberToShow = 31;
-                datalist = meterDbHelper.loadMonth(date);
+                datalist = meterDbHelper.loadMonth(ca.getTime());
+                dateButton.setText(MeterDataSource.monthToString(ca.getTime()));
                 break;
             case YEAR:
                 maxNumberToShow = 365;
-                datalist = meterDbHelper.loadYear(date);
+                datalist = meterDbHelper.loadYear(ca.getTime());
+                dateButton.setText(MeterDataSource.yearToString(ca.getTime()));
                 break;
         }
 
         if(datalist != null){
-            addListToChart(datalist);
+            if(datalist.size() != 0){
+                addListToChart(datalist);
+            } else {
+                cleanChart();
+                Toast.makeText(getActivity(),"Keine Daten für gewähltes Datum gefunden", Toast.LENGTH_SHORT).show();
+            }
+        }else{
+            cleanChart();
+            Toast.makeText(getActivity(),"Keine Daten für gewähltes Datum gefunden", Toast.LENGTH_SHORT).show();
         }
 
         meterDbHelper.closeDatabase();
+    }
+
+    private void cleanChart(){
+        chart.setLineChartData(null);
+        previewChart.setLineChartData(null);
+    }
+
+    private Calendar getPickedDate(){
+        return new GregorianCalendar (
+                datePicker.getYear(),
+                datePicker.getMonth(),
+                datePicker.getDayOfMonth()
+        );
     }
 
 }
