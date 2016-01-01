@@ -58,7 +58,7 @@ public class LimitFragment extends CustomFragment {
         tvLimitValue.setText( "0");
         tvLimitPercent.setText( "0 %");
 
-        Log.d("DEBUG", "LimitFragment - onCreateView() - " + fragmentName);
+        Log.d( "DEBUG", "LimitFragment - onCreateView() - " + fragmentName);
         return v;
     }
 
@@ -89,12 +89,12 @@ public class LimitFragment extends CustomFragment {
      */
     @Override
     public void UpdateFragmentContent( String update) {
-        Log.d("DEBUG", "LimitFragment - UpdateFragmentContent() - " + update);
+        Log.d( "DEBUG", "LimitFragment - UpdateFragmentContent() - " + update);
         /*
             Format of received string:
             <fragmentName>;<LimitValue>;<CurrentValue>
          */
-        String[] msgSplit = update.split(";");
+        String[] msgSplit = update.split( ";");
 
         tvCurrentValue.setText( msgSplit[1]);
         tvLimitValue.setText(msgSplit[2]);
@@ -107,10 +107,10 @@ public class LimitFragment extends CustomFragment {
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
 
-            tvLimitPercent.setText(ERR_NO_DATA_IN_DB);
+            tvLimitPercent.setText( ERR_NO_DATA_IN_DB);
             pbLimit.setProgress( 0);
         } else {
-            int percentValue = ( Integer.valueOf( msgSplit[1]) * 100) / Integer.valueOf(msgSplit[2]);
+            int percentValue = ( Integer.valueOf( msgSplit[1]) * 100) / Integer.valueOf( msgSplit[2]);
             String limitPercentHelper = String.valueOf( percentValue) + " %";
             tvLimitPercent.setText( limitPercentHelper);
             pbLimit.setProgress( percentValue);
@@ -133,13 +133,13 @@ public class LimitFragment extends CustomFragment {
         this.setUserVisible( isVisibleToUser);
 
         if ( this.getUserVisible()) {
-            Log.d("DEBUG", "LimitFragment - setUserVisibleHint() - visible");
-            ((MainActivity)getActivity()).sendDataToHandheld( fragmentName);
+            Log.d( "DEBUG", "LimitFragment - setUserVisibleHint() - visible");
+            ( ( MainActivity)getActivity()).sendDataToHandheld( fragmentName);
         } else if( !this.getUserVisible()) {
-            Log.d("DEBUG", "LimitFragment - setUserVisibleHint() - invisible");
-            fragmentName = getArguments().getString("msg");
+            Log.d( "DEBUG", "LimitFragment - setUserVisibleHint() - invisible");
+            fragmentName = getArguments().getString( "msg");
         }
-        Log.d("DEBUG", "LimitFragment - setUserVisibleHint()");
+        Log.d( "DEBUG", "LimitFragment - setUserVisibleHint()");
     }
 
     public boolean getUserVisible() {

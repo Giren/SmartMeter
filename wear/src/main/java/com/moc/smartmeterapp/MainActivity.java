@@ -98,8 +98,9 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onConnected( Bundle connectionHint) {
         // register MessageListener
-        Wearable.MessageApi.addListener(googleClient, this);
-        Log.d("DEBUG", "MainActivity - onConnected()");
+        Wearable.MessageApi.addListener( googleClient, this);
+        sendDataToHandheld( "keepAlive");
+        Log.d( "DEBUG", "MainActivity - onConnected()");
     }
 
     // Placeholder for required connection callbacks
@@ -119,11 +120,10 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
-        if( messageEvent.getPath().equals( WEARABLE_DATA_PATH)) {
+        if( messageEvent.getPath().equals(WEARABLE_DATA_PATH)) {
             final String message = new String( messageEvent.getData());
             Log.d("DEBUG", "MainActivity - onMessageReceived() - Message path received on watch is: " + messageEvent.getPath());
             Log.d("DEBUG", "MainActivity - onMessageReceived() - Message received on watch is: " + message);
-
             // handle received message on watch
             runOnUiThread( new Runnable() {
                 @Override
@@ -138,7 +138,27 @@ public class MainActivity extends FragmentActivity implements
         Log.d("DEBUG", "MainActivity - handleReceivedMessage(): " + message);
         List<Fragment> allFragments = getSupportFragmentManager().getFragments();
 
-        fragmentData.addData( message);
+        //fragmentData.addData( message);
+
+        if( message.startsWith( "keepAlive")) {
+            // TODO process additional data in keepAlive message
+            // send keepAlive to handheld
+            Runnable getNewData = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        // wait before send
+                        Thread.sleep( 500);
+                    } catch (Exception e) {
+                        Log.d("DEBUG", "handleReceivedMessage() - keepAlive Exception" + e.getMessage());
+                    }
+                    // send keepAliveResponse on messagePath
+                    new SendToDataLayerThread( HANDHELD_DATA_PATH, "keepAlive").start();
+                }
+            };
+            new Thread( getNewData).start();
+            return;
+        }
 
         if (allFragments != null) {
             for (Fragment fragment : allFragments) {
@@ -154,22 +174,14 @@ public class MainActivity extends FragmentActivity implements
                         // send message to get new data
                         final CustomFragment finalFragment = myFragment;
 
-                        final int threadTimeout;
-
-                        if( message.contains( "liveData") && !message.contains( "keepAlive")) {
-                            // TODO update limits and redraw tacho
-                            break;
+                        if( message.startsWith( "liveData")) {
+                            return;
                         } else {
-                            if( message.contains( "liveData")) {
-                                threadTimeout = 500;
-                            } else {
-                                threadTimeout = 10000;
-                            }
                             Runnable getNewData = new Runnable() {
                                 @Override
                                 public void run() {
                                     try {
-                                        Thread.sleep( threadTimeout);
+                                        Thread.sleep( 10000);
                                     } catch (Exception e) {
                                         System.out.println( e.getMessage());
                                     }

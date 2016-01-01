@@ -58,6 +58,8 @@ public class WearService extends WearableListenerService implements
     private String limitMonth;
     private String limitYear;
 
+    private String visibleFragmentOnWearable;
+
     private Limit limit1, limit2, limit3;
 
 
@@ -76,8 +78,6 @@ public class WearService extends WearableListenerService implements
 
         liveCommunication = new LiveCommunication(getApplicationContext());
 
-        meterDbHelper.openDatabase();
-        Log.d("DEBUG", "REACT ON MESSAGE - openDatabase()");
         timeZone = TimeZone.getDefault();
         //calendar = new GregorianCalendar( timeZone);
 
@@ -111,7 +111,7 @@ public class WearService extends WearableListenerService implements
     @Override
     public void onConnected(Bundle bundle) {
         Log.d("DEBUG", "WEAR SERVICE ON CONNECTED");
-        liveCommunication.registerDataEventHandler(this);
+        liveCommunication.registerDataEventHandler( this);
         liveCommunication.create();
     }
 
@@ -134,15 +134,12 @@ public class WearService extends WearableListenerService implements
     @Override
     public void onDestroy() {
         Log.d("DEBUG", "ON DESTROY");
-//        if( liveCommunication != null) {
-            liveCommunication.destroy();
-//            liveCommunication = null;
-//        }
-        meterDbHelper.closeDatabase();
-        Log.d("DEBUG", "REACT ON MESSAGE - closeDatabase()");
-        if (null != googleClient)
+        liveCommunication.unregisterDataEventHandler(this);
+        liveCommunication.destroy();
+        visibleFragmentOnWearable = null;
+        if ( null != googleClient)
         {
-            if (googleClient.isConnected())
+            if ( googleClient.isConnected())
             {
                 googleClient.disconnect();
             }
@@ -168,55 +165,54 @@ public class WearService extends WearableListenerService implements
     }
 
     public void reactOnMessage( String receivedMessage) {
-        Log.d("DEBUG", "REACT ON MESSAGE + message: " + receivedMessage);
-// db open
-        //Log.d("DEBUG", "REACT ON MESSAGE - openDatabase()");
+        Log.d("DEBUG", "reactOnMessage() + message: " + receivedMessage);
         switch ( receivedMessage) {
+            case "keepAlive": {
+                Log.d( "DEBUG", "case: keepAlive");
+                // send "keepAlive" response to wearable
+                keepAliveResponse( WEARABLE_DATA_PATH, "keepAlive");
+                break;
+            }
             case "liveData": {
-                Log.d("DEBUG", "liveData case");
-//                if( liveCommunication == null) {
-//
-//                }
-                liveDataKeepAlive(WEARABLE_DATA_PATH);
+                Log.d( "DEBUG", "liveData case");
+                visibleFragmentOnWearable = "liveData";
+                // liveDataKeepAlive(WEARABLE_DATA_PATH);
                 break;
             }
             case "limitWeek": {
-                Log.d("DEBUG", "limitWeekCase");
-//                if( liveCommunication != null) {
-//                    liveCommunication.destroy();
-//                    liveCommunication = null;
-//                }
-                dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitWeek", limitWeek);
+                Log.d( "DEBUG", "limitWeekCase");
+                visibleFragmentOnWearable = "limitWeek";
+                meterDbHelper.openDatabase();
+                Log.d( "DEBUG", "reactOnMessage() - openDatabase()");
+                dataMessageToWearableLimit( WEARABLE_DATA_PATH, "limitWeek", limitWeek);
+                meterDbHelper.closeDatabase();
+                Log.d( "DEBUG", "REACT ON MESSAGE - closeDatabase()");
                 break;
             }
             case "limitMonth": {
-                Log.d("DEBUG", "limitMonth case");
-//                if( liveCommunication != null) {
-//                    liveCommunication.destroy();
-//                    liveCommunication = null;
-//                }
-                dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitMonth", limitMonth);
+                Log.d( "DEBUG", "limitMonth case");
+                visibleFragmentOnWearable = "limitMonth";
+                meterDbHelper.openDatabase();
+                Log.d( "DEBUG", "reactOnMessage() - openDatabase()");
+                dataMessageToWearableLimit( WEARABLE_DATA_PATH, "limitMonth", limitMonth);
+                meterDbHelper.closeDatabase();
+                Log.d( "DEBUG", "REACT ON MESSAGE - closeDatabase()");
                 break;
             }
             case "limitYear": {
-                Log.d("DEBUG", "limitYear case");
-//                if( liveCommunication != null) {
-//                    liveCommunication.destroy();
-//                    liveCommunication = null;
-//                }
-                dataMessageToWearableLimit(WEARABLE_DATA_PATH, "limitYear", limitYear);
-                break;
-            }
-            case "goodbye": {
-                Log.d("DEBUG", "goodbye case");
+                Log.d( "DEBUG", "limitYear case");
+                visibleFragmentOnWearable = "limitYear";
+                meterDbHelper.openDatabase();
+                Log.d( "DEBUG", "reactOnMessage() - openDatabase()");
+                dataMessageToWearableLimit( WEARABLE_DATA_PATH, "limitYear", limitYear);
+                meterDbHelper.closeDatabase();
+                Log.d( "DEBUG", "REACT ON MESSAGE - closeDatabase()");
                 break;
             }
             default:
                 Log.d("DEBUG", "default case");
                 break;
         }
-        // DB close
-        //Log.d("DEBUG", "REACT ON MESSAGE - closeDatabase()");
     }
 
     public void dataMessageToWearableLimit(String path, String fragmentName, String limitValue) {
@@ -354,14 +350,14 @@ public class WearService extends WearableListenerService implements
 
             if( dayCurrent == null || dayBefore == null) {
                 return ERR_NO_DATA_IN_DB;
+        } else {
+            if( dayCurrent.getDate().after( dayBefore.getDate())) {
+                int currentValue = dayCurrent.getMmm().getTotalSum() - dayBefore.getMmm().getTotalSum();
+                return String.valueOf( currentValue);
             } else {
-                if( dayCurrent.getDate().after( dayBefore.getDate())) {
-                    int currentValue = dayCurrent.getMmm().getTotalSum() - dayBefore.getMmm().getTotalSum();
-                    return String.valueOf( currentValue);
-                } else {
-                    return ERR_NO_DATA_IN_DB;
-                }
+                return ERR_NO_DATA_IN_DB;
             }
+        }
             //return String.valueOf((int) (Math.random() * Integer.valueOf(limitYear)));
         }
     }
@@ -381,13 +377,11 @@ public class WearService extends WearableListenerService implements
             case "limitMonth": {
                 Log.d("DEBUG", "getCurrentLimitValue - limitMonth case");
                 return getCurrentValueOfThisMonth();
-                // TODO get Data from DB
                 //return String.valueOf( ( int)( Math.random() * Integer.valueOf( limitMonth)));
             }
             case "limitYear": {
                 Log.d("DEBUG", "getCurrentLimitValue - limitYear case");
                 return getCurrentValueOfThisYear();
-                // TODO get Data from DB
                 //return String.valueOf( ( int)( Math.random() * Integer.valueOf( limitYear)));
             }
             default: {
@@ -425,6 +419,22 @@ public class WearService extends WearableListenerService implements
         }
         // send Data on messagePath
         new SendToDataLayerThread( path, dataMessage).start();
+    }
+
+    public void keepAliveResponse( String messagePath, String keepAliveMessage) {
+        /*
+        TODO
+        implement information which should be send with keepAlive
+        for example limit informations
+         */
+        try {
+            // wait before send
+            Thread.sleep( 500);
+        } catch (Exception e) {
+            Log.d("DEBUG", "keepAliveResponse() - Exception" + e.getMessage());
+        }
+        // send keepAliveResponse on messagePath
+        new SendToDataLayerThread( messagePath, keepAliveMessage).start();
     }
 
     @Override

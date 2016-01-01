@@ -100,13 +100,8 @@ public class LiveFragment extends CustomFragment {
         System.out.println("Live UpdateFragmentContent" + update);
         String[] splitted = update.split( ";");
 
-        if( splitted[1].equals( "keepAlive")) {
-            Log.d("DEBUG", "UpdateFragmentContent() - keepAlive");
-
-        } else {
-            meterView.setValue( Float.valueOf( splitted[1]));
-            tvLiveValue.setText( splitted[1]);
-        }
+        meterView.setValue( Float.valueOf( splitted[1]));
+        tvLiveValue.setText( splitted[1]);
     }
 
     @Override
@@ -117,7 +112,7 @@ public class LiveFragment extends CustomFragment {
 
         if ( this.getUserVisible()) {
             System.out.println( "this fragment is now visible");
-            ((MainActivity)getActivity()).sendDataToHandheld( fragmentName);
+            ( ( MainActivity)getActivity()).sendDataToHandheld( fragmentName);
         } else if( !this.getUserVisible()) {
             System.out.println( "this fragment is now invisible");
             fragmentName = getArguments().getString("msg");
