@@ -109,5 +109,6 @@ public class HomeWeekFragment extends Fragment implements PreferenceHelper.PrefR
     public void onPrefReceive(MyPreferences pref) {
         this.prefs = pref;
         meterView.setLimiter(getLimiter());
+        meterView.invalidate();
     }
 }
