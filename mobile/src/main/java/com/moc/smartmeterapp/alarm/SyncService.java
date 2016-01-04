@@ -55,74 +55,83 @@ public class SyncService extends IntentService implements RestCommunication.IDat
             new RestCommunication(getApplicationContext()).fetchSinceData(lastDay.getDate(), this);
         }
 
+        final Limit limit1 = new Limit();
+        final Limit limit2 = new Limit();
+        final Limit limit3 = new Limit();
+
         new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
             @Override
             public void onLimitsReceived(Limit limit, int slot) {
-                Log.i("GOT LIMIT", "slot=" + String.valueOf(slot) + " max=" + String.valueOf(limit.getMax()));
-                MyPreferences preferences = PreferenceHelper.getPreferences(getApplicationContext());
-                if (preferences != null) {
-                    preferences.setLimit1(limit);
-                    PreferenceHelper.setPreferences(getApplicationContext(), preferences);
-                    PreferenceHelper.sendBroadcast(getApplicationContext(), preferences);
-                }
+                limit1.setMax(limit.getMax());
+                limit1.setColor(limit.getColor());
+                limit1.setMin(limit.getMin());
             }
 
             @Override
             public void onError(String message) {
-                Log.e("ERROR LIMIT", message);
+
             }
 
             @Override
             public void onComplete() {
+                new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
+                    @Override
+                    public void onLimitsReceived(Limit limit, int slot) {
+                        limit2.setMax(limit.getMax());
+                        limit2.setColor(limit.getColor());
+                        limit2.setMin(limit.getMin());
+                    }
 
+                    @Override
+                    public void onError(String message) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
+                            @Override
+                            public void onLimitsReceived(Limit limit, int slot) {
+                                limit3.setMax(limit.getMax());
+                                limit3.setColor(limit.getColor());
+                                limit3.setMin(limit.getMin());
+                            }
+
+                            @Override
+                            public void onError(String message) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                MyPreferences tempPreferences = PreferenceHelper.getPreferences(getApplicationContext());
+                                boolean changes = false;
+
+                                if(limit1.equals(tempPreferences.getLimit1())) {
+                                    tempPreferences.setLimit1(limit1);
+                                    changes = true;
+                                }
+
+                                if(limit2.equals(tempPreferences.getLimit2())) {
+                                    tempPreferences.setLimit2(limit2);
+                                    changes = true;
+                                }
+
+                                if(limit3.equals(tempPreferences.getLimit3())) {
+                                    tempPreferences.setLimit1(limit3);
+                                    changes = true;
+                                }
+
+                                if(changes){
+                                    PreferenceHelper.setPreferences(getApplicationContext(), tempPreferences);
+                                    PreferenceHelper.sendBroadcast(getApplicationContext(), tempPreferences);
+                                }
+                            }
+                        }, 2);
+                    }
+                }, 1);
             }
         }, 0);
-
-        new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
-            @Override
-            public void onLimitsReceived(Limit limit, int slot) {
-                Log.i("GOT LIMIT", "slot=" + String.valueOf(slot) + " max=" + String.valueOf(limit.getMax()));
-                MyPreferences preferences = PreferenceHelper.getPreferences(getApplicationContext());
-                if (preferences != null) {
-                    preferences.setLimit2(limit);
-                    PreferenceHelper.setPreferences(getApplicationContext(), preferences);
-                    PreferenceHelper.sendBroadcast(getApplicationContext(), preferences);
-                }
-            }
-
-            @Override
-            public void onError(String message) {
-                Log.e("ERROR LIMIT", message);
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        }, 1);
-
-        new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
-            @Override
-            public void onLimitsReceived(Limit limit, int slot) {
-                Log.i("GOT LIMIT", "slot=" + String.valueOf(slot) + " max=" + String.valueOf(limit.getMax()));
-                MyPreferences preferences = PreferenceHelper.getPreferences(getApplicationContext());
-                if (preferences != null) {
-                    preferences.setLimit3(limit);
-                    PreferenceHelper.setPreferences(getApplicationContext(), preferences);
-                    PreferenceHelper.sendBroadcast(getApplicationContext(), preferences);
-                }
-            }
-
-            @Override
-            public void onError(String message) {
-                Log.e("ERROR LIMIT", message);
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        }, 2);
 
         //PreferenceHelper.sendBroadcast(getApplicationContext());
     }
