@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.util.Log;
 
 import com.moc.smartmeterapp.communication.RestCommunication;
 import com.moc.smartmeterapp.database.IDatabase;
@@ -101,6 +102,8 @@ public class PreferenceHelper {
             helper.savePreferences(prefs);
 
             helper.closeDatabase();
+
+            Log.d("PREFERENCES", "SET TO DATABASE");
         }
     }
 
@@ -110,6 +113,8 @@ public class PreferenceHelper {
             new RestCommunication(context).saveLimit(myPreferences.getLimit1(), 0);
             new RestCommunication(context).saveLimit(myPreferences.getLimit2(), 1);
             new RestCommunication(context).saveLimit(myPreferences.getLimit3(), 2);
+
+            Log.d("PREFERENCES", "LIMITS SET TO SERVER DATABASE");
         }
     }
 
@@ -118,6 +123,8 @@ public class PreferenceHelper {
             Intent intent = new Intent(BROADCAST_ACTION);
             intent.putExtra(PREFS, myPreferences);
             context.sendBroadcast(intent);
+
+            Log.d("PREFERENCES", "SEND BROADCAST");
         }
     }
 

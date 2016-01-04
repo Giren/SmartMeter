@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -213,6 +214,7 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
     }
 
     private void setPreferenceView(MyPreferences pref){
+        Log.d("PREFERENCE VIEW", "UPDATE");
         primeLimitStart.setText(String.valueOf(pref.getLimit1().getMin()));
         primeLimitStop.setText(String.valueOf(pref.getLimit1().getMax()));
         primeLimitColorBtn.setBackgroundColor(pref.getLimit1().getColor());
