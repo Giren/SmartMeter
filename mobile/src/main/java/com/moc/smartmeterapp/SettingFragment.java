@@ -50,6 +50,7 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
     private Button manualSync;
 
     private Button saveButton;
+    private Button saveIPButton;
 
     private MyPreferences prefs;
     private PreferenceHelper preferenceHelper;
@@ -203,6 +204,39 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
 
                 PreferenceHelper.setPreferences(getActivity(), preferences);
                 PreferenceHelper.limitsToServer(getActivity());
+                PreferenceHelper.sendBroadcast(getActivity(), preferences);
+
+                Toast.makeText(getActivity(), "Gespeichert", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        saveIPButton = (Button)view.findViewById(R.id.ip_set_button);
+        saveIPButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Limit limit1 = new Limit(
+                        Integer.valueOf(primeLimitStart.getText().toString()),
+                        Integer.valueOf(primeLimitStop.getText().toString()),
+                        ((ColorDrawable) primeLimitColorBtn.getBackground()).getColor());
+                Limit limit2 = new Limit(
+                        Integer.valueOf(opt1LimitStart.getText().toString()),
+                        Integer.valueOf(opt1LimitStop.getText().toString()),
+                        ((ColorDrawable) opt1LimitColorBtn.getBackground()).getColor());
+                Limit limit3 = new Limit(
+                        Integer.valueOf(opt2LimitStart.getText().toString()),
+                        Integer.valueOf(opt2LimitStop.getText().toString()),
+                        ((ColorDrawable) opt2LimitColorBtn.getBackground()).getColor());
+
+                MyPreferences preferences = new MyPreferences(
+                        limit1,
+                        limit2,
+                        limit3,
+                        editIP.getText().toString(),
+                        syncCheck.isChecked(),
+                        false
+                );
+
+                PreferenceHelper.setPreferences(getActivity(), preferences);
                 PreferenceHelper.sendBroadcast(getActivity(), preferences);
 
                 Toast.makeText(getActivity(), "Gespeichert", Toast.LENGTH_SHORT).show();
