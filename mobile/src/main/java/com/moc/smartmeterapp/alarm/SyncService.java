@@ -200,7 +200,6 @@ public class SyncService extends IntentService implements RestCommunication.IDat
             IDatabase db = new MeterDbHelper(getApplicationContext());
             db.openDatabase();
             db.saveYear(dataObject.getDays());
-
             db.closeDatabase();
         }
     }
