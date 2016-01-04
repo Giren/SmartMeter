@@ -111,6 +111,7 @@ public class MainActivity extends AppCompatActivity{
                                         }
 
                                         if(changes){
+                                            tempPreferences.setUnSynced(false);
                                             PreferenceHelper.setPreferences(getApplicationContext(), tempPreferences);
                                             PreferenceHelper.sendBroadcast(getApplicationContext(), tempPreferences);
                                         }
