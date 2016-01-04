@@ -245,48 +245,4 @@ public class SettingFragment extends Fragment {
 
         syncCheck.setChecked(pref.getSync());
     }
-
-
-    private void insertTestDatainDB() {
-
-        meterDbHelper.openDatabase();
-
-        // erster Tag im Jahr
-        Day firstDayOfYear = new Day( new GregorianCalendar( 2015, 0, 1).getTime());
-        List<Hour> hourList = new ArrayList<Hour>();
-        for( int i = 0; i<24; i++) {
-            hourList.add( new Hour( new MinMeanMax( 2, 0, 0, 0)));
-        }
-        firstDayOfYear.setHours( hourList);
-        meterDbHelper.saveDay(firstDayOfYear);
-
-        // 1. des aktuellen Monats
-        Day firstOfMonth = new Day( new GregorianCalendar( 2015, 11, 1).getTime());
-        hourList = new ArrayList<Hour>();
-        for( int i = 0; i<24; i++) {
-            hourList.add( new Hour( new MinMeanMax( 10, 0, 0, 0)));
-        }
-        firstOfMonth.setHours( hourList);
-        meterDbHelper.saveDay( firstOfMonth);
-
-        //Wochenanfang
-        Day firstOfWeek = new Day( new GregorianCalendar( 2015, 11, 27).getTime());
-        hourList = new ArrayList<Hour>();
-        for( int i = 0; i<24; i++) {
-            hourList.add( new Hour( new MinMeanMax( 17, 0, 0, 0)));
-        }
-        firstOfWeek.setHours( hourList);
-        meterDbHelper.saveDay( firstOfWeek);
-
-        //Wochenanfang
-        Day today = new Day( new GregorianCalendar( 2015, 11, 29).getTime());
-        hourList = new ArrayList<Hour>();
-        for( int i = 0; i<24; i++) {
-            hourList.add( new Hour( new MinMeanMax( 35, 0, 0, 0)));
-        }
-        today.setHours( hourList);
-        meterDbHelper.saveDay( today);
-
-        meterDbHelper.closeDatabase();
-    }
 }
