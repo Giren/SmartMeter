@@ -9,7 +9,6 @@ import android.graphics.Color;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.moc.smartmeterapp.MainActivity;
 import com.moc.smartmeterapp.R;
 import com.moc.smartmeterapp.communication.RestCommunication;
@@ -20,9 +19,7 @@ import com.moc.smartmeterapp.model.Day;
 import com.moc.smartmeterapp.model.Limit;
 import com.moc.smartmeterapp.preferences.MyPreferences;
 import com.moc.smartmeterapp.preferences.PreferenceHelper;
-
-import java.util.Date;
-import java.util.List;
+import com.moc.smartmeterapp.utils.HomeHelper;
 
 /**
  * Created by philipp on 23.12.2015.
@@ -169,10 +166,37 @@ public class SyncService extends IntentService implements RestCommunication.IDat
                 }
             }, 0);
         }
+
+        //Check limit reached
+        HomeHelper helper = new HomeHelper(getApplicationContext());
+        Integer consumption = helper.getConsumption(HomeHelper.MONTH);
+        if(consumption != null && consumption > myPreferences.getLimit1().getMin()) {
+            sendAlarmNotification("Das Monatslimit wurde erreicht. Aktueller Verbrauch: " + consumption + " kWh");
+        }
     }
 
-    // Post a notification indicating whether a doodle was found.
-    private void sendNotification(String msg) {
+
+    private void sendAlarmNotification(String msg) {
+        mNotificationManager = (NotificationManager)
+                this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, MainActivity.class), 0);
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.limit)
+                        .setContentTitle("Smart Meter App")
+                        .setStyle(new NotificationCompat.BigTextStyle()
+                                .bigText(msg))
+                        .setColor(Color.WHITE)
+                        .setContentText(msg);
+
+        mBuilder.setContentIntent(contentIntent);
+        mNotificationManager.notify(0, mBuilder.build());
+    }
+
+    private void sendSyncNotification(String msg) {
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -206,7 +230,7 @@ public class SyncService extends IntentService implements RestCommunication.IDat
 
     @Override
     public void onError(String message) {
-        sendNotification("Es ist ein Fehler bei der Synchronisation aufgetreten.");
+        sendSyncNotification("Es ist ein Fehler bei der Synchronisation aufgetreten.");
     }
 
     @Override
@@ -214,6 +238,6 @@ public class SyncService extends IntentService implements RestCommunication.IDat
         String s = "Es wurden " + String.valueOf(count) + " Datensätze vom Server übertragen.";
         if(total > 0)
             s += " Total: " + String.valueOf(total);
-        sendNotification(s);
+        sendSyncNotification(s);
     }
 }
