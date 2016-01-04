@@ -23,18 +23,15 @@ import com.moc.smartmeterapp.ui.MeterView;
 
 public class LiveFragment extends Fragment implements LiveCommunication.ILiveDataEvent, PreferenceHelper.PrefReceive {
 
+    private MyPreferences prefs;
     private PreferenceHelper preferenceHelper;
 
+    private final int FACTOR = ( (3600*1000) / (31*24*900) );
+
     private MeterView meterView;
-    private Limiter limiter;
-    private Limit limitRed;
-    private Limit limitYellow;
-    private SeekBar seekBar;
     private LiveCommunication liveCommunication;
-    private RestCommunication restCommunication;
 
     private int meterViewMax = 1000;
-    private int meterViewAVG = 300;
 
     @Override
     public void onLiveDataReceived(int value) {
@@ -43,10 +40,6 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
                 meterViewMax = value;
                 meterView.setMax(meterViewMax);
             }
-
-            meterViewAVG = (meterViewAVG + value) / 2;
-
-            meterView.setAverage(meterViewAVG);
             meterView.setValue(value);
         }
 
@@ -63,6 +56,8 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
         liveCommunication = new LiveCommunication(getActivity());
         liveCommunication.create();
         liveCommunication.registerDataEventHandler(this);
+
+        prefs = PreferenceHelper.getPreferences(getActivity());
 
         return inflater.inflate(R.layout.live_fragment_layout, null);
     }
@@ -90,54 +85,35 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        MyPreferences pref = PreferenceHelper.getPreferences(view.getContext());
-
-        if(pref != null){
-            limitRed = new Limit(
-                    pref.getLimit1().getMin(),
-                    pref.getLimit1().getMax(),
-                    pref.getLimit1().getColor()
-            );
-            limitYellow = new Limit(
-                    pref.getLimit2().getMin(),
-                    pref.getLimit2().getMax(),
-                    pref.getLimit2().getColor()
-            );
-
-        } else{
-            limitRed = new Limit(2000, 2500, Color.RED);
-            limitYellow = new Limit(1500, 2000, Color.YELLOW);
-        }
-
-        limiter = new Limiter();
-        limiter.addLimit(limitYellow);
-        limiter.addLimit(limitRed);
-
         meterView = (MeterView) view.findViewById(R.id.meterview);
         meterView.setOffsetAngle(45);
-        meterView.setLimiter(limiter);
+        meterView.setLimiter(getLimiter());
+    }
 
-        seekBar = (SeekBar) view.findViewById(R.id.seekBar);
-        seekBar.setMax(2500);
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+    private Limiter getLimiter() {
+        Limiter limiter = new Limiter();
 
-            }
+        Limit limit3 = prefs.getLimit3();
+        limit3.setMax(limit3.getMax() * FACTOR);
+        limit3.setMin(limit3.getMin() * FACTOR);
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
+        Limit limit2 = prefs.getLimit2();
+        limit2.setMax(limit2.getMax() * FACTOR);
+        limit2.setMin(limit2.getMin() * FACTOR);
 
-            }
+        Limit limit1 = prefs.getLimit1();
+        limit1.setMax(limit1.getMax() * FACTOR);
+        limit1.setMin(limit1.getMin() * FACTOR);
 
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                meterView.setMax(seekBar.getProgress() + 2500);
-            }
-        });
+        limiter.addLimit(limit3);
+        limiter.addLimit(limit2);
+        limiter.addLimit(limit1);
+        return limiter;
     }
 
     @Override
     public void onPrefReceive(MyPreferences pref) {
+        this.prefs = pref;
+        meterView.setLimiter(getLimiter());
     }
 }
