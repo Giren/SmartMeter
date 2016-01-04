@@ -15,15 +15,17 @@ public class MyPreferences implements Serializable{
     private String limit3Color;
 
     private String ipAddress;
-    private Boolean sync;
+    private Boolean autoSync;
+    private Boolean unSynced;
 
     public MyPreferences(Limit limit1, Limit limit2, Limit limit3,
-                         String ipAddress, Boolean sync) {
+                         String ipAddress, Boolean autoSync, Boolean unSynced) {
         this.limit1 = limit1;
         this.limit2 = limit2;
         this.limit3 = limit3;
         this.ipAddress = ipAddress;
-        this.sync = sync;
+        this.autoSync = autoSync;
+        this.unSynced = unSynced;
     }
 
     public MyPreferences(){
@@ -45,8 +47,12 @@ public class MyPreferences implements Serializable{
         return ipAddress;
     }
 
-    public Boolean getSync() {
-        return sync;
+    public Boolean getAutoSync() {
+        return autoSync;
+    }
+
+    public Boolean getUnSynced(){
+        return unSynced;
     }
 
     public void setLimit1(Limit limit1) {
@@ -65,7 +71,11 @@ public class MyPreferences implements Serializable{
         this.ipAddress = ipAddress;
     }
 
-    public void setSync(Boolean sync) {
-        this.sync = sync;
+    public void setAutoSync(Boolean autoSync) {
+        this.autoSync = autoSync;
+    }
+
+    public void setUnSynced(Boolean unSynced){
+        this.unSynced = unSynced;
     }
 }

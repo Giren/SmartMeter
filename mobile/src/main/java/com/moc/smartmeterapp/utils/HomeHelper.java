@@ -49,7 +49,6 @@ public class HomeHelper {
                     }
                     ca.add(Calendar.DAY_OF_MONTH, 1);
                 }
-
                 break;
             case MONTH:
                 days = databaseHelper.loadMonth(ca.getTime());
@@ -59,7 +58,7 @@ public class HomeHelper {
                 break;
         }
 
-        if (days != null) {
+        if (days != null && days.size() > 0) {
             consumption = days.get(days.size() - 1).getMmm().getTotalSum() - days.get(0).getMmm().getTotalSum();
             consumption /= 10000;
             databaseHelper.closeDatabase();

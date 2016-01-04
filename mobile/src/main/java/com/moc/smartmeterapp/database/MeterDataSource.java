@@ -50,7 +50,8 @@ public class MeterDataSource {
             MeterDbHelper.COLUMN_PREF_LIMIT_2,
             MeterDbHelper.COLUMN_PREF_LIMIT_3,
             MeterDbHelper.COLUMN_PREF_IP,
-            MeterDbHelper.COLUMN_PREF_SYNC
+            MeterDbHelper.COLUMN_PREF_AUTO_SYNC,
+            MeterDbHelper.COLUMN_PREF_UNSYNCED
     };
 
     public MeterDataSource(Context context){
@@ -226,11 +227,13 @@ public class MeterDataSource {
 
         int dbIndex = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_ID);
         int dbIp = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_IP);
-        int dbSync = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_SYNC);
+        int dbAutoSync = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_AUTO_SYNC);
+        int dbUnsync = cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_UNSYNCED);
 
         Long id = cursor.getLong(dbIndex);
         String ip = cursor.getString(dbIp);
-        Boolean sync = Boolean.parseBoolean(cursor.getString(dbSync));
+        Boolean autoSync = Boolean.parseBoolean(cursor.getString(dbAutoSync));
+        Boolean unsynced = Boolean.parseBoolean(cursor.getString(dbUnsync));
 
         blob = cursor.getBlob(cursor.getColumnIndex(MeterDbHelper.COLUMN_PREF_LIMIT_1));
         json = new String(blob);
@@ -249,7 +252,8 @@ public class MeterDataSource {
                 limit2,
                 limit3,
                 ip,
-                sync
+                autoSync,
+                unsynced
         );
 
         return preferences;
@@ -264,7 +268,8 @@ public class MeterDataSource {
         contentValues.put(MeterDbHelper.COLUMN_PREF_LIMIT_3, gson.toJson(myPreferences.getLimit3()).getBytes());
 
         contentValues.put(MeterDbHelper.COLUMN_PREF_IP, myPreferences.getIpAddress());
-        contentValues.put(MeterDbHelper.COLUMN_PREF_SYNC, String.valueOf(myPreferences.getSync()));
+        contentValues.put(MeterDbHelper.COLUMN_PREF_AUTO_SYNC, String.valueOf(myPreferences.getAutoSync()));
+        contentValues.put(MeterDbHelper.COLUMN_PREF_UNSYNCED, String.valueOf(myPreferences.getUnSynced()));
 
         deleteMeterPref();
         long insertID = database.insert(MeterDbHelper.TABLE_PREFS, null, contentValues);
