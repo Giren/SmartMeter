@@ -24,15 +24,6 @@ import java.util.List;
  */
 public class HelpFragment extends Fragment{
 
-    private MeterDbHelper meterDbHelper;
-
-    private EditText text;
-    private Day day;
-    private Day day1;
-    private Day day2;
-    private Day day3;
-
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -43,93 +34,5 @@ public class HelpFragment extends Fragment{
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        text = (EditText) view.findViewById(R.id.editText);
-
-        Button restButton = (Button) view.findViewById(R.id.button_rest);
-        restButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                meterDbHelper.openDatabase();
-                //Day newDay = meterDbHelper.loadDay(nDate);
-                //meterDbHelper.getAllEntries();
-                //meterDbHelper.loadMonth(day2.getDate());
-                //meterDbHelper.loadYear(day1.getDate());
-                //meterDbHelper.deleteMonth(day1.getDate());
-                //meterDbHelper.deleteYear(day.getDate());
-                //meterDbHelper.deleteDay(day.getDate());
-                //listView.setAdapter(listToArrayadapter(meterDbHelper.loadMonth(day1.getDate())));
-                //listView.setAdapter(showAllDBEntries());
-                MyPreferences prefs = meterDbHelper.loadPreferences();
-                text.setText("Limit1: " + prefs.getLimit1().getMin()+"-"+ prefs.getLimit1().getMax() + "\n" +
-                        "Limit1Color: " + prefs.getLimit1().getColor() + "\n" +
-                        "Limit2: " + prefs.getLimit2().getMin()+"-"+ prefs.getLimit2().getMax() + "\n" +
-                        "Limit2Color: " + prefs.getLimit2().getColor() + "\n" +
-                        "Limit3: " + prefs.getLimit3().getMin()+"-"+ prefs.getLimit3().getMax() + "\n" +
-                        "Limit3Color: " + prefs.getLimit3().getColor() + "\n" +
-                        "IP Address: " + prefs.getIpAddress() + "\n" +
-                        "Notification: " + prefs.getAutoSync() + "\n");
-                //meterDbHelper.loadLatestDay();
-                meterDbHelper.closeDatabase();
-            }
-        });
-
-
-        List<Hour> hours;
-        hours = new ArrayList<Hour>();
-        for(int i=0; i<24; i++) {
-            hours.add(new Hour());
-        }
-
-
-        List<Day> dataList = new ArrayList<>();
-
-//        Calendar calendar1 = new GregorianCalendar(2016,1,2);
-//        Calendar calendar2 = new GregorianCalendar(2016,1,15);
-//        Calendar calendar3 = new GregorianCalendar(2016,1,27);
-//        Calendar calendar4 = new GregorianCalendar(2017,1,3);
-
-        Date date = new Date();
-        date.setDate(2);
-        date.setMonth(2);
-        date.setYear(116);
-        day = new Day();
-        day.setDate(date);
-        dataList.add(day);
-
-        Date date1 = new Date();
-        date1.setDate(15);
-        date1.setMonth(1);
-        date1.setYear(116);
-        day1 = new Day();
-        day1.setDate(date1);
-        dataList.add(day1);
-
-        Date date2 = new Date();
-        date2.setDate(27);
-        date2.setMonth(1);
-        date2.setYear(116);
-        day2 = new Day();
-        day2.setDate(date2);
-        dataList.add(day2);
-
-        Date date3 = new Date();
-        date3.setDate(3);
-        date3.setMonth(1);
-        date3.setYear(116);
-        day3 = new Day();
-        day3.setDate(date3);
-        dataList.add(day3);
-
-        meterDbHelper = new MeterDbHelper(getActivity().getBaseContext());
-        meterDbHelper.openDatabase();
-//        meterDbHelper.deleteMeterList();
-//        meterDbHelper.saveDay(day);
-//        meterDbHelper.saveDay(day1);
-//        meterDbHelper.saveDay(day2);
-//        meterDbHelper.saveDay(day3);
-//        listView.setAdapter(showAllDBEntries());
-        //MyPreferences pref = new MyPreferences(100,"#11",100,"#11",100,"#11","10.0.0.1",true);
-        //meterDbHelper.savePreferences(pref);
-        meterDbHelper.closeDatabase();
     }
 }

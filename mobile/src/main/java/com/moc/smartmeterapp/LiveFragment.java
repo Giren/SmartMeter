@@ -121,5 +121,6 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
     public void onPrefReceive(MyPreferences pref) {
         this.prefs = pref;
         meterView.setLimiter(getLimiter());
+        meterView.invalidate();
     }
 }
