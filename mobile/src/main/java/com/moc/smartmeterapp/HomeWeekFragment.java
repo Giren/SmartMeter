@@ -58,7 +58,7 @@ public class HomeWeekFragment extends Fragment implements PreferenceHelper.PrefR
         meterView.setOffsetAngle(45);
         meterView.setLimiter(getLimiter());
 
-        Observable.just(homeHelper.getConsumption(HomeHelper.YEAR))
+        Observable.just(homeHelper.getConsumption(HomeHelper.WEEK))
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new rx.Observer<Integer>() {

@@ -3,6 +3,7 @@ package com.moc.smartmeterapp;
 import android.app.Activity;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -46,34 +47,47 @@ public class MainActivity extends AppCompatActivity{
     private HelpFragment helpFragment;
 
     private Toolbar toolbar;
-    private ServiceConnection dataServiceConnection;
-    private LiveDataService liveDataService;
-    private boolean serviceBinded;
 
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
 
+    private Handler handler;
+    private Runnable runnable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        rx.Observable roundtrip = Observable.interval(5, TimeUnit.SECONDS)
-                .timeInterval()
-                .flatMap(new Func1<TimeInterval<Long>, Observable<?>>() {
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                final Limit limit1 = new Limit();
+                final Limit limit2 = new Limit();
+                final Limit limit3 = new Limit();
+
+                new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
                     @Override
-                    public Observable<?> call(TimeInterval<Long> longTimeInterval) {
+                    public void onLimitsReceived(Limit limit, int slot) {
+                        limit1.setMax(limit.getMax());
+                        limit1.setColor(limit.getColor());
+                        limit1.setMin(limit.getMin());
+                    }
+
+                    @Override
+                    public void onError(String message) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
                         new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
                             @Override
                             public void onLimitsReceived(Limit limit, int slot) {
-                                Log.i("GOT LIMIT", "slot=" + String.valueOf(slot) + " max=" + String.valueOf(limit.getMax()));
-                                MyPreferences preferences = PreferenceHelper.getPreferences(getApplicationContext());
-                                if (preferences != null) {
-                                    preferences.setLimit2(limit);
-                                    PreferenceHelper.setPreferences(getApplicationContext(), preferences);
-                                    PreferenceHelper.sendBroadcast(getApplicationContext());
-                                }
+                                limit2.setMax(limit.getMax());
+                                limit2.setColor(limit.getColor());
+                                limit2.setMin(limit.getMin());
                             }
 
                             @Override
@@ -83,78 +97,56 @@ public class MainActivity extends AppCompatActivity{
 
                             @Override
                             public void onComplete() {
+                                new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
+                                    @Override
+                                    public void onLimitsReceived(Limit limit, int slot) {
+                                        limit3.setMax(limit.getMax());
+                                        limit3.setColor(limit.getColor());
+                                        limit3.setMin(limit.getMin());
+                                    }
 
+                                    @Override
+                                    public void onError(String message) {
+
+                                    }
+
+                                    @Override
+                                    public void onComplete() {
+                                        MyPreferences tempPreferences = PreferenceHelper.getPreferences(getApplicationContext());
+                                        boolean changes = false;
+
+                                        if(limit1.equals(tempPreferences.getLimit1())) {
+                                            tempPreferences.setLimit1(limit1);
+                                            changes = true;
+                                        }
+
+                                        if(limit2.equals(tempPreferences.getLimit2())) {
+                                            tempPreferences.setLimit2(limit2);
+                                            changes = true;
+                                        }
+
+                                        if(limit3.equals(tempPreferences.getLimit3())) {
+                                            tempPreferences.setLimit1(limit3);
+                                            changes = true;
+                                        }
+
+                                        if(changes){
+                                            PreferenceHelper.setPreferences(getApplicationContext(), tempPreferences);
+                                            PreferenceHelper.sendBroadcast(getApplicationContext(), tempPreferences);
+                                        }
+
+                                        handler.postDelayed(runnable, 5000);
+                                    }
+                                }, 2);
                             }
-                        }, 0);
-
-                        new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
-                            @Override
-                            public void onLimitsReceived(Limit limit, int slot) {
-                                Log.i("GOT LIMIT", "slot=" + String.valueOf(slot) + " max=" + String.valueOf(limit.getMax()));
-                                MyPreferences preferences = PreferenceHelper.getPreferences(getApplicationContext());
-                                if (preferences != null) {
-                                    preferences.setLimit2(limit);
-                                    PreferenceHelper.setPreferences(getApplicationContext(), preferences);
-                                    PreferenceHelper.sendBroadcast(getApplicationContext());
-                                }
-                            }
-
-                            @Override
-                            public void onError(String message) {
-
-                            }
-
-                            @Override
-                            public void onComplete() {
-
-                            }
-
                         }, 1);
-
-                        new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
-                            @Override
-                            public void onLimitsReceived(Limit limit, int slot) {
-                                Log.i("GOT LIMIT", "slot=" + String.valueOf(slot) + " max=" + String.valueOf(limit.getMax()));
-                                MyPreferences preferences = PreferenceHelper.getPreferences(getApplicationContext());
-                                if (preferences != null) {
-                                    preferences.setLimit2(limit);
-                                    PreferenceHelper.setPreferences(getApplicationContext(), preferences);
-                                    PreferenceHelper.sendBroadcast(getApplicationContext());
-                                }
-                            }
-
-                            @Override
-                            public void onError(String message) {
-
-                            }
-
-                            @Override
-                            public void onComplete() {
-
-                            }
-                        }, 2);
-
-                        return null;
                     }
-                });
+                }, 0);
+            }
+        };
 
-        roundtrip.observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(Object o) {
-                    }
-                });
+        handler = new Handler();
+        handler.postDelayed(runnable, 1000);
 
         setContentView(R.layout.activity_main);
 
@@ -240,4 +232,10 @@ public class MainActivity extends AppCompatActivity{
         mDrawerToggle.syncState();
     }
 
+    @Override
+    protected void onDestroy() {
+        handler.removeCallbacks(runnable);
+
+        super.onDestroy();
+    }
 }

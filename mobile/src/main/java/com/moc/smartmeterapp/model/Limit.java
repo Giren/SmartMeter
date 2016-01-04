@@ -56,4 +56,14 @@ public class Limit implements Serializable {
 	public void setEventHandler(ILimitEventHandler eventHandler) {
 		this.eventHandler = eventHandler;
 	}
+
+	public boolean equals(Limit limit) {
+		if(limit != null) {
+			if(max == limit.getMax() || min == limit.getMin() || color == limit.getColor()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }
