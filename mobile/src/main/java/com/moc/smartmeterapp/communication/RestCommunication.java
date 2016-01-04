@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.google.gson.GsonBuilder;
 import com.moc.smartmeterapp.model.DataObject;
-import com.moc.smartmeterapp.model.Global;
 import com.moc.smartmeterapp.model.Limit;
 import com.moc.smartmeterapp.preferences.MyPreferences;
 import com.moc.smartmeterapp.preferences.PreferenceHelper;
@@ -15,7 +14,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import retrofit.RestAdapter;
@@ -32,7 +30,7 @@ import rx.schedulers.Schedulers;
 /**
  * Created by philipp on 23.12.2015.
  */
-public class RestCommunication implements PreferenceHelper.PrefReceive{
+public class RestCommunication {
     public static final DateFormat DAY_FORMAT = new SimpleDateFormat("dd");
     public static final DateFormat MONTH_FORMAT = new SimpleDateFormat("MM");
     public static final DateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy");
@@ -49,17 +47,10 @@ public class RestCommunication implements PreferenceHelper.PrefReceive{
 
     private Context context;
     private MyPreferences prefs;
-    private PreferenceHelper preferenceHelper;
 
     private Map<String, String> GLOBAL_PARAMS;
 
-    @Override
-    public void onPrefReceive(MyPreferences pref) {
-        this.prefs = pref;
-    }
-
     public interface IGlobalDataReceiver {
-        void onGlobalDataReceived(Global global);
         void onError(String message);
         void onComplete();
     }
@@ -91,8 +82,6 @@ public class RestCommunication implements PreferenceHelper.PrefReceive{
         this.context = context;
 
         prefs = PreferenceHelper.getPreferences(context);
-        preferenceHelper = new PreferenceHelper();
-        preferenceHelper.register(this);
 
         GLOBAL_PARAMS = new HashMap<String, String>();
         GLOBAL_PARAMS.put("accessToken", "123456");

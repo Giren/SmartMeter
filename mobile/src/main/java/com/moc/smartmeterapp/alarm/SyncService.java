@@ -30,7 +30,6 @@ import java.util.List;
 public class SyncService extends IntentService implements RestCommunication.IDataReceiver {
 
     private NotificationManager mNotificationManager;
-    private NotificationCompat.Builder builder;
     private int count = 0;
     private int total = 0;
 
@@ -41,7 +40,7 @@ public class SyncService extends IntentService implements RestCommunication.IDat
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d("ALARM", "ALAAAAAARM");
+        Log.d("ALARM", "SYNC SERVICE");
     }
 
     @Override
@@ -64,6 +63,7 @@ public class SyncService extends IntentService implements RestCommunication.IDat
                 if (preferences != null) {
                     preferences.setLimit1(limit);
                     PreferenceHelper.setPreferences(getApplicationContext(), preferences);
+                    PreferenceHelper.sendBroadcast(getApplicationContext(), preferences);
                 }
             }
 
@@ -86,6 +86,7 @@ public class SyncService extends IntentService implements RestCommunication.IDat
                 if (preferences != null) {
                     preferences.setLimit2(limit);
                     PreferenceHelper.setPreferences(getApplicationContext(), preferences);
+                    PreferenceHelper.sendBroadcast(getApplicationContext(), preferences);
                 }
             }
 
@@ -105,9 +106,10 @@ public class SyncService extends IntentService implements RestCommunication.IDat
             public void onLimitsReceived(Limit limit, int slot) {
                 Log.i("GOT LIMIT", "slot=" + String.valueOf(slot) + " max=" + String.valueOf(limit.getMax()));
                 MyPreferences preferences = PreferenceHelper.getPreferences(getApplicationContext());
-                if(preferences != null) {
+                if (preferences != null) {
                     preferences.setLimit3(limit);
                     PreferenceHelper.setPreferences(getApplicationContext(), preferences);
+                    PreferenceHelper.sendBroadcast(getApplicationContext(), preferences);
                 }
             }
 
@@ -122,7 +124,7 @@ public class SyncService extends IntentService implements RestCommunication.IDat
             }
         }, 2);
 
-        PreferenceHelper.sendBroadcast(getApplicationContext());
+        //PreferenceHelper.sendBroadcast(getApplicationContext());
     }
 
     // Post a notification indicating whether a doodle was found.

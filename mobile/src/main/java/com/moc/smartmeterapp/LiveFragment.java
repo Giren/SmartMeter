@@ -15,24 +15,15 @@ import android.widget.SeekBar;
 
 import com.moc.smartmeterapp.communication.LiveCommunication;
 import com.moc.smartmeterapp.communication.RestCommunication;
-import com.moc.smartmeterapp.database.IDatabase;
-import com.moc.smartmeterapp.database.MeterDbHelper;
-import com.moc.smartmeterapp.model.DataObject;
-import com.moc.smartmeterapp.model.Day;
-import com.moc.smartmeterapp.model.EntryObject;
-import com.moc.smartmeterapp.model.Global;
-import com.moc.smartmeterapp.model.Hour;
 import com.moc.smartmeterapp.model.Limit;
 import com.moc.smartmeterapp.preferences.MyPreferences;
 import com.moc.smartmeterapp.preferences.PreferenceHelper;
 import com.moc.smartmeterapp.ui.Limiter;
 import com.moc.smartmeterapp.ui.MeterView;
 
-import java.util.List;
+public class LiveFragment extends Fragment implements LiveCommunication.ILiveDataEvent, PreferenceHelper.PrefReceive {
 
-public class LiveFragment extends Fragment implements LiveCommunication.ILiveDataEvent {
-
-    private PreferenceHelper prefHelper;
+    private PreferenceHelper preferenceHelper;
 
     private MeterView meterView;
     private Limiter limiter;
@@ -66,12 +57,12 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        prefHelper = new PreferenceHelper();
+        preferenceHelper = new PreferenceHelper(getActivity());
+        preferenceHelper.register(this);
 
         liveCommunication = new LiveCommunication(getActivity());
         liveCommunication.create();
         liveCommunication.registerDataEventHandler(this);
-        //liveCommunication.bindService();
 
         return inflater.inflate(R.layout.live_fragment_layout, null);
     }
@@ -144,5 +135,9 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
                 meterView.setMax(seekBar.getProgress() + 2500);
             }
         });
+    }
+
+    @Override
+    public void onPrefReceive(MyPreferences pref) {
     }
 }

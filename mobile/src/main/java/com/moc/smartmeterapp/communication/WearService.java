@@ -1,6 +1,5 @@
 package com.moc.smartmeterapp.communication;
 
-import android.app.PendingIntent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -13,21 +12,16 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 import com.moc.smartmeterapp.database.MeterDbHelper;
-import com.moc.smartmeterapp.model.DataObject;
 import com.moc.smartmeterapp.model.Day;
-import com.moc.smartmeterapp.model.EntryObject;
-import com.moc.smartmeterapp.model.Global;
 import com.moc.smartmeterapp.model.Limit;
 import com.moc.smartmeterapp.preferences.MyPreferences;
 import com.moc.smartmeterapp.preferences.PreferenceHelper;
 
-import java.sql.Time;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.TimeZone;
 
 /**

@@ -41,7 +41,8 @@ public class HomeMonthFragment extends Fragment implements PreferenceHelper.Pref
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        preferenceHelper = new PreferenceHelper();
+        preferenceHelper = new PreferenceHelper(getActivity());
+        preferenceHelper.register(this);
 
         prefs = PreferenceHelper.getPreferences(getActivity());
 
