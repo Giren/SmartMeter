@@ -59,7 +59,7 @@ public class Limit implements Serializable {
 
 	public boolean equals(Limit limit) {
 		if(limit != null) {
-			if(max == limit.getMax() || min == limit.getMin() || color == limit.getColor()) {
+			if(max == limit.getMax() && min == limit.getMin() && color == limit.getColor()) {
 				return true;
 			}
 		}
