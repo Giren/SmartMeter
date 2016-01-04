@@ -2,6 +2,7 @@ package com.moc.smartmeterapp;
 
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -175,6 +176,14 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
             public void onClick(View view) {
                 AlarmReceiver alarmReceiver = new AlarmReceiver();
                 alarmReceiver.doAlarm(getActivity());
+                manualSync.setEnabled(false);
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        manualSync.setEnabled(true);
+                    }
+                }, 4000);
             }
         });
 
@@ -241,6 +250,14 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
                 PreferenceHelper.sendBroadcast(getActivity(), preferences);
 
                 Toast.makeText(getActivity(), "Gespeichert", Toast.LENGTH_SHORT).show();
+                saveButton.setEnabled(false);
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        saveButton.setEnabled(true);
+                    }
+                }, 4000);
             }
         });
 
@@ -274,6 +291,14 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
                 PreferenceHelper.sendBroadcast(getActivity(), preferences);
 
                 Toast.makeText(getActivity(), "Gespeichert", Toast.LENGTH_SHORT).show();
+                saveIPButton.setEnabled(false);
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        saveIPButton.setEnabled(true);
+                    }
+                }, 4000);
             }
         });
 
