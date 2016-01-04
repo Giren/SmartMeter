@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity{
                                         }
 
                                         if(limit3.equals(tempPreferences.getLimit3())) {
-                                            tempPreferences.setLimit1(limit3);
+                                            tempPreferences.setLimit3(limit3);
                                             changes = true;
                                         }
 

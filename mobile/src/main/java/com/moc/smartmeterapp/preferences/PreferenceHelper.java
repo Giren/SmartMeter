@@ -115,15 +115,6 @@ public class PreferenceHelper {
         }
     }
 
-    public static void sendBroadcast(Context context) {
-        MyPreferences myPreferences = getPreferences(context);
-        if(myPreferences != null) {
-            Intent intent = new Intent(BROADCAST_ACTION);
-            intent.putExtra(PREFS, myPreferences);
-            context.sendBroadcast(intent);
-        }
-    }
-
     public static void sendBroadcast(Context context, MyPreferences myPreferences) {
         if(myPreferences != null) {
             Intent intent = new Intent(BROADCAST_ACTION);

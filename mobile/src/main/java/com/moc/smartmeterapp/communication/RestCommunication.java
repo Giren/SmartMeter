@@ -12,8 +12,10 @@ import com.moc.smartmeterapp.utils.DateConverter;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import retrofit.RestAdapter;
@@ -49,11 +51,6 @@ public class RestCommunication {
     private MyPreferences prefs;
 
     private Map<String, String> GLOBAL_PARAMS;
-
-    public interface IGlobalDataReceiver {
-        void onError(String message);
-        void onComplete();
-    }
 
     public interface ILimitsReceiver {
         void onLimitsReceived(Limit limit, int slot);

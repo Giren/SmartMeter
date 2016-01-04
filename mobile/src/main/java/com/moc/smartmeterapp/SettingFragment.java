@@ -206,7 +206,7 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
 
                 PreferenceHelper.setPreferences(getActivity(), preferences);
                 PreferenceHelper.limitsToServer(getActivity());
-                PreferenceHelper.sendBroadcast(getActivity());
+                PreferenceHelper.sendBroadcast(getActivity(), preferences);
 
                 Toast.makeText(getActivity(), "Gespeichert", Toast.LENGTH_SHORT).show();
             }
