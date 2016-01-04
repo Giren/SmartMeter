@@ -133,7 +133,7 @@ public class StatisticFragment extends Fragment{
         if(datePicker == null){
             dateButton.setText("Datum");
         } else{
-            dateButton.setText(dateToString(getPickedDate().getTime()));
+            setDateButtonText();
         }
         dateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -227,16 +227,11 @@ public class StatisticFragment extends Fragment{
     }
 
     private void updateChartView(){
-        Viewport viewport = new Viewport(0, maxValueOfLineChartData, maxNumberToShow, 0);
+        Viewport viewport = new Viewport(0, maxValueOfLineChartData+100, maxNumberToShow, 0);
         chart.setMaximumViewport(viewport);
         chart.setCurrentViewport(viewport);
         previewChart.setMaximumViewport(viewport);
         previewX(false);
-    }
-
-    private String dateToString(Date date){
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        return format.format(date);
     }
 
     private void handleUserChoice(){
@@ -252,7 +247,6 @@ public class StatisticFragment extends Fragment{
                 if(day != null){
                     datalist.add(day);
                 }
-                dateButton.setText(MeterDataSource.dateToString(ca.getTime()));
                 break;
             case WEEK:
                 maxNumberToShow = 7;
@@ -263,19 +257,18 @@ public class StatisticFragment extends Fragment{
                     }
                     ca.set(Calendar.DAY_OF_MONTH,ca.get(Calendar.DAY_OF_MONTH)+1);
                 }
-                dateButton.setText(MeterDataSource.dateToString(ca.getTime()));
                 break;
             case MONTH:
                 maxNumberToShow = 31;
                 datalist = meterDbHelper.loadMonth(ca.getTime());
-                dateButton.setText(MeterDataSource.monthToString(ca.getTime()));
                 break;
             case YEAR:
                 maxNumberToShow = 365;
                 datalist = meterDbHelper.loadYear(ca.getTime());
-                dateButton.setText(MeterDataSource.yearToString(ca.getTime()));
                 break;
         }
+
+        setDateButtonText();
 
         if(datalist != null){
             if(datalist.size() != 0){
@@ -303,6 +296,23 @@ public class StatisticFragment extends Fragment{
                 datePicker.getMonth(),
                 datePicker.getDayOfMonth()
         );
+    }
+
+    private void setDateButtonText(){
+        Calendar ca = getPickedDate();
+
+        switch (userChoice){
+            case DAY:
+            case WEEK:
+                dateButton.setText(MeterDataSource.dateToString(ca.getTime()));
+                break;
+            case MONTH:
+                dateButton.setText(MeterDataSource.monthToString(ca.getTime()));
+                break;
+            case YEAR:
+                dateButton.setText(MeterDataSource.yearToString(ca.getTime()));
+                break;
+        }
     }
 
 }
