@@ -5,9 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.util.Log;
 
-import com.moc.smartmeterapp.SettingFragment;
 import com.moc.smartmeterapp.communication.RestCommunication;
 import com.moc.smartmeterapp.database.IDatabase;
 import com.moc.smartmeterapp.database.MeterDbHelper;
@@ -33,7 +31,7 @@ public class PreferenceHelper {
         myPreferences.setLimit1(new Limit(2500, 3000, Color.RED));
         myPreferences.setLimit2(new Limit(2000, 2500, Color.YELLOW));
         myPreferences.setLimit3(new Limit(0, 2000, Color.GREEN));
-        myPreferences.setSync(true);
+        myPreferences.setAutoSync(true);
 
         return myPreferences;
     }

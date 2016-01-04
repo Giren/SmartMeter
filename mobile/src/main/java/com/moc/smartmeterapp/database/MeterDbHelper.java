@@ -39,7 +39,8 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
     public static final String COLUMN_PREF_LIMIT_2 = "limit2";
     public static final String COLUMN_PREF_LIMIT_3 = "limit3";
     public static final String COLUMN_PREF_IP = "ip_address";
-    public static final String COLUMN_PREF_SYNC = "sync";
+    public static final String COLUMN_PREF_AUTO_SYNC = "auto_sync";
+    public static final String COLUMN_PREF_UNSYNCED = "unsynced";
 
     private static final String SQL_CREATE = "CREATE TABLE " + TABLE_METER_LIST + "(" +
             COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -52,7 +53,8 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
             COLUMN_PREF_LIMIT_2 + " BLOB, " +
             COLUMN_PREF_LIMIT_3 + " BLOB, " +
             COLUMN_PREF_IP + " TEXT NOT NULL, " +
-            COLUMN_PREF_SYNC + " TEXT NOT NULL);";
+            COLUMN_PREF_AUTO_SYNC + " TEXT NOT NULL, " +
+            COLUMN_PREF_UNSYNCED + " TEXT NOT NULL);";
 
     public MeterDbHelper(Context context){
         super(context, DB_NAME ,null, DB_VERSION);

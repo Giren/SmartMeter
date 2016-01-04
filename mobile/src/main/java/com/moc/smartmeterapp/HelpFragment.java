@@ -67,7 +67,7 @@ public class HelpFragment extends Fragment{
                         "Limit3: " + prefs.getLimit3().getMin()+"-"+ prefs.getLimit3().getMax() + "\n" +
                         "Limit3Color: " + prefs.getLimit3().getColor() + "\n" +
                         "IP Address: " + prefs.getIpAddress() + "\n" +
-                        "Notification: " + prefs.getSync() + "\n");
+                        "Notification: " + prefs.getAutoSync() + "\n");
                 //meterDbHelper.loadLatestDay();
                 meterDbHelper.closeDatabase();
             }

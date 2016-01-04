@@ -1,16 +1,11 @@
 package com.moc.smartmeterapp;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -201,7 +196,8 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
                         limit2,
                         limit3,
                         editIP.getText().toString(),
-                        syncCheck.isChecked()
+                        syncCheck.isChecked(),
+                        false
                 );
 
                 PreferenceHelper.setPreferences(getActivity(), preferences);
@@ -231,7 +227,7 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
 
         editIP.setText(pref.getIpAddress());
 
-        syncCheck.setChecked(pref.getSync());
+        syncCheck.setChecked(pref.getAutoSync());
     }
 
     @Override
