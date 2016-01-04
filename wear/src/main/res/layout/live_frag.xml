@@ -10,6 +10,40 @@
         android:layout_height="wrap_content"
         android:id="@+id/meterview"
         android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_gravity="center_horizontal|bottom"
+            android:weightSum="1">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:id="@+id/tvLiveValue"
+                android:textColor="#000000"
+                android:layout_weight="0.5"
+                android:textAlignment="textEnd" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text=" kWh"
+                android:id="@+id/tvLiveValueUnit"
+                android:textColor="#000000"
+                android:textAlignment="textStart"
+                android:layout_weight="0.5" />
+        </LinearLayout>
+    </FrameLayout>
 
 </RelativeLayout>
