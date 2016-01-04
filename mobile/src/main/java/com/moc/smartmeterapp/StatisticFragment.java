@@ -69,7 +69,7 @@ public class StatisticFragment extends Fragment{
     private final int MONTH = 2;
     private final int YEAR = 3;
 
-    private MeterDbHelper meterDbHelper;
+    private IDatabase meterDbHelper;
 
     @Nullable
     @Override
@@ -249,13 +249,14 @@ public class StatisticFragment extends Fragment{
                 }
                 break;
             case WEEK:
+                ca.add(Calendar.DAY_OF_MONTH, 1 - (ca.get(Calendar.DAY_OF_WEEK)));
                 maxNumberToShow = 7;
                 for(int i=0; i<maxNumberToShow; i++){
                     day = meterDbHelper.loadDay(ca.getTime());
                     if(day != null){
                         datalist.add(day);
                     }
-                    ca.set(Calendar.DAY_OF_MONTH,ca.get(Calendar.DAY_OF_MONTH)+1);
+                    ca.add(Calendar.DAY_OF_MONTH, 1);
                 }
                 break;
             case MONTH:

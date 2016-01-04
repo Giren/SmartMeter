@@ -86,16 +86,16 @@ public class HomeWeekFragment extends Fragment implements PreferenceHelper.PrefR
         Limiter limiter = new Limiter();
 
         Limit limit3 = prefs.getLimit3();
-        limit3.setMax(limit3.getMax()/FACTOR);
+        limit3.setMax(limit3.getMax() / FACTOR);
         limit3.setMin(limit3.getMin() / FACTOR);
 
         Limit limit2 = prefs.getLimit2();
-        limit2.setMax(limit2.getMax()/FACTOR);
+        limit2.setMax(limit2.getMax() / FACTOR);
         limit2.setMin(limit2.getMin() / FACTOR);
 
         Limit limit1 = prefs.getLimit1();
-        limit1.setMax(limit1.getMax()/FACTOR);
-        limit1.setMin(limit1.getMin()/FACTOR);
+        limit1.setMax(limit1.getMax() / FACTOR);
+        limit1.setMin(limit1.getMin() / FACTOR);
 
         limiter.addLimit(limit3);
         limiter.addLimit(limit2);
