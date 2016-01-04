@@ -16,6 +16,7 @@ import com.moc.smartmeterapp.model.Day;
 import com.moc.smartmeterapp.model.Limit;
 import com.moc.smartmeterapp.preferences.MyPreferences;
 import com.moc.smartmeterapp.preferences.PreferenceHelper;
+import com.moc.smartmeterapp.utils.HomeHelper;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -41,7 +42,10 @@ public class WearService extends WearableListenerService implements
     private LiveCommunication liveCommunication;
     private GoogleApiClient googleClient;
 
+    private HomeHelper homeHelper;
+
     MyPreferences myPreferences;
+    PreferenceHelper preferenceHelper;
 
     TimeZone timeZone;
     private MeterDbHelper meterDbHelper;
@@ -64,8 +68,12 @@ public class WearService extends WearableListenerService implements
         //dayFormat = new SimpleDateFormat( "dd");
         //monthFormat = new SimpleDateFormat( "MM");
         //yearFormat = new SimpleDateFormat( "yyyy");
-
+        preferenceHelper = new PreferenceHelper(getApplicationContext());
         myPreferences = PreferenceHelper.getPreferences(getApplicationContext());
+        preferenceHelper.register( this);
+
+        homeHelper = new HomeHelper( getApplicationContext());
+
         if(meterDbHelper == null){
             meterDbHelper = new MeterDbHelper( getBaseContext());
         }
@@ -131,6 +139,7 @@ public class WearService extends WearableListenerService implements
         liveCommunication.unregisterDataEventHandler(this);
         liveCommunication.destroy();
         visibleFragmentOnWearable = null;
+        preferenceHelper.unregister( this);
         if ( null != googleClient)
         {
             if ( googleClient.isConnected())
@@ -170,36 +179,37 @@ public class WearService extends WearableListenerService implements
             case "liveData": {
                 Log.d( "DEBUG", "liveData case");
                 visibleFragmentOnWearable = "liveData";
-                // liveDataKeepAlive(WEARABLE_DATA_PATH);
+                liveDataLimits(WEARABLE_DATA_PATH);
                 break;
             }
             case "limitWeek": {
                 Log.d( "DEBUG", "limitWeekCase");
                 visibleFragmentOnWearable = "limitWeek";
-                meterDbHelper.openDatabase();
-                Log.d( "DEBUG", "reactOnMessage() - openDatabase()");
-                dataMessageToWearableLimit( WEARABLE_DATA_PATH, "limitWeek", limitWeek);
-                meterDbHelper.closeDatabase();
+
+//                meterDbHelper.openDatabase();
+//                Log.d( "DEBUG", "reactOnMessage() - openDatabase()");
+                dataMessageToWearableLimit( WEARABLE_DATA_PATH, "limitWeek", limitWeek, HomeHelper.WEEK);
+//                meterDbHelper.closeDatabase();
                 Log.d( "DEBUG", "REACT ON MESSAGE - closeDatabase()");
                 break;
             }
             case "limitMonth": {
                 Log.d( "DEBUG", "limitMonth case");
                 visibleFragmentOnWearable = "limitMonth";
-                meterDbHelper.openDatabase();
-                Log.d( "DEBUG", "reactOnMessage() - openDatabase()");
-                dataMessageToWearableLimit( WEARABLE_DATA_PATH, "limitMonth", limitMonth);
-                meterDbHelper.closeDatabase();
+//                meterDbHelper.openDatabase();
+//                Log.d( "DEBUG", "reactOnMessage() - openDatabase()");
+                dataMessageToWearableLimit( WEARABLE_DATA_PATH, "limitWeek", limitMonth, HomeHelper.MONTH);
+//                meterDbHelper.closeDatabase();
                 Log.d( "DEBUG", "REACT ON MESSAGE - closeDatabase()");
                 break;
             }
             case "limitYear": {
                 Log.d( "DEBUG", "limitYear case");
                 visibleFragmentOnWearable = "limitYear";
-                meterDbHelper.openDatabase();
-                Log.d( "DEBUG", "reactOnMessage() - openDatabase()");
-                dataMessageToWearableLimit( WEARABLE_DATA_PATH, "limitYear", limitYear);
-                meterDbHelper.closeDatabase();
+//                meterDbHelper.openDatabase();
+//                Log.d( "DEBUG", "reactOnMessage() - openDatabase()");
+                dataMessageToWearableLimit( WEARABLE_DATA_PATH, "limitWeek", limitYear, HomeHelper.YEAR);
+//                meterDbHelper.closeDatabase();
                 Log.d( "DEBUG", "REACT ON MESSAGE - closeDatabase()");
                 break;
             }
@@ -209,13 +219,15 @@ public class WearService extends WearableListenerService implements
         }
     }
 
-    public void dataMessageToWearableLimit(String path, String fragmentName, String limitValue) {
+    public void dataMessageToWearableLimit(String path, String fragmentName, String limitValue, int homeHelperInt) {
         String seperator = ";";
         String dataMessage;
 
         // Datenvorbereitung
-        String currentValue = getCurrentLimitValue( fragmentName);
+        // String currentValue = getCurrentLimitValue( fragmentName);
         // TODO Datenbeschaffung der einzelnen limits, anschließend senden
+
+        String currentValue = String.valueOf( homeHelper.getConsumption( homeHelperInt));
 
         // vor dem senden nochmal warten
         try {
@@ -386,9 +398,9 @@ public class WearService extends WearableListenerService implements
         return ERR_NO_DATA_IN_DB;
     }
 
-    public void liveDataKeepAlive( String path) {
+    public void liveDataLimits( String path) {
 
-        String dataMessage = "liveData;keepAlive;";
+        String dataMessage = "liveData;";
         dataMessage += "limit1;";
         dataMessage += limit1.getMin() + ";";
         dataMessage += limit1.getMax() + ";";
@@ -433,14 +445,20 @@ public class WearService extends WearableListenerService implements
 
     @Override
     public void onPrefReceive(MyPreferences pref) {
-        // TODO benötigte updaten
+        // TODO update local data objects
+        Log.d( "DEBUG", "WearService Preference Update");
+
         limitWeek = String.valueOf( pref.getLimit1().getMax() / 4);
         limitMonth = String.valueOf( pref.getLimit1().getMax());
-        limitYear = String.valueOf( pref.getLimit1().getMax() * 12);
+        limitYear = String.valueOf(pref.getLimit1().getMax() * 12);
 
+        // update local limit objects
         limit1 = pref.getLimit1();
         limit2 = pref.getLimit2();
         limit3 = pref.getLimit3();
+
+        // send updated limit objects to wearable
+        liveDataLimits(WEARABLE_DATA_PATH);
     }
 
     public class SendToDataLayerThread extends Thread {

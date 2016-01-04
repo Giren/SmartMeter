@@ -12,7 +12,6 @@ import android.graphics.RectF;
 import android.os.Handler;
 import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 
@@ -25,6 +24,7 @@ public class MeterView_Wear extends View {
 	private final int TEXT_SIZE = 25;
 	private final int TEXT_SIZE_SMALL = 16;
 	private final int TEXT_SIZE_BIG = 20;
+    private final int TEXT_SIZE_HUGE = 150;
 	private final int LAST_TEXT_ANGLE = 350;
 	private final int PIN_PADDING = 50;
 	private final int LIMIT_PADDING = 0;
@@ -50,6 +50,7 @@ public class MeterView_Wear extends View {
 	private Paint limitPaint;
 	private TextPaint textPaint;
 	private TextPaint textPaintBig;
+    private TextPaint textPaintHuge;
 	private TextPaint avgPaint;
 
 	//data stuff
@@ -109,6 +110,9 @@ public class MeterView_Wear extends View {
 		textPaintBig = new TextPaint();
 		textPaintBig.setTextSize(TEXT_SIZE_BIG);
 
+        textPaintHuge = new TextPaint();
+        textPaintHuge.setTextSize(TEXT_SIZE_HUGE);
+
 		avgPaint = new TextPaint();
 		avgPaint.set(linePaint);
 		avgPaint.setColor(Color.RED);
@@ -127,7 +131,7 @@ public class MeterView_Wear extends View {
 		ticks = 90;
 		value = 0;
 		avg = 0;
-		text = "-";
+		text = "";
 
 		valuesToText = true;
 	}
@@ -188,6 +192,12 @@ public class MeterView_Wear extends View {
 			tempAvg = avg * angle/max;
 			tempPoint = calcLine(center_x, center_y, radius, tempAvg, offsetAngle);
 			canvas.drawLine(center_x, center_y, tempPoint.x, tempPoint.y, avgPaint);
+
+			tempText = String.valueOf("AVG");
+			textPaint.getTextBounds(tempText, 0, tempText.length(), textBounds);
+			mTextHeight = textBounds.height();
+			tempPoint = calcLine(center_x, center_y, radius+INNER_MARGIN, tempAvg, offsetAngle);
+			canvas.drawText(tempText, tempPoint.x, tempPoint.y + (mTextHeight / 2f), avgPaint);
 		}
 
 		canvas.drawCircle(center_x, center_y, radius-INNER_MARGIN*2-STICK_MARGIN*2, backgroundPaint);
@@ -206,6 +216,7 @@ public class MeterView_Wear extends View {
 				mTextHeight = textBounds.height(); // Use height from getTextBounds()
 
 				tempPoint = calcLine(center_x, center_y, radius-INNER_MARGIN-TEXT_INNER_MARGIN-TEXT_SIZE, i, offsetAngle);
+				// Later when you draw...
 				canvas.drawText(tempText, tempPoint.x, tempPoint.y + (mTextHeight / 2f), textPaint);
 				k++;
 			}
@@ -217,20 +228,24 @@ public class MeterView_Wear extends View {
 			canvas.drawLine(center_x, center_y, tempPoint.x, tempPoint.y, linePaint);
 		}
 
-		// von radius/4 auf radius/8 gegangen
-		canvas.drawCircle(center_x, center_y, radius/8, backgroundPaint);
+		//canvas.drawCircle(center_x, center_y, radius/4, backgroundPaint);
 
 		if(text != null) {
-			//TODO: draw centered text https://chris.banes.me/2014/03/27/measuring-text/
+            float mTextWidth, mTextHeight;
+            Rect textBounds = new Rect();
+            mTextWidth = textPaintBig.measureText(text);
+            mTextHeight = textBounds.height();
+            textPaintBig.getTextBounds(text, 0, text.length(), textBounds);
+
+            canvas.drawText(text, // Text to display
+                    center_x - (mTextWidth / 2f),
+                    center_y + (mTextHeight / 2f) + 2 * radius / 3,
+                    textPaintBig
+            );
 		}
 
 		tempText = null;
 		tempPoint = null;
-	}
-
-	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 	}
 
 	public void setMin(int min) {
@@ -238,7 +253,17 @@ public class MeterView_Wear extends View {
 	}
 
 	public void setMax(int max) {
-		this.max = max;
+		if(limiter != null) {
+			for(Limit l : limiter.getLimits()) {
+				if(l.getMax() > max) {
+					max = l.getMax();
+				}
+			}
+		}
+
+		if ( max > 0){
+			this.max = max;
+		}
 	}
 
 	public void setAverage(int avg) {
@@ -274,6 +299,13 @@ public class MeterView_Wear extends View {
 	}
 
 	public void setLimiter(Limiter limiter) {
+		if(limiter != null) {
+			for(Limit l : limiter.getLimits()) {
+				if(l.getMax() > max) {
+					max = l.getMax();
+				}
+			}
+		}
 		this.limiter = limiter;
 	}
 
@@ -366,8 +398,7 @@ public class MeterView_Wear extends View {
 				relativStep *= -1;
 				positiv = false;
 			}
-			
-			Log.d("calculated ste: ", String.valueOf(relativStep) + " diretion" + String.valueOf(positiv));
+
 			animationState = ANIMATIONSTATE_ANIMATE;
             run();
 		}
