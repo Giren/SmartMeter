@@ -40,6 +40,8 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
                 meterViewMax = value;
                 meterView.setMax(meterViewMax);
             }
+            meterView.enableValueText(false);
+            meterView.setText(String.valueOf(value) + " W");
             meterView.setValue(value);
         }
 
@@ -88,6 +90,10 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
         meterView = (MeterView) view.findViewById(R.id.meterview);
         meterView.setOffsetAngle(45);
         meterView.setLimiter(getLimiter());
+
+        meterView.enableValueText(false);
+        meterView.setText(String.valueOf(0) + " W");
+        meterView.setValue(0);
     }
 
     private Limiter getLimiter() {
