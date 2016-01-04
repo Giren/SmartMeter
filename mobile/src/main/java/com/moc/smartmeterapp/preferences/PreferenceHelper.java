@@ -109,9 +109,9 @@ public class PreferenceHelper {
     public static void limitsToServer(Context context) {
         MyPreferences myPreferences = getPreferences(context);
         if(myPreferences != null) {
-            new RestCommunication(context).saveLimit(myPreferences.getLimit1(), 2);
+            new RestCommunication(context).saveLimit(myPreferences.getLimit1(), 0);
             new RestCommunication(context).saveLimit(myPreferences.getLimit2(), 1);
-            new RestCommunication(context).saveLimit(myPreferences.getLimit3(), 0);
+            new RestCommunication(context).saveLimit(myPreferences.getLimit3(), 2);
         }
     }
 
