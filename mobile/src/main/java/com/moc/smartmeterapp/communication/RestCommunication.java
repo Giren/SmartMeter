@@ -64,6 +64,11 @@ public class RestCommunication {
         void onComplete();
     }
 
+    public interface IRestAnswer {
+        void onError(String message);
+        void onComplete();
+    }
+
     public interface IRestService {
         @GET("/{path}")
         rx.Observable<DataObject> getDataObjectsObservable(@Path("path") String path, @QueryMap Map<String, String> params);
@@ -114,6 +119,10 @@ public class RestCommunication {
     }
 
     public void saveLimit(Limit limit, final int slot) {
+        saveLimit(limit, slot, null);
+    }
+
+    public void saveLimit(Limit limit, final int slot, final IRestAnswer answer) {
         Map<String, String> LOCAL_PARAMS = GLOBAL_PARAMS;
         LOCAL_PARAMS.put("slot", String.valueOf(slot));
         LOCAL_PARAMS.put("color", String.valueOf(limit.getColor()));
@@ -127,11 +136,17 @@ public class RestCommunication {
                     @Override
                     public void onCompleted() {
                         Log.i("SUCCESS", "SAVED LIMIT: SLOT " + String.valueOf(slot));
+                        if(answer != null) {
+                            answer.onComplete();
+                        }
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         Log.e("ERROR", "ERROR WHILE SETTING LIMITS: " + e.getMessage());
+                        if(answer != null) {
+                            answer.onError(e.getMessage());
+                        }
                     }
 
                     @Override

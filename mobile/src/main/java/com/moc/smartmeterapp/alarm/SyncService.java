@@ -55,85 +55,119 @@ public class SyncService extends IntentService implements RestCommunication.IDat
             new RestCommunication(getApplicationContext()).fetchSinceData(lastDay.getDate(), this);
         }
 
-        final Limit limit1 = new Limit();
-        final Limit limit2 = new Limit();
-        final Limit limit3 = new Limit();
+        final MyPreferences myPreferences = PreferenceHelper.getPreferences(getApplicationContext());
+        //Check if limits allready set to server. If not get them
+        if(myPreferences != null && myPreferences.getUnSynced()) {
+            new RestCommunication(getApplicationContext()).saveLimit(myPreferences.getLimit1(), 0, new RestCommunication.IRestAnswer() {
+                @Override
+                public void onError(String message) {
 
-        new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
-            @Override
-            public void onLimitsReceived(Limit limit, int slot) {
-                limit1.setMax(limit.getMax());
-                limit1.setColor(limit.getColor());
-                limit1.setMin(limit.getMin());
-            }
+                }
 
-            @Override
-            public void onError(String message) {
+                @Override
+                public void onComplete() {
+                    new RestCommunication(getApplicationContext()).saveLimit(myPreferences.getLimit2(), 1, new RestCommunication.IRestAnswer() {
+                        @Override
+                        public void onError(String message) {
 
-            }
+                        }
 
-            @Override
-            public void onComplete() {
-                new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
-                    @Override
-                    public void onLimitsReceived(Limit limit, int slot) {
-                        limit2.setMax(limit.getMax());
-                        limit2.setColor(limit.getColor());
-                        limit2.setMin(limit.getMin());
-                    }
+                        @Override
+                        public void onComplete() {
+                            new RestCommunication(getApplicationContext()).saveLimit(myPreferences.getLimit3(), 2, new RestCommunication.IRestAnswer() {
+                                @Override
+                                public void onError(String message) {
 
-                    @Override
-                    public void onError(String message) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
-                            @Override
-                            public void onLimitsReceived(Limit limit, int slot) {
-                                limit3.setMax(limit.getMax());
-                                limit3.setColor(limit.getColor());
-                                limit3.setMin(limit.getMin());
-                            }
-
-                            @Override
-                            public void onError(String message) {
-
-                            }
-
-                            @Override
-                            public void onComplete() {
-                                MyPreferences tempPreferences = PreferenceHelper.getPreferences(getApplicationContext());
-                                boolean changes = false;
-
-                                if(limit1.equals(tempPreferences.getLimit1())) {
-                                    tempPreferences.setLimit1(limit1);
-                                    changes = true;
                                 }
 
-                                if(limit2.equals(tempPreferences.getLimit2())) {
-                                    tempPreferences.setLimit2(limit2);
-                                    changes = true;
+                                @Override
+                                public void onComplete() {
+                                    myPreferences.setUnSynced(false);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        } else {
+            final Limit limit1 = new Limit();
+            final Limit limit2 = new Limit();
+            final Limit limit3 = new Limit();
+
+            new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
+                @Override
+                public void onLimitsReceived(Limit limit, int slot) {
+                    limit1.setMax(limit.getMax());
+                    limit1.setColor(limit.getColor());
+                    limit1.setMin(limit.getMin());
+                }
+
+                @Override
+                public void onError(String message) {
+
+                }
+
+                @Override
+                public void onComplete() {
+                    new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
+                        @Override
+                        public void onLimitsReceived(Limit limit, int slot) {
+                            limit2.setMax(limit.getMax());
+                            limit2.setColor(limit.getColor());
+                            limit2.setMin(limit.getMin());
+                        }
+
+                        @Override
+                        public void onError(String message) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            new RestCommunication(getApplicationContext()).fetchLimit(new RestCommunication.ILimitsReceiver() {
+                                @Override
+                                public void onLimitsReceived(Limit limit, int slot) {
+                                    limit3.setMax(limit.getMax());
+                                    limit3.setColor(limit.getColor());
+                                    limit3.setMin(limit.getMin());
                                 }
 
-                                if(limit3.equals(tempPreferences.getLimit3())) {
-                                    tempPreferences.setLimit3(limit3);
-                                    changes = true;
+                                @Override
+                                public void onError(String message) {
+
                                 }
 
-                                if(changes){
-                                    PreferenceHelper.setPreferences(getApplicationContext(), tempPreferences);
-                                    PreferenceHelper.sendBroadcast(getApplicationContext(), tempPreferences);
-                                }
-                            }
-                        }, 2);
-                    }
-                }, 1);
-            }
-        }, 0);
+                                @Override
+                                public void onComplete() {
+                                    MyPreferences tempPreferences = PreferenceHelper.getPreferences(getApplicationContext());
+                                    boolean changes = false;
 
-        //PreferenceHelper.sendBroadcast(getApplicationContext());
+                                    if(limit1.equals(tempPreferences.getLimit1())) {
+                                        tempPreferences.setLimit1(limit1);
+                                        changes = true;
+                                    }
+
+                                    if(limit2.equals(tempPreferences.getLimit2())) {
+                                        tempPreferences.setLimit2(limit2);
+                                        changes = true;
+                                    }
+
+                                    if(limit3.equals(tempPreferences.getLimit3())) {
+                                        tempPreferences.setLimit3(limit3);
+                                        changes = true;
+                                    }
+
+                                    if(changes){
+                                        PreferenceHelper.setPreferences(getApplicationContext(), tempPreferences);
+                                        PreferenceHelper.sendBroadcast(getApplicationContext(), tempPreferences);
+                                    }
+                                }
+                            }, 2);
+                        }
+                    }, 1);
+                }
+            }, 0);
+        }
     }
 
     // Post a notification indicating whether a doodle was found.

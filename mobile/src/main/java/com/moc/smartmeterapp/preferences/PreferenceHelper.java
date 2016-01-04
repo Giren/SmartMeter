@@ -33,6 +33,7 @@ public class PreferenceHelper {
         myPreferences.setLimit2(new Limit(2000, 2500, Color.YELLOW));
         myPreferences.setLimit3(new Limit(0, 2000, Color.GREEN));
         myPreferences.setAutoSync(true);
+        myPreferences.setUnSynced(false);
 
         return myPreferences;
     }
@@ -107,6 +108,7 @@ public class PreferenceHelper {
         }
     }
 
+    @Deprecated
     public static void limitsToServer(Context context) {
         MyPreferences myPreferences = getPreferences(context);
         if(myPreferences != null) {

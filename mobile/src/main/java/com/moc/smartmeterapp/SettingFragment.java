@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.moc.smartmeterapp.alarm.AlarmReceiver;
+import com.moc.smartmeterapp.communication.RestCommunication;
 import com.moc.smartmeterapp.database.MeterDbHelper;
 import com.moc.smartmeterapp.model.Limit;
 import com.moc.smartmeterapp.preferences.MyPreferences;
@@ -193,17 +194,50 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
                         Integer.valueOf(opt2LimitStop.getText().toString()),
                         ((ColorDrawable) opt2LimitColorBtn.getBackground()).getColor());
 
-                MyPreferences preferences = new MyPreferences(
+                final MyPreferences preferences = new MyPreferences(
                         limit1,
                         limit2,
                         limit3,
                         editIP.getText().toString(),
                         syncCheck.isChecked(),
-                        false
+                        true
                 );
 
                 PreferenceHelper.setPreferences(getActivity(), preferences);
-                PreferenceHelper.limitsToServer(getActivity());
+                //PreferenceHelper.limitsToServer(getActivity());
+
+                new RestCommunication(getActivity()).saveLimit(preferences.getLimit1(), 0, new RestCommunication.IRestAnswer() {
+                    @Override
+                    public void onError(String message) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        new RestCommunication(getActivity()).saveLimit(preferences.getLimit2(), 1, new RestCommunication.IRestAnswer() {
+                            @Override
+                            public void onError(String message) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                new RestCommunication(getActivity()).saveLimit(preferences.getLimit3(), 2, new RestCommunication.IRestAnswer() {
+                                    @Override
+                                    public void onError(String message) {
+
+                                    }
+
+                                    @Override
+                                    public void onComplete() {
+                                        preferences.setUnSynced(false);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+
                 PreferenceHelper.sendBroadcast(getActivity(), preferences);
 
                 Toast.makeText(getActivity(), "Gespeichert", Toast.LENGTH_SHORT).show();

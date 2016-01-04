@@ -26,7 +26,8 @@ public class MeterView extends View {
 	private final int TEXT_INNER_MARGIN = 25;
 	private final int TEXT_SIZE = 35;
 	private final int TEXT_SIZE_SMALL = 25;
-	private final int TEXT_SIZE_BIG = 80;
+	private final int TEXT_SIZE_BIG = 50;
+    private final int TEXT_SIZE_HUGE = 150;
 	private final int LAST_TEXT_ANGLE = 350;
 	private final int PIN_PADDING = 50;
 	private final int LIMIT_PADDING = 45;
@@ -52,6 +53,7 @@ public class MeterView extends View {
 	private Paint limitPaint;
 	private TextPaint textPaint;
 	private TextPaint textPaintBig;
+    private TextPaint textPaintHuge;
 	private TextPaint avgPaint;
 
 	//data stuff
@@ -111,6 +113,9 @@ public class MeterView extends View {
 		textPaintBig = new TextPaint();
 		textPaintBig.setTextSize(TEXT_SIZE_BIG);
 
+        textPaintHuge = new TextPaint();
+        textPaintHuge.setTextSize(TEXT_SIZE_HUGE);
+
 		avgPaint = new TextPaint();
 		avgPaint.set(linePaint);
 		avgPaint.setColor(Color.RED);
@@ -129,7 +134,7 @@ public class MeterView extends View {
 		ticks = 90;
 		value = 0;
 		avg = 0;
-		text = "-";
+		text = "";
 
 		valuesToText = true;
 	}
@@ -229,7 +234,17 @@ public class MeterView extends View {
 		//canvas.drawCircle(center_x, center_y, radius/4, backgroundPaint);
 
 		if(text != null) {
-			//TODO: draw centered text https://chris.banes.me/2014/03/27/measuring-text/
+            float mTextWidth, mTextHeight;
+            Rect textBounds = new Rect();
+            mTextWidth = textPaintBig.measureText(text);
+            mTextHeight = textBounds.height();
+            textPaintBig.getTextBounds(text, 0, text.length(), textBounds);
+
+            canvas.drawText(text, // Text to display
+                    center_x - (mTextWidth / 2f),
+                    center_y + (mTextHeight / 2f) + 2 * radius / 3,
+                    textPaintBig
+            );
 		}
 
 		tempText = null;
