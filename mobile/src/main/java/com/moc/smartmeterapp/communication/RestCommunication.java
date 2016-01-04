@@ -113,7 +113,9 @@ public class RestCommunication {
 
                     @Override
                     public void onNext(Limit limits) {
-                        limitsReceiver.onLimitsReceived(limits, slot);
+                        if(limitsReceiver != null) {
+                            limitsReceiver.onLimitsReceived(limits, slot);
+                        }
                     }
                 });
     }

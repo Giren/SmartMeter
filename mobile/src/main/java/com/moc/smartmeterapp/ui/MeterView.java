@@ -37,12 +37,10 @@ public class MeterView extends View {
 	//temp stuff
 	private Point tempPoint;
 	private String tempText;
-	private Rect textBounds;
 	private int tempCountSticks;
 	private int tempAvg;
 	private float tempValue;
 	private double tempAngle;
-	private float mTextHeight;
 	private RectF rectF;
 	private int tempAngleA;
 	private int tempAngleB;
@@ -71,6 +69,8 @@ public class MeterView extends View {
 	private int longTickEach;
 	private String text;
 	private boolean valuesToText;
+    private float mTextWidth, mTextHeight;
+    private Rect textBounds;
 
 	//event stuff
 	private Limiter limiter;
@@ -122,6 +122,7 @@ public class MeterView extends View {
 		avgPaint.setTextSize(TEXT_SIZE_SMALL);
 		avgPaint.setTextAlign(Align.CENTER);
 
+        textBounds = new Rect();
 		rectF = new RectF();
 		height = getHeight();
 		width = getWidth();
@@ -234,8 +235,6 @@ public class MeterView extends View {
 		//canvas.drawCircle(center_x, center_y, radius/4, backgroundPaint);
 
 		if(text != null) {
-            float mTextWidth, mTextHeight;
-            Rect textBounds = new Rect();
             mTextWidth = textPaintBig.measureText(text);
             mTextHeight = textBounds.height();
             textPaintBig.getTextBounds(text, 0, text.length(), textBounds);

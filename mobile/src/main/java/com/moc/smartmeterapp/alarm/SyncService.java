@@ -83,6 +83,7 @@ public class SyncService extends IntentService implements RestCommunication.IDat
                                 @Override
                                 public void onComplete() {
                                     myPreferences.setUnSynced(false);
+                                    PreferenceHelper.setPreferences(getApplicationContext(), myPreferences);
                                 }
                             });
                         }
@@ -142,17 +143,17 @@ public class SyncService extends IntentService implements RestCommunication.IDat
                                     MyPreferences tempPreferences = PreferenceHelper.getPreferences(getApplicationContext());
                                     boolean changes = false;
 
-                                    if(limit1.equals(tempPreferences.getLimit1())) {
+                                    if(!limit1.equals(tempPreferences.getLimit1())) {
                                         tempPreferences.setLimit1(limit1);
                                         changes = true;
                                     }
 
-                                    if(limit2.equals(tempPreferences.getLimit2())) {
+                                    if(!limit2.equals(tempPreferences.getLimit2())) {
                                         tempPreferences.setLimit2(limit2);
                                         changes = true;
                                     }
 
-                                    if(limit3.equals(tempPreferences.getLimit3())) {
+                                    if(!limit3.equals(tempPreferences.getLimit3())) {
                                         tempPreferences.setLimit3(limit3);
                                         changes = true;
                                     }
