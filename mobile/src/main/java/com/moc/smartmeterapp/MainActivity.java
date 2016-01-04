@@ -11,32 +11,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-import com.google.android.gms.appstate.AppState;
-import com.moc.smartmeterapp.alarm.AlarmReceiver;
-import com.moc.smartmeterapp.communication.LiveDataService;
 import com.moc.smartmeterapp.communication.RestCommunication;
-import com.moc.smartmeterapp.database.IDatabase;
-import com.moc.smartmeterapp.database.MeterDbHelper;
-import com.moc.smartmeterapp.model.DataObject;
-import com.moc.smartmeterapp.model.Day;
-import com.moc.smartmeterapp.model.Hour;
 import com.moc.smartmeterapp.model.Limit;
 import com.moc.smartmeterapp.preferences.MyPreferences;
 import com.moc.smartmeterapp.preferences.PreferenceHelper;
-
-import java.util.concurrent.TimeUnit;
-
-import rx.Notification;
-import rx.Observable;
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
-import rx.schedulers.TimeInterval;
 
 public class MainActivity extends AppCompatActivity{
 

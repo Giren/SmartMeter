@@ -69,7 +69,7 @@ public class StatisticFragment extends Fragment{
     private final int MONTH = 2;
     private final int YEAR = 3;
 
-    private MeterDbHelper meterDbHelper;
+    private IDatabase meterDbHelper;
 
     @Nullable
     @Override
