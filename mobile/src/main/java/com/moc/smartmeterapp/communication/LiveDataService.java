@@ -39,7 +39,6 @@ public class LiveDataService extends Service implements PreferenceHelper.PrefRec
     public static final String BROADCAST_ACTION = "com.moc.smartmeterapp.LiveDataService";
 
     private boolean receiverIsRunning = false;
-    private boolean testIsRunning = false;
 
     private Socket clientSocket;
     private BufferedReader inFromServer;
@@ -65,7 +64,7 @@ public class LiveDataService extends Service implements PreferenceHelper.PrefRec
             prefs.setIpAddress("127.0.0.1");
         }
 
-        preferenceHelper = new PreferenceHelper();
+        preferenceHelper = new PreferenceHelper(getApplicationContext());
         preferenceHelper.register(this);
     }
 

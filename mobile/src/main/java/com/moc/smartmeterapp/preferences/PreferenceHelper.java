@@ -3,6 +3,7 @@ package com.moc.smartmeterapp.preferences;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.util.Log;
 
@@ -18,11 +19,11 @@ import java.util.List;
 /**
  * Created by michael on 28.12.15.
  */
-public class PreferenceHelper extends BroadcastReceiver{
+public class PreferenceHelper {
 
     private static final String STD_IP = "127.0.0.1";
-    public static final String MESSAGE_IDENTIFIER = "PREFS";
-    public static final String INTENT_IDENTIFIER = "com.moc.smartmeterapp.preferences.PreferenceHelper";
+    public static final String PREFS = "prefs_data";
+    public static final String BROADCAST_ACTION = "com.moc.smartmeterapp.PreferenceHelper";
 
     private List<PrefReceive> prefList;
 
@@ -37,20 +38,27 @@ public class PreferenceHelper extends BroadcastReceiver{
         return myPreferences;
     }
 
-    public PreferenceHelper(){
-        prefList = new ArrayList<PrefReceive>();
-    }
-
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        MyPreferences pref = (MyPreferences)intent.getSerializableExtra(MESSAGE_IDENTIFIER);
-        if(pref != null){
-            for(PrefReceive p: prefList){
-                if(p != null){
-                    p.onPrefReceive(pref);
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            MyPreferences pref = (MyPreferences)intent.getSerializableExtra(PREFS);
+            if(pref != null){
+                for(PrefReceive p: prefList){
+                    if(p != null){
+                        p.onPrefReceive(pref);
+                    }
                 }
             }
         }
+    };
+
+    public PreferenceHelper(Context context){
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(PreferenceHelper.BROADCAST_ACTION);
+
+        context.registerReceiver(broadcastReceiver, filter);
+
+        prefList = new ArrayList<PrefReceive>();
     }
 
     public void register(PrefReceive prefReceive){
@@ -98,16 +106,29 @@ public class PreferenceHelper extends BroadcastReceiver{
         }
     }
 
-    public static void sendBroadcast(Context context) {
-        context.sendBroadcast(new Intent(INTENT_IDENTIFIER).putExtra(MESSAGE_IDENTIFIER, getPreferences(context)));
-    }
-
     public static void limitsToServer(Context context) {
         MyPreferences myPreferences = getPreferences(context);
         if(myPreferences != null) {
             new RestCommunication(context).saveLimit(myPreferences.getLimit1(), 2);
             new RestCommunication(context).saveLimit(myPreferences.getLimit2(), 1);
             new RestCommunication(context).saveLimit(myPreferences.getLimit3(), 0);
+        }
+    }
+
+    public static void sendBroadcast(Context context) {
+        MyPreferences myPreferences = getPreferences(context);
+        if(myPreferences != null) {
+            Intent intent = new Intent(BROADCAST_ACTION);
+            intent.putExtra(PREFS, myPreferences);
+            context.sendBroadcast(intent);
+        }
+    }
+
+    public static void sendBroadcast(Context context, MyPreferences myPreferences) {
+        if(myPreferences != null) {
+            Intent intent = new Intent(BROADCAST_ACTION);
+            intent.putExtra(PREFS, myPreferences);
+            context.sendBroadcast(intent);
         }
     }
 

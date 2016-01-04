@@ -40,10 +40,17 @@ public class HomeHelper {
         IDatabase databaseHelper = new MeterDbHelper(context);
         databaseHelper.openDatabase();
 
-        System.out.println(">>>>>>>>>>>GET CONSUMPTION <<<<<<<<<<<<<");
-
         switch (periodConst) {
             case WEEK:
+                ca.add(Calendar.DAY_OF_MONTH, 1 - (ca.get(Calendar.DAY_OF_WEEK)));
+                for(int i=0; i<7; i++){
+                    Day day = databaseHelper.loadDay(ca.getTime());
+                    if(day != null){
+                        days.add(day);
+                    }
+                    ca.add(Calendar.DAY_OF_MONTH, 1);
+                }
+
                 break;
             case MONTH:
                 days = databaseHelper.loadMonth(ca.getTime());

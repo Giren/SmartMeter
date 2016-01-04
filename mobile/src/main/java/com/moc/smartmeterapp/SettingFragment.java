@@ -1,12 +1,16 @@
 package com.moc.smartmeterapp;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,24 +22,18 @@ import android.widget.Toast;
 
 import com.moc.smartmeterapp.alarm.AlarmReceiver;
 import com.moc.smartmeterapp.database.MeterDbHelper;
-import com.moc.smartmeterapp.model.Day;
-import com.moc.smartmeterapp.model.Hour;
 import com.moc.smartmeterapp.model.Limit;
-import com.moc.smartmeterapp.model.MinMeanMax;
 import com.moc.smartmeterapp.preferences.MyPreferences;
 import com.moc.smartmeterapp.preferences.PreferenceHelper;
 import com.moc.smartmeterapp.utils.HSVColorPickerDialog;
 
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.regex.Pattern;
 
 
 /**
  * Created by michael on 24.11.15.
  */
-public class SettingFragment extends Fragment {
+public class SettingFragment extends Fragment implements PreferenceHelper.PrefReceive{
     private MeterDbHelper meterDbHelper;
 
     private EditText primeLimitStart;
@@ -60,8 +58,6 @@ public class SettingFragment extends Fragment {
     private MyPreferences prefs;
     private PreferenceHelper preferenceHelper;
 
-    private Intent intent;
-
     private static final Pattern PARTIAl_IP_ADDRESS =
             Pattern.compile("^((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])\\.){0,3}" +
                     "((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])){0,1}$");
@@ -74,16 +70,10 @@ public class SettingFragment extends Fragment {
             meterDbHelper = new MeterDbHelper(getActivity().getBaseContext());
         }
 
-        intent = new Intent(PreferenceHelper.INTENT_IDENTIFIER);
+        preferenceHelper = new PreferenceHelper(getActivity());
+        preferenceHelper.register(this);
 
         prefs = PreferenceHelper.getPreferences(getActivity());
-        preferenceHelper = new PreferenceHelper();
-        preferenceHelper.register(new PreferenceHelper.PrefReceive() {
-            @Override
-            public void onPrefReceive(MyPreferences pref) {
-                setPreferenceView(prefs);
-            }
-        });
 
         return inflater.inflate(R.layout.setting_fragment_layout,null,false);
     }
@@ -218,8 +208,6 @@ public class SettingFragment extends Fragment {
                 PreferenceHelper.limitsToServer(getActivity());
                 PreferenceHelper.sendBroadcast(getActivity());
 
-                //insertTestDatainDB();
-
                 Toast.makeText(getActivity(), "Gespeichert", Toast.LENGTH_SHORT).show();
             }
         });
@@ -244,5 +232,12 @@ public class SettingFragment extends Fragment {
         editIP.setText(pref.getIpAddress());
 
         syncCheck.setChecked(pref.getSync());
+    }
+
+    @Override
+    public void onPrefReceive(MyPreferences pref) {
+        if(pref != null){
+            setPreferenceView(pref);
+        }
     }
 }

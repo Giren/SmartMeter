@@ -18,6 +18,7 @@ import com.moc.smartmeterapp.preferences.MyPreferences;
 import com.moc.smartmeterapp.preferences.PreferenceHelper;
 import com.moc.smartmeterapp.ui.Limiter;
 import com.moc.smartmeterapp.ui.MeterView;
+import com.moc.smartmeterapp.utils.HomeHelper;
 
 import java.util.List;
 
@@ -33,14 +34,18 @@ public class HomeWeekFragment extends Fragment implements PreferenceHelper.PrefR
     private MyPreferences prefs;
     private PreferenceHelper preferenceHelper;
 
+    private HomeHelper homeHelper;
     private MeterView meterView;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        preferenceHelper = new PreferenceHelper();
+        preferenceHelper = new PreferenceHelper(getActivity());
+        preferenceHelper.register(this);
 
         prefs = PreferenceHelper.getPreferences(getActivity());
+
+        homeHelper = new HomeHelper(getActivity());
 
         return inflater.inflate(R.layout.home_week_fragment_layout,null);
     }
@@ -53,38 +58,28 @@ public class HomeWeekFragment extends Fragment implements PreferenceHelper.PrefR
         meterView.setOffsetAngle(45);
         meterView.setLimiter(getLimiter());
 
-        final IDatabase databaseHelper = new MeterDbHelper(getActivity());
-        databaseHelper.openDatabase();
-        Day day = databaseHelper.loadLatestDay();
+        Observable.just(homeHelper.getConsumption(HomeHelper.YEAR))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new rx.Observer<Integer>() {
+                    @Override
+                    public void onCompleted() {
+                    }
 
-        if(day != null) {
-            Observable.just(databaseHelper.loadMonth(day.getDate()))
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new rx.Observer<List<Day>>() {
-                        @Override
-                        public void onCompleted() {
-                            databaseHelper.closeDatabase();
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Integer consumption) {
+                        if (consumption != null) {
+                            meterView.setMax((int) (consumption + consumption * OFFSET));
+                            meterView.setValue(consumption);
+                            meterView.invalidate();
                         }
-
-                        @Override
-                        public void onError(Throwable e) {
-
-                        }
-
-                        @Override
-                        public void onNext(List<Day> days) {
-                            if (days != null) {
-                                int diff = days.get(days.size() - 1).getMmm().getTotalSum() - days.get(0).getMmm().getTotalSum();
-                                diff /= FACTOR;
-                                diff /= 10000;
-                                meterView.setMax((int)(diff + diff*OFFSET));
-                                meterView.setValue(diff);
-                                meterView.invalidate();
-                            }
-                        }
-                    });
-        }
+                    }
+                });
     }
 
     private Limiter getLimiter() {
