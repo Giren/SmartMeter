@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.moc.smartmeterapp.model.Limit;
 import com.moc.smartmeterapp.preferences.MyPreferences;
 import com.moc.smartmeterapp.preferences.PreferenceHelper;
 import com.moc.smartmeterapp.ui.Limiter;
@@ -23,6 +24,7 @@ import rx.schedulers.Schedulers;
 public class HomeYearFragment extends Fragment implements PreferenceHelper.PrefReceive{
 
     private final float OFFSET = 0.1f;
+    private final int FACTOR = 12;
 
     private MyPreferences prefs;
     private PreferenceHelper preferenceHelper;
@@ -78,9 +80,22 @@ public class HomeYearFragment extends Fragment implements PreferenceHelper.PrefR
 
     private Limiter getLimiter() {
         Limiter limiter = new Limiter();
-        limiter.addLimit(prefs.getLimit3());
-        limiter.addLimit(prefs.getLimit2());
-        limiter.addLimit(prefs.getLimit1());
+
+        Limit limit3 = prefs.getLimit3();
+        limit3.setMax(limit3.getMax() * FACTOR);
+        limit3.setMin(limit3.getMin() * FACTOR);
+
+        Limit limit2 = prefs.getLimit2();
+        limit2.setMax(limit2.getMax() * FACTOR);
+        limit2.setMin(limit2.getMin() * FACTOR);
+
+        Limit limit1 = prefs.getLimit1();
+        limit1.setMax(limit1.getMax() * FACTOR);
+        limit1.setMin(limit1.getMin() * FACTOR);
+
+        limiter.addLimit(limit3);
+        limiter.addLimit(limit2);
+        limiter.addLimit(limit1);
         return limiter;
     }
 
