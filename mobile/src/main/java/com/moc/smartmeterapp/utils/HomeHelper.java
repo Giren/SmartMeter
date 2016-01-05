@@ -34,7 +34,8 @@ public class HomeHelper {
     public Integer getConsumption(int periodConst) {
         List<Day> days = new ArrayList<Day>();
         int consumption;
-        Calendar ca = new GregorianCalendar(2015,10,20);
+        Calendar ca = new GregorianCalendar(2015,10,20); //für Präsi
+        //Calendar ca = new GregorianCalendar();
 
         IDatabase databaseHelper = new MeterDbHelper(context);
         databaseHelper.openDatabase();
