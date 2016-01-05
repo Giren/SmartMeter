@@ -31,7 +31,7 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
     private MeterView meterView;
     private LiveCommunication liveCommunication;
 
-    private int meterViewMax = 1000;
+    private int meterViewMax = 0;
 
     @Override
     public void onLiveDataReceived(int value) {
