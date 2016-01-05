@@ -209,11 +209,10 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
                         limit3,
                         editIP.getText().toString(),
                         syncCheck.isChecked(),
-                        true
+                        false
                 );
 
                 PreferenceHelper.setPreferences(getActivity(), preferences);
-                //PreferenceHelper.limitsToServer(getActivity());
 
                 new RestCommunication(getActivity()).saveLimit(preferences.getLimit1(), 0, new RestCommunication.IRestAnswer() {
                     @Override
@@ -234,12 +233,13 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
                                 new RestCommunication(getActivity()).saveLimit(preferences.getLimit3(), 2, new RestCommunication.IRestAnswer() {
                                     @Override
                                     public void onError(String message) {
-
+                                        Toast.makeText(getActivity(), "Nicht gespeichert", Toast.LENGTH_SHORT).show();
                                     }
 
                                     @Override
                                     public void onComplete() {
-                                        preferences.setUnSynced(false);
+                                        //preferences.setUnSynced(false);
+                                        Toast.makeText(getActivity(), "Gespeichert", Toast.LENGTH_SHORT).show();
                                     }
                                 });
                             }
@@ -249,7 +249,6 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
 
                 PreferenceHelper.sendBroadcast(getActivity(), preferences);
 
-                Toast.makeText(getActivity(), "Gespeichert", Toast.LENGTH_SHORT).show();
                 saveButton.setEnabled(false);
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
