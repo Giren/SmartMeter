@@ -77,6 +77,7 @@ public class LiveDataService extends Service implements PreferenceHelper.PrefRec
     @Override
     public void onDestroy() {
         stopReceiver();
+        preferenceHelper.destroy();
         Log.d("DEBUG", "Service destroyed...");
         super.onDestroy();
     }

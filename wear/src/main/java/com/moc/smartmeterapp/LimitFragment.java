@@ -2,7 +2,10 @@ package com.moc.smartmeterapp;
 
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.support.annotation.ColorRes;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,16 +48,17 @@ public class LimitFragment extends CustomFragment {
 
         // set fragment name an name in view
         fragmentName = getArguments().getString( "msg");
-        tvLimitView.setText( getLimitViewName( fragmentName));
+        tvLimitView.setText(getLimitViewName(fragmentName));
 
         // configure progressbar
-        pbLimit.setMax( 100);
-        pbLimit.setProgress( 0);
-        pbLimit.setScaleY( 3f);
-        //pbLimit.setDrawingCacheBackgroundColor( Color.GREEN);
+        pbLimit.setMax(100);
+        pbLimit.setProgress(0);
+        pbLimit.setScaleY(3f);
+        //pbLimit.getProgressDrawable().setColorFilter(Color.BLUE, PorterDuff.Mode.SRC_IN);
+        //pbLimit.getIndeterminateDrawable().setColorFilter( Color.BLUE, PorterDuff.Mode.SRC_IN);
 
         // confige current value, limit value, percent value in view
-        tvCurrentValue.setText( "0");
+        tvCurrentValue.setText("0");
         tvLimitValue.setText( "0");
         tvLimitPercent.setText( "0 %");
 
@@ -97,7 +101,7 @@ public class LimitFragment extends CustomFragment {
         String[] msgSplit = update.split( ";");
 
         tvCurrentValue.setText( msgSplit[1]);
-        tvLimitValue.setText(msgSplit[2]);
+        tvLimitValue.setText( msgSplit[2]);
 
         if( msgSplit[1].equals( ERR_NO_DATA_IN_DB)) {
 
@@ -113,7 +117,60 @@ public class LimitFragment extends CustomFragment {
             int percentValue = ( Integer.valueOf( msgSplit[1]) * 100) / Integer.valueOf( msgSplit[2]);
             String limitPercentHelper = String.valueOf( percentValue) + " %";
             tvLimitPercent.setText( limitPercentHelper);
-            pbLimit.setProgress( percentValue);
+            pbLimit.setProgress(percentValue);
+
+            //setProgressBarColor( fragmentName, Integer.valueOf( msgSplit[1]));
+
+
+        }
+    }
+
+    public void setProgressBarColor( String fragmentName, int curVal) {
+        Log.d("DEBUG", "LimitFragment - setProgressBarColor() for:" + fragmentName);
+        Limit limit1 = ( ( MainActivity)getActivity()).fragmentData.limit1;
+        Limit limit2 = ( ( MainActivity)getActivity()).fragmentData.limit2;
+        Limit limit3 = ( ( MainActivity)getActivity()).fragmentData.limit3;
+        int limit1min = limit1.getMin();
+        int limit2min = limit2.getMin();
+        int limit3min = limit3.getMin();
+        switch ( fragmentName) {
+            case "limitWeek": {
+                Log.d("DEBUG", "LimitFragment - getLimitViewName() - return: Wochenlimit");
+                limit1min = limit1.getMin() / 4;
+                limit2min = limit2.getMin() / 4;
+                limit3min = limit3.getMin() / 4;
+                break;
+            }
+            case "limitMonth": {
+                Log.d("DEBUG", "LimitFragment - getLimitViewName() - return: Monatslimit");
+                limit1min = limit1.getMin();
+                limit2min = limit2.getMin();
+                limit3min = limit3.getMin();
+                break;
+            }
+            case "limitYear": {
+                Log.d("DEBUG", "LimitFragment - getLimitViewName() - return: Jahreslimit");
+                limit1min = limit1.getMin() * 12;
+                limit2min = limit2.getMin() * 12;
+                limit3min = limit3.getMin() * 12;
+                break;
+            }
+            default: {
+                Log.d("DEBUG", "LimitFragment - getLimitViewName() - return: Default");
+                break;
+            }
+        }
+        if( curVal >= limit3min) {
+            pbLimit.getProgressDrawable().setColorFilter( limit3.getColor(), PorterDuff.Mode.SRC_IN);
+            pbLimit.getIndeterminateDrawable().setColorFilter( limit3.getColor(), PorterDuff.Mode.SRC_IN);
+        }
+        if( curVal >= limit2min) {
+            pbLimit.getProgressDrawable().setColorFilter( limit2.getColor(), PorterDuff.Mode.SRC_IN);
+            pbLimit.getIndeterminateDrawable().setColorFilter( limit2.getColor(), PorterDuff.Mode.SRC_IN);
+        }
+        if ( curVal >= limit1min) {
+            pbLimit.getProgressDrawable().setColorFilter( limit1.getColor(), PorterDuff.Mode.SRC_IN);
+            pbLimit.getIndeterminateDrawable().setColorFilter( limit1.getColor(), PorterDuff.Mode.SRC_IN);
         }
     }
 

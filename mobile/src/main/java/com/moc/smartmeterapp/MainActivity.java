@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity{
     private Handler handler;
     private Runnable runnable;
 
+    private RestCommunication restCommunication;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

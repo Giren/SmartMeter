@@ -111,4 +111,10 @@ public class HomeWeekFragment extends Fragment implements PreferenceHelper.PrefR
         meterView.setLimiter(getLimiter());
         meterView.invalidate();
     }
+
+    @Override
+    public void onDestroy() {
+        preferenceHelper.destroy();
+        super.onDestroy();
+    }
 }
