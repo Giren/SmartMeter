@@ -105,6 +105,7 @@ public class HomeMonthFragment extends Fragment implements PreferenceHelper.Pref
     public void onPrefReceive(MyPreferences pref) {
         this.prefs = pref;
         meterView.setLimiter(getLimiter());
+        meterView.setMax(pref.getLimit1().getMax());
         meterView.invalidate();
     }
 
