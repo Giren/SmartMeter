@@ -107,4 +107,10 @@ public class HomeMonthFragment extends Fragment implements PreferenceHelper.Pref
         meterView.setLimiter(getLimiter());
         meterView.invalidate();
     }
+
+    @Override
+    public void onDestroy() {
+        preferenceHelper.destroy();
+        super.onDestroy();
+    }
 }

@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,6 +83,12 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
         super.onViewCreated(view, savedInstanceState);
 
         primeLimitStart = (EditText)view.findViewById(R.id.prime_limit_start);
+        primeLimitStart.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                opt1LimitStop.setText(primeLimitStart.getText());
+            }
+        });
         primeLimitStop = (EditText)view.findViewById(R.id.prime_limit_stop);
         primeLimitColorBtn = (Button)view.findViewById(R.id.prime_limit_color);
         primeLimitColorBtn.setOnClickListener(new View.OnClickListener() {
@@ -100,6 +107,12 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
         });
 
         opt1LimitStart = (EditText)view.findViewById(R.id.opt1_limit_start);
+        opt1LimitStart.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                opt2LimitStop.setText(opt1LimitStart.getText());
+            }
+        });
         opt1LimitStop = (EditText)view.findViewById(R.id.opt1_limit_stop);
         opt1LimitColorBtn = (Button)view.findViewById(R.id.opt1_limit_color_button);
         opt1LimitColorBtn.setOnClickListener(new View.OnClickListener() {
@@ -329,5 +342,11 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
         if(pref != null){
             setPreferenceView(pref);
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        preferenceHelper.destroy();
+        super.onDestroy();
     }
 }

@@ -24,6 +24,7 @@ public class PreferenceHelper {
     public static final String PREFS = "prefs_data";
     public static final String BROADCAST_ACTION = "com.moc.smartmeterapp.PreferenceHelper";
 
+    private Context context;
     private List<PrefReceive> prefList;
 
     private static MyPreferences createStdPrefs() {
@@ -56,6 +57,7 @@ public class PreferenceHelper {
         IntentFilter filter = new IntentFilter();
         filter.addAction(PreferenceHelper.BROADCAST_ACTION);
 
+        this.context = context;
         context.registerReceiver(broadcastReceiver, filter);
 
         prefList = new ArrayList<PrefReceive>();
@@ -132,5 +134,11 @@ public class PreferenceHelper {
 
     public static interface PrefReceive{
         void onPrefReceive(MyPreferences pref);
+    }
+
+    public void destroy() {
+        if(context != null && broadcastReceiver != null) {
+            context.unregisterReceiver(broadcastReceiver);
+        }
     }
 }

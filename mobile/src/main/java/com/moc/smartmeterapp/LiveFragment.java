@@ -80,6 +80,7 @@ public class LiveFragment extends Fragment implements LiveCommunication.ILiveDat
     public void onDestroy() {
         Log.d("DEBUG", "onDestroy");
         liveCommunication.destroy();
+        preferenceHelper.destroy();
         super.onDestroy();
     }
 
