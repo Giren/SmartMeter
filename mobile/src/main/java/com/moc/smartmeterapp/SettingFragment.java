@@ -192,7 +192,9 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 if(opt1LimitStart != null && do_change) {
+                    do_change = false;
                     opt1LimitStart.setText(charSequence);
+                    do_change = true;
                 }
             }
 
