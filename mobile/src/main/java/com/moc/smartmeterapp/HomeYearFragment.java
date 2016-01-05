@@ -72,7 +72,7 @@ public class HomeYearFragment extends Fragment implements PreferenceHelper.PrefR
                         if (consumption != null) {
                             meterView.setMax((int) (consumption + consumption * OFFSET));
                             meterView.enableValueText(false);
-                            meterView.setText(String.valueOf(consumption) + " kW/h");
+                            meterView.setText(String.valueOf(consumption) + " kWh");
                             meterView.setValue(consumption);
                             meterView.invalidate();
                         }
