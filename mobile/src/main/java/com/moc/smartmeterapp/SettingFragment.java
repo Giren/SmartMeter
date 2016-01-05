@@ -114,6 +114,12 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
             }
         });
         opt1LimitStop = (EditText)view.findViewById(R.id.opt1_limit_stop);
+        opt1LimitStop.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                primeLimitStart.setText(opt1LimitStop.getText());
+            }
+        });
         opt1LimitColorBtn = (Button)view.findViewById(R.id.opt1_limit_color_button);
         opt1LimitColorBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,6 +138,12 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
 
         opt2LimitStart = (EditText)view.findViewById(R.id.opt2_limit_start);
         opt2LimitStop = (EditText)view.findViewById(R.id.opt2_limit_stop);
+        opt2LimitStop.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                opt2LimitStart.setText(opt2LimitStop.getText());
+            }
+        });
         opt2LimitColorBtn = (Button)view.findViewById(R.id.opt2_limit_color_button);
         opt2LimitColorBtn.setOnClickListener(new View.OnClickListener() {
             @Override
