@@ -170,8 +170,8 @@ public class SyncService extends IntentService implements RestCommunication.IDat
         //Check limit reached
         HomeHelper helper = new HomeHelper(getApplicationContext());
         Integer consumption = helper.getConsumption(HomeHelper.MONTH);
-        if(consumption != null && consumption > myPreferences.getLimit1().getMin()) {
-            sendAlarmNotification("Das Monatslimit wurde erreicht. Aktueller Verbrauch: " + consumption + " kWh");
+        if(consumption != null && myPreferences != null && consumption > myPreferences.getLimit1().getMin()) {
+            sendAlarmNotification("Das Monatslimit wurde erreicht. Aktueller Verbrauch um " + String.valueOf(consumption-myPreferences.getLimit1().getMin()) + " kWh überschritten.");
         }
     }
 
@@ -230,7 +230,7 @@ public class SyncService extends IntentService implements RestCommunication.IDat
 
     @Override
     public void onError(String message) {
-        sendSyncNotification("Es ist ein Fehler bei der Synchronisation aufgetreten.");
+        sendSyncNotification("Es ist ein Fehler bei der Synchronisation aufgetreten. Es konnte keine Vebindung zum Server aufgebaut werden.");
     }
 
     @Override

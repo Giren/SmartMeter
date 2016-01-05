@@ -73,8 +73,6 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         pm.setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
-
-        Toast.makeText(context, "Automatische Synchronisation aktiviert", Toast.LENGTH_SHORT).show();
     }
 
     public void cancelAlarm(Context context) {
@@ -91,8 +89,5 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         pm.setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP);
-
-
-        Toast.makeText(context, "Automatische Synchronisation deaktiviert", Toast.LENGTH_SHORT).show();
     }
 }
