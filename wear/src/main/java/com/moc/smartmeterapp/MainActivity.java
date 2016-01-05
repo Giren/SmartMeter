@@ -68,7 +68,6 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     protected void onStop() {
-        // sendDataToHandheld("goodbye");
         // remove MessageListener and disconnect googleClient
         if( null != googleClient && googleClient.isConnected()) {
             Wearable.MessageApi.removeListener( googleClient, this);
@@ -138,10 +137,9 @@ public class MainActivity extends FragmentActivity implements
         Log.d("DEBUG", "MainActivity - handleReceivedMessage(): " + message);
         List<Fragment> allFragments = getSupportFragmentManager().getFragments();
 
-        //fragmentData.addData( message);
+        fragmentData.addData( message);
 
         if( message.startsWith( "keepAlive")) {
-            // TODO process additional data in keepAlive message
             // send keepAlive to handheld
             Runnable getNewData = new Runnable() {
                 @Override
@@ -166,17 +164,16 @@ public class MainActivity extends FragmentActivity implements
                 if (myFragment != null && myFragment.getUserVisibleHint()) {
                     // Processed when fragment not null and visible for the user
                     String[] msgSplit = message.split(";");
-                    // check that message and fragment name equals
                     if( msgSplit[0].equals(myFragment.getFragmentName())) {
+                        // processed when message and fragment name equals
                         Log.d("DEBUG", "MainActivity - handleReceivedMessage() - visibleFragmentName: " + myFragment.getFragmentName());
                         // Content update in visible fragment
                         myFragment.UpdateFragmentContent( message);
-                        // send message to get new data
                         final CustomFragment finalFragment = myFragment;
-
                         if( message.startsWith( "liveData")) {
                             return;
                         } else {
+                            // send message to get new data
                             Runnable getNewData = new Runnable() {
                                 @Override
                                 public void run() {

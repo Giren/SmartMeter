@@ -22,8 +22,8 @@ public class MeterView_Wear extends View {
 	private final int OUTTER_MARGIN = 0;
 	private final int TEXT_INNER_MARGIN = 40;
 	private final int TEXT_SIZE = 25;
-	private final int TEXT_SIZE_SMALL = 16;
-	private final int TEXT_SIZE_BIG = 20;
+	private final int TEXT_SIZE_SMALL = 25;
+	private final int TEXT_SIZE_BIG = 25;
     private final int TEXT_SIZE_HUGE = 150;
 	private final int LAST_TEXT_ANGLE = 350;
 	private final int PIN_PADDING = 50;
