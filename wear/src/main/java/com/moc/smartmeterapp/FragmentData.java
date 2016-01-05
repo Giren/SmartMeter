@@ -1,6 +1,7 @@
 package com.moc.smartmeterapp;
 
 import android.app.Fragment;
+import android.graphics.Color;
 
 /**
  * Created by David on 28.12.2015.
@@ -14,6 +15,9 @@ public class FragmentData {
     private String limitMonthLimitValue;
     private String limitYearCurrentValue;
     private String limitYearLimitValue;
+    public Limit limit1;
+    public Limit limit2;
+    public Limit limit3;
 
 //    FragmentData( String fragmentData) {
 //        String[] fragmentDataSplit = fragmentData.split(";");
@@ -35,6 +39,9 @@ public class FragmentData {
         this.limitMonthLimitValue  = "0";
         this.limitYearCurrentValue = "0";
         this.limitYearLimitValue  = "0";
+        limit1 = new Limit(180,250, 0);
+        limit2 = new Limit(120,180, 0);
+        limit3 = new Limit(0,120, 0);
     }
 
 
@@ -42,7 +49,22 @@ public class FragmentData {
         String[] dataSplit = addData.split( ";");
         switch ( dataSplit[0]) {
             case "liveData": {
-                liveDataValue = dataSplit[1];
+                if( dataSplit.length == 2) {
+                    liveDataValue = dataSplit[1];
+                } else {
+                    // update limits
+                    limit1.setMin( Integer.valueOf( dataSplit[2]));
+                    limit1.setMax( Integer.valueOf( dataSplit[3]));
+                    limit1.setColor( Integer.valueOf( dataSplit[4]));
+
+                    limit2.setMin( Integer.valueOf( dataSplit[6]));
+                    limit2.setMax( Integer.valueOf( dataSplit[7]));
+                    limit2.setColor( Integer.valueOf( dataSplit[8]));
+
+                    limit3.setMin( Integer.valueOf( dataSplit[10]));
+                    limit3.setMax( Integer.valueOf( dataSplit[11]));
+                    limit3.setColor( Integer.valueOf( dataSplit[12]));
+                }
                 break;
             }
             case "limitWeek": {

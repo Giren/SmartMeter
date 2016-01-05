@@ -1,16 +1,11 @@
 package com.moc.smartmeterapp;
 
-
-import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * Created by David on 23.11.2015.
@@ -22,66 +17,70 @@ public class LiveFragment extends CustomFragment {
 
     private MeterView_Wear meterView;
     private Limiter limiter;
-    private Limit limitRed;
-    private Limit limitYellow;
     private Limit limit1;
     private Limit limit2;
     private Limit limit3;
 
-    private TextView tvLiveValue;
+    private int meterViewMax = 1000;
+    private final int FACTOR = ( ( 3600 * 1000) / ( 31 * 24 * 900) );
 
     private Vibrator vibrator;
     private long[] vibrationPattern = {0, 500, 50, 300};
     private final int indexInPatternToRepeat = -1;
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        vibrator = (Vibrator) view.getContext().getSystemService(view.getContext().VIBRATOR_SERVICE);
+    public void onViewCreated( View view, Bundle savedInstanceState) {
+        super.onViewCreated( view, savedInstanceState);
+        vibrator = ( Vibrator) view.getContext().getSystemService( view.getContext().VIBRATOR_SERVICE);
     }
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.live_frag, container, false);
 
-        tvLiveValue = ( TextView) view.findViewById( R.id.tvLiveValue);
-        tvLiveValue.setText( "0");
+        limit1 = new Limit(180,250, 0);
+        limit2 = new Limit(120,180, 0);
+        limit3 = new Limit(0,120, 0);
 
-        limitRed = new Limit(2000, 2500, Color.RED);
-        limitRed.setEventHandler(new Limit.ILimitEventHandler() {
+//        limit1 = ( ( MainActivity)getActivity()).fragmentData.limit1;
+//        limit2 = ( ( MainActivity)getActivity()).fragmentData.limit2;
+//        limit3 = ( ( MainActivity)getActivity()).fragmentData.limit3;
+
+        limit1.setEventHandler(new Limit.ILimitEventHandler() {
             @Override
-            public void onLimitReached(Limit limit, float value) {
-                vibrator.vibrate(vibrationPattern, indexInPatternToRepeat);
+            public void onLimitReached( Limit limit, float value) {
+                vibrator.vibrate( vibrationPattern, indexInPatternToRepeat);
             }
             @Override
-            public void onLimitLeave(Limit limit, float value) {
+            public void onLimitLeave( Limit limit, float value) {
             }
         });
-        limitYellow = new Limit(1500, 2000, Color.YELLOW);
-        limitYellow.setEventHandler(new Limit.ILimitEventHandler() {
+
+        limit2.setEventHandler( new Limit.ILimitEventHandler() {
             @Override
-            public void onLimitReached(Limit limit, float value) {
-                vibrator.vibrate(vibrationPattern, indexInPatternToRepeat);
+            public void onLimitReached( Limit limit, float value) {
+                vibrator.vibrate( vibrationPattern, indexInPatternToRepeat);
             }
 
             @Override
-            public void onLimitLeave(Limit limit, float value) {
-
+            public void onLimitLeave( Limit limit, float value) {
             }
         });
 
         limiter = new Limiter();
-        limiter.addLimit(limitYellow);
-        limiter.addLimit(limitRed);
+        limiter.addLimit( limit1);
+        limiter.addLimit( limit2);
+        limiter.addLimit( limit3);
 
-        meterView = (MeterView_Wear)view.findViewById(R.id.meterview);
-        meterView.setMax(2500);
-        meterView.setOffsetAngle(45);
-        meterView.setTicks(45, 10);
-        meterView.setAverage(450);
-        meterView.setLimiter(limiter);
-        meterView.enableValueText(false);
-        meterView.setTicks(45);
+        meterView = ( MeterView_Wear)view.findViewById( R.id.meterview);
+        meterView.setMax( meterViewMax);
+        meterView.setOffsetAngle( 45);
+        meterView.setTicks( 45, 10);
+        meterView.setLimiter( limiter);
+        meterView.enableValueText( false);
+        meterView.setText( "0 W");
+        meterView.setValue( 0);
+        meterView.setTicks( 45);
 
         return view;
     }
@@ -97,28 +96,54 @@ public class LiveFragment extends CustomFragment {
 
     @Override
     public void UpdateFragmentContent( String update) {
-        System.out.println("Live UpdateFragmentContent" + update);
+        Log.d("DEBUG", "LiveFragment - UpdateFragmentContent(): " + update);
         String[] splitted = update.split( ";");
 
-        meterView.setValue( Float.valueOf( splitted[1]));
-        tvLiveValue.setText( splitted[1]);
+        if( splitted.length == 2) {
+            int meterValue = Integer.valueOf( splitted[1]);
+            if( meterValue > meterViewMax) {
+                meterViewMax = meterValue;
+                meterView.setMax(meterViewMax);
+            }
+            meterView.enableValueText(false);
+            meterView.setText( meterValue + " W");
+            meterView.setValue( meterValue);
+        } else {
+            // update limits
+            limit1.setMin( Integer.valueOf( splitted[2]) * FACTOR);
+            limit1.setMax(Integer.valueOf(splitted[3]) * FACTOR);
+            limit1.setColor(Integer.valueOf(splitted[4]));
+
+            limit2.setMin(Integer.valueOf(splitted[6]) * FACTOR);
+            limit2.setMax(Integer.valueOf(splitted[7]) * FACTOR);
+            limit2.setColor(Integer.valueOf(splitted[8]));
+
+            limit3.setMin(Integer.valueOf(splitted[10]) * FACTOR);
+            limit3.setMax(Integer.valueOf(splitted[11]) * FACTOR);
+            limit3.setColor(Integer.valueOf(splitted[12]));
+
+            limiter.addLimit( limit1);
+            limiter.addLimit( limit2);
+            limiter.addLimit( limit3);
+
+            meterView.setLimiter( limiter);
+            meterView.invalidate();
+        }
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
 
-        this.setUserVisible( isVisibleToUser);
+        this.setUserVisible(isVisibleToUser);
 
         if ( this.getUserVisible()) {
-            System.out.println( "this fragment is now visible");
+            Log.d( "DEBUG", fragmentName + " is fragment now visible");
             ( ( MainActivity)getActivity()).sendDataToHandheld( fragmentName);
         } else if( !this.getUserVisible()) {
-            System.out.println( "this fragment is now invisible");
             fragmentName = getArguments().getString("msg");
+            Log.d("DEBUG", fragmentName + " is fragment now invisible");
         }
-
-        System.out.println("setUserVisibleHint called");
     }
 
     public boolean getUserVisible() {

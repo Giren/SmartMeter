@@ -151,8 +151,6 @@
                     android:layout_alignEnd="@+id/tvkwhLabel2"
                     android:max="100"
                     android:indeterminate="false"
-                    android:foreground="#15ff00"
-                    android:background="#ffffff"
                     android:layout_alignParentEnd="false"
                     android:layout_alignParentStart="false"
                     android:layout_gravity="center_horizontal" />
