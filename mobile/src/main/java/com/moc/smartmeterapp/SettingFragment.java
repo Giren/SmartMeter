@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +57,8 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
     private MyPreferences prefs;
     private PreferenceHelper preferenceHelper;
 
+    private boolean do_change = true;
+
     private static final Pattern PARTIAl_IP_ADDRESS =
             Pattern.compile("^((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])\\.){0,3}" +
                     "((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])){0,1}$");
@@ -82,15 +83,40 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        primeLimitStart = (EditText)view.findViewById(R.id.prime_limit_start);
-        primeLimitStart.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                opt1LimitStop.setText(primeLimitStart.getText());
-            }
-        });
+        opt2LimitColorBtn = (Button)view.findViewById(R.id.opt2_limit_color_button);
+        editIP = (EditText)view.findViewById(R.id.network_ip);
+        syncCheck = (CheckBox)view.findViewById(R.id.sync_check);
+        saveButton = (Button)view.findViewById(R.id.save_prefs);
+        manualSync = (Button)view.findViewById(R.id.manual_sync);
+        opt2LimitStart = (EditText)view.findViewById(R.id.opt2_limit_start);
+        opt2LimitStop = (EditText)view.findViewById(R.id.opt2_limit_stop);
+        opt1LimitColorBtn = (Button)view.findViewById(R.id.opt1_limit_color_button);
+        opt1LimitStop = (EditText)view.findViewById(R.id.opt1_limit_stop);
+        opt1LimitStart = (EditText)view.findViewById(R.id.opt1_limit_start);
         primeLimitStop = (EditText)view.findViewById(R.id.prime_limit_stop);
         primeLimitColorBtn = (Button)view.findViewById(R.id.prime_limit_color);
+        primeLimitStart = (EditText)view.findViewById(R.id.prime_limit_start);
+        saveIPButton = (Button)view.findViewById(R.id.ip_set_button);
+
+        primeLimitStart.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(opt1LimitStop != null && do_change) {
+                    do_change = false;
+                    opt1LimitStop.setText(charSequence);
+                    do_change = true;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
         primeLimitColorBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,22 +131,44 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
                 dialog.show();
             }
         });
+        opt1LimitStart.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-        opt1LimitStart = (EditText)view.findViewById(R.id.opt1_limit_start);
-        opt1LimitStart.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            }
+
             @Override
-            public void onFocusChange(View view, boolean b) {
-                opt2LimitStop.setText(opt1LimitStart.getText());
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(opt2LimitStop != null && do_change) {
+                    do_change = false;
+                    opt2LimitStop.setText(charSequence);
+                    do_change = true;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
             }
         });
-        opt1LimitStop = (EditText)view.findViewById(R.id.opt1_limit_stop);
-        opt1LimitStop.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        opt1LimitStop.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onFocusChange(View view, boolean b) {
-                primeLimitStart.setText(opt1LimitStop.getText());
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(primeLimitStart != null && do_change) {
+                    do_change = false;
+                    primeLimitStart.setText(charSequence);
+                    do_change = true;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
             }
         });
-        opt1LimitColorBtn = (Button)view.findViewById(R.id.opt1_limit_color_button);
         opt1LimitColorBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -135,16 +183,25 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
                 dialog.show();
             }
         });
-
-        opt2LimitStart = (EditText)view.findViewById(R.id.opt2_limit_start);
-        opt2LimitStop = (EditText)view.findViewById(R.id.opt2_limit_stop);
-        opt2LimitStop.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        opt2LimitStop.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onFocusChange(View view, boolean b) {
-                opt2LimitStart.setText(opt2LimitStop.getText());
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(opt1LimitStart != null && do_change) {
+                    do_change = false;
+                    opt1LimitStart.setText(charSequence);
+                    do_change = true;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
             }
         });
-        opt2LimitColorBtn = (Button)view.findViewById(R.id.opt2_limit_color_button);
         opt2LimitColorBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -160,7 +217,6 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
             }
         });
 
-        editIP = (EditText)view.findViewById(R.id.network_ip);
         editIP.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -181,21 +237,17 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
                 }
             }
         });
-        syncCheck = (CheckBox)view.findViewById(R.id.sync_check);
         syncCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 AlarmReceiver alarmReceiver = new AlarmReceiver();
-                if(b) {
+                if (b) {
                     alarmReceiver.setAlarm(getActivity());
                 } else {
                     alarmReceiver.cancelAlarm(getActivity());
                 }
             }
         });
-
-        saveButton = (Button)view.findViewById(R.id.save_prefs);
-        manualSync = (Button)view.findViewById(R.id.manual_sync);
         manualSync.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -285,7 +337,6 @@ public class SettingFragment extends Fragment implements PreferenceHelper.PrefRe
             }
         });
 
-        saveIPButton = (Button)view.findViewById(R.id.ip_set_button);
         saveIPButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
