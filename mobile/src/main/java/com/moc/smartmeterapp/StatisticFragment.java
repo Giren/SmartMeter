@@ -271,14 +271,9 @@ public class StatisticFragment extends Fragment{
 
         setDateButtonText();
 
-        if(datalist != null){
-            if(datalist.size() != 0){
-                addListToChart(datalist);
-            } else {
-                cleanChart();
-                Toast.makeText(getActivity(),"Keine Daten für gewähltes Datum gefunden", Toast.LENGTH_SHORT).show();
-            }
-        }else{
+        if(datalist != null && datalist.size() != 0){
+            addListToChart(datalist);
+        }else {
             cleanChart();
             Toast.makeText(getActivity(),"Keine Daten für gewähltes Datum gefunden", Toast.LENGTH_SHORT).show();
         }
