@@ -8,32 +8,36 @@
     <lecho.lib.hellocharts.view.LineChartView
         android:id="@+id/chart"
         android:layout_width="wrap_content"
-        android:layout_height="373dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.3"
         android:paddingStart="10dp">
     </lecho.lib.hellocharts.view.LineChartView>
 
     <lecho.lib.hellocharts.view.PreviewLineChartView
         android:id="@+id/chart_preview"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="0.26"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.7"
         android:paddingStart="10dp">
     </lecho.lib.hellocharts.view.PreviewLineChartView>
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <Button
-            android:layout_width="180dp"
+            android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:layout_weight="0.5"
             android:id="@+id/button_left"
             android:background="@color/orange"/>
 
         <Button
-            android:layout_width="180dp"
+            android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:id="@+id/button_right"
+            android:layout_weight="0.5"
             android:layout_gravity="right"
             android:background="@color/orange"/>
 
