@@ -1,5 +1,6 @@
 package com.moc.smartmeterapp;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
@@ -38,9 +39,9 @@ public class LiveFragment extends CustomFragment {
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.live_frag, container, false);
 
-        limit1 = new Limit(180,250, 0);
-        limit2 = new Limit(120,180, 0);
-        limit3 = new Limit(0,120, 0);
+        limit1 = new Limit(900, 1250, Color.RED);
+        limit2 = new Limit(250, 900, Color.YELLOW);
+        limit3 = new Limit(0,250, Color.GREEN);
 
 //        limit1 = ( ( MainActivity)getActivity()).fragmentData.limit1;
 //        limit2 = ( ( MainActivity)getActivity()).fragmentData.limit2;
