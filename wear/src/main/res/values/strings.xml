@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SmartMeterApp</string>
+    <string name="app_name">Power Meter</string>
     <string name="tvLimitUnitLimit">[kWh]</string>
     <string name="tvLimitUnitCurrent">[kWh]</string>
     <string name="tvCurrentText">Aktuell:</string>
