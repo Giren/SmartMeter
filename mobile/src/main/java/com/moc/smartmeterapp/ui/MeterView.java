@@ -164,12 +164,27 @@ public class MeterView extends View {
 		canvas.drawCircle(center_x, center_y, radius, backgroundPaint);
 
 		if(limiter != null) {
-			for(Limit l : limiter.getLimits()){
-				rectF.set(center_x-radius+LIMIT_PADDING, center_y-radius+LIMIT_PADDING, center_x+radius-LIMIT_PADDING, center_y+radius-LIMIT_PADDING);
-				limitPaint.setColor(l.getColor());
-				tempAngleA = l.getMin() * angle/max + offsetAngle+ANGLE_ORIENTATION;
-				tempAngleB = l.getMax() * angle/max + offsetAngle+ANGLE_ORIENTATION;
+			Limit maxLimit = null;
+
+			for (Limit iLimit : limiter.getLimits()) {
+				if (maxLimit == null) {
+					maxLimit = iLimit;
+				} else if (maxLimit.getMax() < iLimit.getMax()) {
+					maxLimit = iLimit;
+				}
+			}
+
+			for(Limit kLimit : limiter.getLimits()){
+				rectF.set(center_x - radius + LIMIT_PADDING, center_y - radius + LIMIT_PADDING, center_x + radius - LIMIT_PADDING, center_y + radius - LIMIT_PADDING);
+				limitPaint.setColor(kLimit.getColor());
+				tempAngleA = kLimit.getMin() * angle/max + offsetAngle+ANGLE_ORIENTATION;
+				if(kLimit == maxLimit && kLimit.getMax() < max) {
+					tempAngleB = angle + offsetAngle + ANGLE_ORIENTATION;
+				} else {
+					tempAngleB = kLimit.getMax() * angle/max + offsetAngle+ANGLE_ORIENTATION;
+				}
 				tempAngleB -= tempAngleA;
+
 				canvas.drawArc(rectF, tempAngleA , tempAngleB, true, limitPaint);
 			}
 		}
@@ -341,6 +356,9 @@ public class MeterView extends View {
 	public void preRender(float value) {
 		this.value = value;
 
+		if(max < value)
+			max = (int)value;
+
 		if(limiter != null)
 			limiter.setValue(value);
 
@@ -402,14 +420,14 @@ public class MeterView extends View {
 			}
 
 			animationState = ANIMATIONSTATE_ANIMATE;
-            run();
+			run();
 		}
 
 		@Override
 		public void run() {
 			switch (animationState) {
 				case ANIMATIONSTATE_ANIMATE:
-					frame ++;
+					frame++;
 					if (frame < FramesTotal) {
 						if(positiv) {
 							meterView.preRender(current + relativStep*interpolator.getInterpolation(frame * frameToOvershoot));
