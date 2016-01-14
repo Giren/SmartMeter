@@ -1,5 +1,6 @@
 package com.moc.smartmeterapp;
 
+import android.view.View;
 import android.animation.TimeInterpolator;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -12,8 +13,8 @@ import android.graphics.RectF;
 import android.os.Handler;
 import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.view.View;
 import android.view.animation.DecelerateInterpolator;
+
 
 public class MeterView_Wear extends View {
 	private final int ANGLE_ORIENTATION = 90;
@@ -24,7 +25,7 @@ public class MeterView_Wear extends View {
 	private final int TEXT_SIZE = 25;
 	private final int TEXT_SIZE_SMALL = 25;
 	private final int TEXT_SIZE_BIG = 25;
-    private final int TEXT_SIZE_HUGE = 150;
+	private final int TEXT_SIZE_HUGE = 150;
 	private final int LAST_TEXT_ANGLE = 350;
 	private final int PIN_PADDING = 50;
 	private final int LIMIT_PADDING = 0;
@@ -34,12 +35,10 @@ public class MeterView_Wear extends View {
 	//temp stuff
 	private Point tempPoint;
 	private String tempText;
-	private Rect textBounds;
 	private int tempCountSticks;
 	private int tempAvg;
 	private float tempValue;
 	private double tempAngle;
-	private float mTextHeight;
 	private RectF rectF;
 	private int tempAngleA;
 	private int tempAngleB;
@@ -50,7 +49,7 @@ public class MeterView_Wear extends View {
 	private Paint limitPaint;
 	private TextPaint textPaint;
 	private TextPaint textPaintBig;
-    private TextPaint textPaintHuge;
+	private TextPaint textPaintHuge;
 	private TextPaint avgPaint;
 
 	//data stuff
@@ -68,6 +67,8 @@ public class MeterView_Wear extends View {
 	private int longTickEach;
 	private String text;
 	private boolean valuesToText;
+	private float mTextWidth, mTextHeight;
+	private Rect textBounds;
 
 	//event stuff
 	private Limiter limiter;
@@ -110,8 +111,8 @@ public class MeterView_Wear extends View {
 		textPaintBig = new TextPaint();
 		textPaintBig.setTextSize(TEXT_SIZE_BIG);
 
-        textPaintHuge = new TextPaint();
-        textPaintHuge.setTextSize(TEXT_SIZE_HUGE);
+		textPaintHuge = new TextPaint();
+		textPaintHuge.setTextSize(TEXT_SIZE_HUGE);
 
 		avgPaint = new TextPaint();
 		avgPaint.set(linePaint);
@@ -119,6 +120,7 @@ public class MeterView_Wear extends View {
 		avgPaint.setTextSize(TEXT_SIZE_SMALL);
 		avgPaint.setTextAlign(Align.CENTER);
 
+		textBounds = new Rect();
 		rectF = new RectF();
 		height = getHeight();
 		width = getWidth();
@@ -160,12 +162,27 @@ public class MeterView_Wear extends View {
 		canvas.drawCircle(center_x, center_y, radius, backgroundPaint);
 
 		if(limiter != null) {
-			for(Limit l : limiter.getLimits()){
-				rectF.set(center_x-radius+LIMIT_PADDING, center_y-radius+LIMIT_PADDING, center_x+radius-LIMIT_PADDING, center_y+radius-LIMIT_PADDING);
-				limitPaint.setColor(l.getColor());
-				tempAngleA = l.getMin() * angle/max + offsetAngle+ANGLE_ORIENTATION;
-				tempAngleB = l.getMax() * angle/max + offsetAngle+ANGLE_ORIENTATION;
+			Limit maxLimit = null;
+
+			for (Limit iLimit : limiter.getLimits()) {
+				if (maxLimit == null) {
+					maxLimit = iLimit;
+				} else if (maxLimit.getMax() < iLimit.getMax()) {
+					maxLimit = iLimit;
+				}
+			}
+
+			for(Limit kLimit : limiter.getLimits()){
+				rectF.set(center_x - radius + LIMIT_PADDING, center_y - radius + LIMIT_PADDING, center_x + radius - LIMIT_PADDING, center_y + radius - LIMIT_PADDING);
+				limitPaint.setColor(kLimit.getColor());
+				tempAngleA = kLimit.getMin() * angle/max + offsetAngle+ANGLE_ORIENTATION;
+				if(kLimit == maxLimit && kLimit.getMax() < max) {
+					tempAngleB = angle + offsetAngle + ANGLE_ORIENTATION;
+				} else {
+					tempAngleB = kLimit.getMax() * angle/max + offsetAngle+ANGLE_ORIENTATION;
+				}
 				tempAngleB -= tempAngleA;
+
 				canvas.drawArc(rectF, tempAngleA , tempAngleB, true, limitPaint);
 			}
 		}
@@ -231,17 +248,15 @@ public class MeterView_Wear extends View {
 		//canvas.drawCircle(center_x, center_y, radius/4, backgroundPaint);
 
 		if(text != null) {
-            float mTextWidth, mTextHeight;
-            Rect textBounds = new Rect();
-            mTextWidth = textPaintBig.measureText(text);
-            mTextHeight = textBounds.height();
-            textPaintBig.getTextBounds(text, 0, text.length(), textBounds);
+			mTextWidth = textPaintBig.measureText(text);
+			mTextHeight = textBounds.height();
+			textPaintBig.getTextBounds(text, 0, text.length(), textBounds);
 
-            canvas.drawText(text, // Text to display
-                    center_x - (mTextWidth / 2f),
-                    center_y + (mTextHeight / 2f) + 2 * radius / 3,
-                    textPaintBig
-            );
+			canvas.drawText(text, // Text to display
+					center_x - (mTextWidth / 2f),
+					center_y + (mTextHeight / 2f) + 2 * radius / 3,
+					textPaintBig
+			);
 		}
 
 		tempText = null;
@@ -339,6 +354,9 @@ public class MeterView_Wear extends View {
 	public void preRender(float value) {
 		this.value = value;
 
+		if(max < value)
+			max = (int)value;
+
 		if(limiter != null)
 			limiter.setValue(value);
 
@@ -391,23 +409,23 @@ public class MeterView_Wear extends View {
 			positiv = true;
 			current = from;
 			target = to;
-			
+
 			relativStep = target-current;
-			
+
 			if(relativStep < 0) {
 				relativStep *= -1;
 				positiv = false;
 			}
 
 			animationState = ANIMATIONSTATE_ANIMATE;
-            run();
+			run();
 		}
 
 		@Override
 		public void run() {
 			switch (animationState) {
 				case ANIMATIONSTATE_ANIMATE:
-					frame ++;
+					frame++;
 					if (frame < FramesTotal) {
 						if(positiv) {
 							meterView.preRender(current + relativStep*interpolator.getInterpolation(frame * frameToOvershoot));

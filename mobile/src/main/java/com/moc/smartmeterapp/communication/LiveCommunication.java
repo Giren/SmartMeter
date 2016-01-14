@@ -67,10 +67,10 @@ public class LiveCommunication {
                     if(e != null) {
                         try {
                             e.onLiveDataReceived(Integer.valueOf(temp));
-                        }
-                        catch (Exception ex) {
-                            Log.d( "DEBUG", "LiveCommunication() - onLiveDataReceived callback: " + ex.getMessage());
-                            dataEventHandlers.remove( e);
+                        } catch (Exception exception) {
+                            exception.printStackTrace();
+                            Log.e("ERROR IN LIVEDATA", "CALLBACK NULL");
+                            dataEventHandlers.remove(e);
                         }
                     }
                 }
