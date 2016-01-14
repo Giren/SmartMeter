@@ -65,7 +65,13 @@ public class LiveCommunication {
             if(temp != null && !temp.isEmpty()) {
                 for(ILiveDataEvent e : dataEventHandlers) {
                     if(e != null) {
-                        e.onLiveDataReceived(Integer.valueOf(temp));
+                        try {
+                            e.onLiveDataReceived(Integer.valueOf(temp));
+                        } catch (Exception exception) {
+                            exception.printStackTrace();
+                            Log.e("ERROR IN LIVEDATA", "CALLBACK NULL");
+                            dataEventHandlers.remove(e);
+                        }
                     }
                 }
             }
