@@ -61,7 +61,8 @@ public class StatisticFragment extends Fragment{
     private NumberPicker monthPicker;
     private NumberPicker yearPicker;
 
-    private String dialogSelectTilte = "Welcher Zeitraum ?";
+    private String dialogSelectPeriodTitle = "Zeitraum auswählen";
+    private String dialogSelectDateTilte = "Datum auswählen";
     private String[] selectString = { "Tag", "Woche", "Monat", "Jahr" };
     private String[] monthString = { "Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember" };
     private int maxNumberToShow;
@@ -112,7 +113,7 @@ public class StatisticFragment extends Fragment{
                 }
 
                 dialogSelect.setContentView(R.layout.dialog_select);
-                dialogSelect.setTitle(dialogSelectTilte);
+                dialogSelect.setTitle(dialogSelectPeriodTitle);
 
                 numberPicker = (NumberPicker) dialogSelect.findViewById(R.id.number_picker);
                 numberPicker.setMinValue(0);
@@ -173,6 +174,7 @@ public class StatisticFragment extends Fragment{
                         yearPicker.setWrapSelectorWheel(true);
                         break;
                 }
+                dialog.setTitle(dialogSelectDateTilte);
 
                 Button dialogButton = (Button) dialog.findViewById(R.id.apply_button);
                 dialogButton.setOnClickListener(new View.OnClickListener() {
