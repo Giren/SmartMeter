@@ -75,8 +75,6 @@ public class LiveCommunication {
                     }
                 }
             }
-
-
         }
     };
 
