@@ -22,7 +22,7 @@ public class LiveFragment extends CustomFragment {
     private Limit limit2;
     private Limit limit3;
 
-    private int meterViewMax = 1000;
+    private int meterViewMax = 0;
     private final int FACTOR = ( ( 3600 * 1000) / ( 31 * 24 * 900) );
 
     private Vibrator vibrator;
