@@ -58,16 +58,21 @@ public class StatisticFragment extends Fragment{
     private Dialog dialogSelect;
     private DatePicker datePicker;
     private NumberPicker numberPicker;
+    private NumberPicker monthPicker;
+    private NumberPicker yearPicker;
 
     private String dialogSelectTilte = "Welcher Zeitraum ?";
     private String[] selectString = { "Tag", "Woche", "Monat", "Jahr" };
+    private String[] monthString = { "Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember" };
     private int maxNumberToShow;
     private int userChoice = 0;
+    private Calendar pickedCalendar;
 
     private final int DAY = 0;
     private final int WEEK = 1;
     private final int MONTH = 2;
     private final int YEAR = 3;
+    private final int OFFSET = 100;
 
     private IDatabase meterDbHelper;
 
@@ -105,6 +110,7 @@ public class StatisticFragment extends Fragment{
                 if (dialogSelect == null) {
                     dialogSelect = new Dialog(v.getContext());
                 }
+
                 dialogSelect.setContentView(R.layout.dialog_select);
                 dialogSelect.setTitle(dialogSelectTilte);
 
@@ -130,7 +136,7 @@ public class StatisticFragment extends Fragment{
         });
 
         dateButton = (Button)view.findViewById(R.id.button_right);
-        if(datePicker == null){
+        if(pickedCalendar == null){
             dateButton.setText("Datum");
         } else{
             setDateButtonText();
@@ -141,13 +147,38 @@ public class StatisticFragment extends Fragment{
                 if (dialog == null) {
                     dialog = new Dialog(v.getContext());
                 }
-                dialog.setContentView(R.layout.dialog);
-                datePicker = (DatePicker) dialog.findViewById(R.id.dpResult);
+                switch (userChoice){
+                    case DAY:
+                    case WEEK:
+                        dialog.setContentView(R.layout.dialog);
+                        datePicker = (DatePicker) dialog.findViewById(R.id.dpResult);
+                        break;
+                    case MONTH:
+                        dialog.setContentView(R.layout.dialog_month);
+                        monthPicker = (NumberPicker) dialog.findViewById(R.id.picker_month_month);
+                        monthPicker.setMinValue(0);
+                        monthPicker.setMaxValue(11);
+                        monthPicker.setDisplayedValues(monthString);
+                        monthPicker.setWrapSelectorWheel(true);
+                        yearPicker = (NumberPicker) dialog.findViewById(R.id.picker_month_year);
+                        yearPicker.setMinValue(2015);
+                        yearPicker.setMaxValue(2100);
+                        yearPicker.setWrapSelectorWheel(true);
+                        break;
+                    case YEAR:
+                        dialog.setContentView(R.layout.dialog_year);
+                        yearPicker = (NumberPicker) dialog.findViewById(R.id.picker_year_year);
+                        yearPicker.setMinValue(2015);
+                        yearPicker.setMaxValue(2100);
+                        yearPicker.setWrapSelectorWheel(true);
+                        break;
+                }
 
                 Button dialogButton = (Button) dialog.findViewById(R.id.apply_button);
                 dialogButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        setPickedDate();
                         handleUserChoice();
                         updateChartView();
                         dialog.dismiss();
@@ -220,14 +251,13 @@ public class StatisticFragment extends Fragment{
 
         @Override
         public void onViewportChanged(Viewport newViewport) {
-            // don't use animation, it is unnecessary when using preview chart.
             chart.setCurrentViewport(newViewport);
         }
 
     }
 
     private void updateChartView(){
-        Viewport viewport = new Viewport(0, maxValueOfLineChartData+100, maxNumberToShow, 0);
+        Viewport viewport = new Viewport(0, maxValueOfLineChartData+OFFSET, maxNumberToShow, 0);
         chart.setMaximumViewport(viewport);
         chart.setCurrentViewport(viewport);
         previewChart.setMaximumViewport(viewport);
@@ -237,35 +267,34 @@ public class StatisticFragment extends Fragment{
     private void handleUserChoice(){
         Day day;
         List<Day> datalist = new ArrayList<Day>();
-        Calendar ca = getPickedDate();
 
         meterDbHelper.openDatabase();
         switch (userChoice){
             case DAY:
                 maxNumberToShow = 24;
-                day = meterDbHelper.loadDay(ca.getTime());
+                day = meterDbHelper.loadDay(pickedCalendar.getTime());
                 if(day != null){
                     datalist.add(day);
                 }
                 break;
             case WEEK:
-                ca.add(Calendar.DAY_OF_MONTH, 1 - (ca.get(Calendar.DAY_OF_WEEK)));
+                pickedCalendar.add(Calendar.DAY_OF_MONTH, 1 - (pickedCalendar.get(Calendar.DAY_OF_WEEK)));
                 maxNumberToShow = 7;
                 for(int i=0; i<maxNumberToShow; i++){
-                    day = meterDbHelper.loadDay(ca.getTime());
+                    day = meterDbHelper.loadDay(pickedCalendar.getTime());
                     if(day != null){
                         datalist.add(day);
                     }
-                    ca.add(Calendar.DAY_OF_MONTH, 1);
+                    pickedCalendar.add(Calendar.DAY_OF_MONTH, 1);
                 }
                 break;
             case MONTH:
                 maxNumberToShow = 31;
-                datalist = meterDbHelper.loadMonth(ca.getTime());
+                datalist = meterDbHelper.loadMonth(pickedCalendar.getTime());
                 break;
             case YEAR:
                 maxNumberToShow = 365;
-                datalist = meterDbHelper.loadYear(ca.getTime());
+                datalist = meterDbHelper.loadYear(pickedCalendar.getTime());
                 break;
         }
 
@@ -286,27 +315,41 @@ public class StatisticFragment extends Fragment{
         previewChart.setLineChartData(null);
     }
 
-    private Calendar getPickedDate(){
-        return new GregorianCalendar (
-                datePicker.getYear(),
-                datePicker.getMonth(),
-                datePicker.getDayOfMonth()
-        );
+    private void setPickedDate() {
+        switch (userChoice) {
+            case DAY:
+            case WEEK:
+                pickedCalendar = new GregorianCalendar(
+                        datePicker.getYear(),
+                        datePicker.getMonth(),
+                        datePicker.getDayOfMonth());
+                break;
+            case MONTH:
+                pickedCalendar = new GregorianCalendar(
+                        yearPicker.getValue(),
+                        monthPicker.getValue(),
+                        1);
+                break;
+            case YEAR:
+                pickedCalendar = new GregorianCalendar(
+                        yearPicker.getValue(),
+                        1,
+                        1);
+                break;
+        }
     }
 
     private void setDateButtonText(){
-        Calendar ca = getPickedDate();
-
         switch (userChoice){
             case DAY:
             case WEEK:
-                dateButton.setText(MeterDataSource.dateToString(ca.getTime()));
+                dateButton.setText(MeterDataSource.dateToString(pickedCalendar.getTime()));
                 break;
             case MONTH:
-                dateButton.setText(MeterDataSource.monthToString(ca.getTime()));
+                dateButton.setText(MeterDataSource.monthToString(pickedCalendar.getTime()));
                 break;
             case YEAR:
-                dateButton.setText(MeterDataSource.yearToString(ca.getTime()));
+                dateButton.setText(MeterDataSource.yearToString(pickedCalendar.getTime()));
                 break;
         }
     }

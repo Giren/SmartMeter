@@ -10,7 +10,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/dpResult"
-        android:text="Apply" />
+        android:background="@color/orange"
+        android:text="Bestätigen" />
 
     <DatePicker
         android:id="@+id/dpResult"
