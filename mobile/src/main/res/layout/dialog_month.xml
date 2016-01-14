@@ -4,20 +4,11 @@
     android:layout_height="wrap_content"
     android:gravity="center_horizontal">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/month_header"
-        android:text="Monat auswählen"
-        android:gravity="center_horizontal"
-        android:textSize="32dp"/>
-
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:id="@+id/linear_month"
-        android:layout_below="@+id/month_header"
         android:weightSum="2" >
 
         <NumberPicker
@@ -43,7 +34,5 @@
         android:layout_below="@+id/linear_month"
         android:background="@color/orange"
         android:text="Bestätigen" />
-
-
 
 </RelativeLayout>
