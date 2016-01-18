@@ -46,6 +46,7 @@ public class SyncService extends IntentService implements RestCommunication.IDat
         IDatabase database = new MeterDbHelper(getApplicationContext());
         database.openDatabase();
         Day lastDay = database.loadLatestDay();
+        Log.d("LATEST DAY", String.valueOf(lastDay.getDate().toString()));
         database.closeDatabase();
 
         if(lastDay != null) {
