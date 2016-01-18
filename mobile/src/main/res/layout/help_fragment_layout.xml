@@ -7,13 +7,10 @@
         android:id="@+id/imageView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/whs"
+        android:src="@drawable/logo"
         android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentBottom="false"
-        android:layout_marginLeft="30dp"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="30dp" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp" />
 
 
     <EditText
@@ -22,7 +19,7 @@
         android:inputType="none"
         android:ems="10"
         android:id="@+id/editText"
-        android:text="Created by:\nDominic Prass\nDavid Schlebes\nPhilipp Kamps\nMichael Nienhaus"
+        android:text="Created by:\nDominic Prass B.Sc.\nDavid Schlebes B.Sc.\nPhilipp Kamps B.Sc.\nMichael Nienhaus B.Sc."
         android:editable="false"
         android:layout_below="@+id/imageView1"
         android:layout_centerHorizontal="true"

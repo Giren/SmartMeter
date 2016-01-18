@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Power Meter</string>
+    <string name="app_name">Smart Meter</string>
     <string name="home_view">Home</string>
     <string name="live_view">Live</string>
     <string name="statistic_view">Statistik</string>
