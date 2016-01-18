@@ -24,6 +24,8 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
 
     private MeterDataSource meterDataSource;
 
+    private final static int STD_YEAR = 2015;
+
     private static final String DB_NAME = "MeterDB";
     private static final int DB_VERSION = 1;
 
@@ -110,7 +112,7 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
         if(day != null)
             return day;
 
-        Calendar calendar = new GregorianCalendar(1900, 1, 1);
+        Calendar calendar = new GregorianCalendar(STD_YEAR, 1, 1);
         day = new Day(calendar.getTime());
 
         return day;
