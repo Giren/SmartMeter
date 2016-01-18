@@ -112,7 +112,7 @@ public class MeterDbHelper extends SQLiteOpenHelper implements IDatabase{
         if(day != null)
             return day;
 
-        Calendar calendar = new GregorianCalendar(STD_YEAR, 1, 1);
+        Calendar calendar = new GregorianCalendar(STD_YEAR, 0, 1);
         day = new Day(calendar.getTime());
 
         return day;
